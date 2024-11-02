@@ -5,9 +5,10 @@ import * as ExpressSession from 'express-session'
 import { DataSource } from 'typeorm'
 import { Session } from './utils/typeorm'
 import { TypeormStore } from 'connect-typeorm'
+import * as passport from 'passport'
 
 async function bootstrap() {
-    const { PORT, COOKIE_SECRET, COOKIE_MAX_AGE } = process.env
+    const { PORT, COOKIE_SECRET, COOKIE_MAX_AGE, SESSION_NAME } = process.env
 
     const app = await NestFactory.create(AppModule)
     const globalPrefix = 'api'
@@ -17,12 +18,15 @@ async function bootstrap() {
     app.use(
         ExpressSession({
             secret: COOKIE_SECRET,
-            resave: false,
-            saveUninitialized: false,
+            resave: true,
+            name: SESSION_NAME,
+            saveUninitialized: true,
             cookie: { maxAge: Number(COOKIE_MAX_AGE) },
             store: new TypeormStore().connect(sessionRepo),
         }),
     )
+    app.use(passport.initialize())
+    app.use(passport.session())
     try {
         await app.listen(PORT, () =>
             Logger.log(

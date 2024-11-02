@@ -4,6 +4,7 @@ import { AuthController } from './auth.controller'
 import { UserModule } from '../user/user.module'
 import { Services } from '../../utils/constants'
 import { LocalStrategy } from './local.strategy'
+import { SessionSerializer } from './passport.serializer'
 
 @Module({
     imports: [UserModule],
@@ -13,6 +14,7 @@ import { LocalStrategy } from './local.strategy'
             useClass: AuthService,
         },
         LocalStrategy,
+        SessionSerializer,
     ],
     controllers: [AuthController],
 })
