@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { UserModule } from './user/user.module'
 import { AuthModule } from './auth/auth.module'
 import { PassportModule } from '@nestjs/passport'
+import { ChatModule } from './chat/chat.module'
+import { MessageModule } from './message/message.module'
 
 @Module({
     imports: [
@@ -20,6 +22,8 @@ import { PassportModule } from '@nestjs/passport'
         }),
         UserModule,
         AuthModule,
+        ChatModule,
+        MessageModule,
     ],
     controllers: [],
     providers: [],

@@ -1,4 +1,4 @@
-import { User } from './typeorm'
+import { PrivateMessage, User } from './typeorm'
 
 export type CreateUserParams = {
     email: string
@@ -14,4 +14,17 @@ export type FindUserParams = Partial<{
 }>
 export type UpdateUserParams = {
     user: User
+}
+export type CreateChatParams = {
+    user: User
+    email: string
+    message?: string
+}
+export type FindChatParams = {
+    userOne: User
+    userTwo: Partial<User>
+}
+export type UpdateChatParams = {
+    id: number
+    lastMessageSent: PrivateMessage
 }

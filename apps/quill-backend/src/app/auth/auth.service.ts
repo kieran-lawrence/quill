@@ -14,9 +14,10 @@ export class AuthService {
         email: string,
         pass: string,
     ): Promise<Omit<User, 'password'> | null> {
-        const user = await this.userService.findUser({ email })
+        const user = await this.userService.validateUser({ email })
         if (!user) return null
+        const userDb = await this.userService.findUser({ id: user.id })
         const isPasswordValid = await compareHash(pass, user.password)
-        return isPasswordValid ? user : null
+        return isPasswordValid ? userDb : null
     }
 }

@@ -12,6 +12,22 @@ export class UserService {
         private readonly userRepository: Repository<User>,
     ) {}
 
+    async validateUser({
+        id,
+        email,
+    }: FindUserParams): Promise<User | undefined> {
+        return this.userRepository.findOne({
+            where: {
+                id: id,
+                email: email,
+            },
+            select: {
+                email: true,
+                password: true,
+            },
+            cache: true,
+        })
+    }
     async findUser({
         id,
         email,
@@ -23,14 +39,9 @@ export class UserService {
                 email: email,
                 username: username,
             },
-            select: {
-                email: true,
-                password: true,
-            },
-            cache: true,
         })
     }
-    async createUser(userDetails: CreateUserParams) {
+    async createUser(userDetails: CreateUserParams): Promise<Partial<User>> {
         const userExists = await this.findUser({ email: userDetails.email })
         if (userExists)
             throw new ConflictException(

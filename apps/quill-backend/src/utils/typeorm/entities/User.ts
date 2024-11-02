@@ -1,5 +1,12 @@
 import { Exclude } from 'class-transformer'
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm'
+import { PrivateMessage } from './PrivateMessage'
 
 @Entity()
 export class User {
@@ -21,4 +28,8 @@ export class User {
     @Column({ select: false })
     @Exclude()
     password: string
+
+    @OneToMany(() => PrivateMessage, (message) => message.author)
+    @JoinColumn()
+    messages: PrivateMessage[]
 }
