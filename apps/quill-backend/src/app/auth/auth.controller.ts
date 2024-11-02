@@ -2,7 +2,7 @@ import {
     Controller,
     Post,
     UseGuards,
-    Req,
+    Res,
     UsePipes,
     ValidationPipe,
     Body,
@@ -12,6 +12,7 @@ import { Routes, Services } from '../../utils/constants'
 import { AuthenticatedGuard, LocalAuthGuard } from './local-auth.guard'
 import { CreateUserDto } from './dtos/CreateUser.dto'
 import { UserService } from '../user/user.service'
+import { Response } from 'express'
 
 @Controller(Routes.AUTH)
 export class AuthController {
@@ -21,19 +22,19 @@ export class AuthController {
 
     @Post('register')
     @UsePipes(ValidationPipe)
-    async userRegister(@Body() createUserDto: CreateUserDto) {
+    async register(@Body() createUserDto: CreateUserDto) {
         return this.userService.createUser(createUserDto)
     }
 
     @UseGuards(LocalAuthGuard)
     @Post('login')
-    async login(@Req() req) {
-        return req.user
+    async login(@Res() res: Response) {
+        return res.status(200).send()
     }
 
     @UseGuards(AuthenticatedGuard)
     @Post('logout')
-    async logout(@Req() req) {
-        return req.logout()
+    async logout(@Res() res: Response) {
+        res.status(200).send()
     }
 }
