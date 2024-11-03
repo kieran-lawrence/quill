@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module'
 import { PassportModule } from '@nestjs/passport'
 import { ChatModule } from './chat/chat.module'
 import { MessageModule } from './message/message.module'
+import { GroupModule } from './group/group.module';
 
 @Module({
     imports: [
@@ -24,6 +25,7 @@ import { MessageModule } from './message/message.module'
         AuthModule,
         ChatModule,
         MessageModule,
+        GroupModule,
     ],
     controllers: [],
     providers: [],

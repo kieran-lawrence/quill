@@ -1,4 +1,4 @@
-import { PrivateMessage, User } from './typeorm'
+import { GroupChat, PrivateMessage, User } from './typeorm'
 
 export type CreateUserParams = {
     email: string
@@ -27,4 +27,19 @@ export type UpdateChatParams = {
 export type SearchChatsParams = {
     userOneId: number
     userTwo: Partial<User>
+}
+export type CreateGroupChatParams = {
+    name?: string
+    creator: User
+    members: string[]
+    message: string
+}
+export type UpdateGroupChatParams = {
+    user: User
+} & Partial<GroupChat>
+export type ModifyGroupChatMemberParams = {
+    groupId: number
+    userId?: number
+    user: User
+    users?: number[]
 }
