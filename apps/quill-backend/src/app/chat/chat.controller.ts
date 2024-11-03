@@ -4,6 +4,7 @@ import {
     Get,
     Inject,
     Param,
+    ParseIntPipe,
     Post,
     Query,
     UseGuards,
@@ -34,21 +35,26 @@ export class ChatController {
         return this.chatsService.createChat({ user, email, message })
     }
 
-    @Get()
-    async getAll(@AuthenticatedUser() { id }: User) {
-        return this.chatsService.getChats(id)
+    @Get('/search')
+    @UsePipes(ValidationPipe)
+    async search(
+        @AuthenticatedUser() userOne: User,
+        @Query() { email, username }: SearchChatsDto,
+    ) {
+        return this.chatsService.searchChatsQuery({
+            userOneId: userOne.id,
+            userTwo: { email, username },
+        })
     }
 
     @Get(':id')
-    async getById(@Param('id') id: number) {
+    async getById(@Param('id', ParseIntPipe) id: number) {
+        console.log(id)
         return this.chatsService.getChatById(id)
     }
 
-    @Post('/search')
-    async search(
-        @AuthenticatedUser() userOne: User,
-        @Query() userTwo: SearchChatsDto,
-    ) {
-        return this.chatsService.findChat({ userOne, userTwo })
+    @Get()
+    async getAll(@AuthenticatedUser() { id }: User) {
+        return this.chatsService.getChatsByUserId(id)
     }
 }

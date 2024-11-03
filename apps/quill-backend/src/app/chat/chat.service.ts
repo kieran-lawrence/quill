@@ -11,7 +11,7 @@ import { UserService } from '../user/user.service'
 import { Services } from '../../utils/constants'
 import {
     CreateChatParams,
-    FindChatParams,
+    SearchChatsParams,
     UpdateChatParams,
 } from '../../utils/types'
 
@@ -34,10 +34,7 @@ export class ChatService {
                 'A recipient with this email does not exist',
             )
 
-        const exists = await this.findChat({
-            userOne: creator,
-            userTwo: recipient,
-        })
+        const exists = await this.getChatByUserId(creator.id, recipient.id)
         if (exists) throw new ConflictException('This chat already exists')
         const chat = this.chatRepository.create({ creator, recipient })
         const savedChat = await this.save(chat)
@@ -57,7 +54,8 @@ export class ChatService {
         }
         return savedChat
     }
-    async getChats(id: number): Promise<Chat[]> {
+    /** Gets all chats that the user is part of */
+    async getChatsByUserId(id: number): Promise<Chat[]> {
         return this.chatRepository
             .createQueryBuilder('chat')
             .leftJoinAndSelect('chat.creator', 'creator')
@@ -69,6 +67,46 @@ export class ChatService {
             .orderBy('chat.lastMessageSentAt', 'DESC')
             .getMany()
     }
+    /** Gets a single chat between two users */
+    async getChatByUserId(userOneId, userTwoId): Promise<Chat> {
+        return this.chatRepository.findOne({
+            where: [
+                {
+                    creator: { id: userOneId },
+                    recipient: { id: userTwoId },
+                },
+                {
+                    creator: { id: userTwoId },
+                    recipient: { id: userOneId },
+                },
+            ],
+        })
+    }
+    /** Gets any chats matching the query that the user is a part of */
+    async searchChatsQuery({
+        userOneId,
+        userTwo,
+    }: SearchChatsParams): Promise<Chat[]> {
+        return this.chatRepository
+            .createQueryBuilder('chat')
+            .leftJoinAndSelect('chat.creator', 'creator')
+            .leftJoinAndSelect('chat.recipient', 'recipient')
+            .leftJoinAndSelect('chat.messages', 'messages')
+            .where('creator.id = :id', { id: userOneId })
+            .orWhere('recipient.id = :id', { id: userOneId })
+            .orWhere('creator.username = :username', {
+                username: userTwo.username,
+            })
+            .orWhere('recipient.username = :username', {
+                username: userTwo.username,
+            })
+            .orWhere('creator.email = :email', { email: userTwo.email })
+            .orWhere('recipient.email = :email', { email: userTwo.email })
+            .leftJoinAndSelect('chat.lastMessageSent', 'lastMessageSent')
+            .orderBy('chat.lastMessageSentAt', 'DESC')
+            .getMany()
+    }
+    /** Gets a single chat based on its ID */
     async getChatById(id: number): Promise<Chat> {
         return this.chatRepository.findOne({
             where: [{ id }],
@@ -78,44 +116,6 @@ export class ChatService {
                 'messages',
                 'messages.author',
                 'lastMessageSent',
-            ],
-        })
-    }
-    async findChat({ userOne, userTwo }: FindChatParams): Promise<Chat | null> {
-        return this.chatRepository.findOne({
-            where: [
-                {
-                    creator: {
-                        id: userOne.id,
-                        email: userOne.email,
-                        username: userOne.username,
-                        firstName: userOne.firstName,
-                        lastName: userOne.lastName,
-                    },
-                    recipient: {
-                        id: userTwo.id,
-                        email: userTwo.email,
-                        username: userTwo.username,
-                        firstName: userTwo.firstName,
-                        lastName: userTwo.lastName,
-                    },
-                },
-                {
-                    creator: {
-                        id: userTwo.id,
-                        email: userTwo.email,
-                        username: userTwo.username,
-                        firstName: userTwo.firstName,
-                        lastName: userTwo.lastName,
-                    },
-                    recipient: {
-                        id: userOne.id,
-                        email: userOne.email,
-                        username: userOne.username,
-                        firstName: userOne.firstName,
-                        lastName: userOne.lastName,
-                    },
-                },
             ],
         })
     }

@@ -8,12 +8,4 @@ export class SearchChatsDto {
     @IsString()
     @IsOptional()
     username: string
-
-    @IsString()
-    @IsOptional()
-    firstName: string
-
-    @IsString()
-    @IsOptional()
-    lastName: string
 }

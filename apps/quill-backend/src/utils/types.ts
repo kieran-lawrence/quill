@@ -20,11 +20,11 @@ export type CreateChatParams = {
     email: string
     message?: string
 }
-export type FindChatParams = {
-    userOne: User
-    userTwo: Partial<User>
-}
 export type UpdateChatParams = {
     id: number
     lastMessageSent: PrivateMessage
+}
+export type SearchChatsParams = {
+    userOneId: number
+    userTwo: Partial<User>
 }
