@@ -43,3 +43,11 @@ export type ModifyGroupChatMemberParams = {
     user: User
     users?: number[]
 }
+export type AddFriendParams = {
+    user: User
+    email: string
+}
+export type DeleteFriendParams = {
+    id: number
+    friendId: number
+}

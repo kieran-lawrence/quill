@@ -3,10 +3,12 @@ import {
     Column,
     Entity,
     JoinColumn,
+    ManyToMany,
     OneToMany,
     PrimaryGeneratedColumn,
 } from 'typeorm'
 import { PrivateMessage } from './PrivateMessage'
+import { GroupChat } from './GroupChat'
 
 @Entity()
 export class User {
@@ -32,4 +34,7 @@ export class User {
     @OneToMany(() => PrivateMessage, (message) => message.author)
     @JoinColumn()
     messages: PrivateMessage[]
+
+    @ManyToMany(() => GroupChat, (groupChat) => groupChat.members)
+    groupChats: GroupChat[]
 }
