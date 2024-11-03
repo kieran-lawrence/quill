@@ -44,4 +44,7 @@ export class GroupChat {
 
     @UpdateDateColumn({ name: 'updated_at' })
     lastMessageSentAt: Date
+
+    @Column({ nullable: true })
+    coverImage?: string
 }
