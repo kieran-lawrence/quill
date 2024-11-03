@@ -49,7 +49,6 @@ export class ChatController {
 
     @Get(':id')
     async getById(@Param('id', ParseIntPipe) id: number) {
-        console.log(id)
         return this.chatsService.getChatById(id)
     }
 

@@ -15,5 +15,11 @@ import { UserModule } from '../user/user.module'
             useClass: ChatService,
         },
     ],
+    exports: [
+        {
+            provide: Services.CHAT,
+            useClass: ChatService,
+        },
+    ],
 })
 export class ChatModule {}

@@ -1,4 +1,4 @@
-import { GroupChat, PrivateMessage, User } from './typeorm'
+import { Chat, GroupChat, GroupMessage, PrivateMessage, User } from './typeorm'
 
 export type CreateUserParams = {
     email: string
@@ -50,4 +50,50 @@ export type AddFriendParams = {
 export type DeleteFriendParams = {
     id: number
     friendId: number
+}
+export type CreateGroupMessageParams = {
+    messageContent: string
+    groupId: number
+    user: User
+}
+export type CreateGroupMessageResponse = {
+    message: GroupMessage
+    chat: GroupChat
+}
+export type EditGroupMessageParams = {
+    user: User
+    id: number
+    messageContent: string
+}
+export type EditGroupMessageResponse = {
+    messageId: number
+    message: GroupMessage
+    updatedChat: GroupChat
+}
+export type DeleteGroupMessageParams = {
+    user: User
+    id: number
+}
+export type CreatePrivateMessageParams = {
+    messageContent: string
+    chatId: number
+    user: User
+}
+export type CreatePrivateMessageResponse = {
+    message: PrivateMessage
+    chat: Chat
+}
+export type EditPrivateMessageParams = {
+    user: User
+    id: number
+    messageContent: string
+}
+export type EditPrivateMessageResponse = {
+    messageId: number
+    message: PrivateMessage
+    updatedChat: Chat
+}
+export type DeletePrivateMessageParams = {
+    user: User
+    id: number
 }

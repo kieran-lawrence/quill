@@ -119,6 +119,13 @@ export class ChatService {
             ],
         })
     }
+    /** Get the chat without all the relations */
+    async getChatOnly(id: number): Promise<Chat> {
+        return this.chatRepository.findOne({
+            where: [{ id }],
+            relations: ['creator', 'recipient'],
+        })
+    }
     async save(chat: Chat): Promise<Chat> {
         return this.chatRepository.save(chat)
     }
