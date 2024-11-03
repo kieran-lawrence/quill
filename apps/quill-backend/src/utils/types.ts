@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Chat, GroupChat, GroupMessage, PrivateMessage, User } from './typeorm'
-
 export type CreateUserParams = {
     email: string
     firstName: string
@@ -14,6 +14,8 @@ export type FindUserParams = Partial<{
 }>
 export type UpdateUserParams = {
     user: User
+    data: any
+    avatar?: any
 }
 export type CreateChatParams = {
     user: User
