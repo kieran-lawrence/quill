@@ -49,7 +49,7 @@
   "generators": {
     "@nx/next": {
       "application": {
-        "style": "css",
+        "style": "styled-components",
         "linter": "eslint"
       }
     }
