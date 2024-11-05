@@ -4,9 +4,18 @@ type QuillButtonProps = {
     text: string
     type: 'filled' | 'outlined'
     outlineOffset?: string
+    isDisabled?: boolean
 }
-export const QuillButton = ({ text, ...rest }: QuillButtonProps) => {
-    return <SButton {...rest}>{text}</SButton>
+export const QuillButton = ({
+    text,
+    isDisabled,
+    ...rest
+}: QuillButtonProps) => {
+    return (
+        <SButton {...rest} disabled={isDisabled}>
+            {text}
+        </SButton>
+    )
 }
 const SButton = styled.button<Omit<QuillButtonProps, 'text'>>`
     border: none;

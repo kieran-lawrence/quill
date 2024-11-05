@@ -5,14 +5,17 @@ import { Features } from './components/home/Features'
 import { Header } from './components/home/Header'
 import { Hero } from './components/home/Hero'
 import Layout from './components/Layout'
+import Providers from './contexts'
 
 export default function Index() {
     return (
         <Layout>
-            <Header />
-            <Hero />
-            <Features />
-            <Community />
+            <Providers>
+                <Header />
+                <Hero />
+                <Features />
+                <Community />
+            </Providers>
         </Layout>
     )
 }

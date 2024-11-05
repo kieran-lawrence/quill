@@ -2,11 +2,18 @@ import styled from 'styled-components'
 import { QuillLogo } from '../QuillLogo'
 import { Dancing_Script } from 'next/font/google'
 import Link from 'next/link'
+import { useGetAuthStatusQuery } from '../../utils/store/auth'
+import { useRouter } from 'next/navigation'
 
 const dancingScript = Dancing_Script({
     subsets: ['latin'],
 })
 export const Header = () => {
+    const { data: user } = useGetAuthStatusQuery()
+    const router = useRouter()
+    const handleClick = () =>
+        user ? router.push('/chats') : router.push('/login')
+
     return (
         <SHeader>
             <STitle href="/">
@@ -20,7 +27,9 @@ export const Header = () => {
                     <li>Support</li>
                     <li>Discover</li>
                 </ul>
-                <SButton>Get Started</SButton>
+                <SButton onClick={handleClick}>
+                    {user ? 'Open Quill' : 'Get Started'}
+                </SButton>
             </SNav>
         </SHeader>
     )

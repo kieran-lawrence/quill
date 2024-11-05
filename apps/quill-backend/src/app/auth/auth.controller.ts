@@ -7,6 +7,8 @@ import {
     ValidationPipe,
     Body,
     Inject,
+    Get,
+    Req,
 } from '@nestjs/common'
 import { Routes, Services } from '../../utils/constants'
 import { AuthenticatedGuard, LocalAuthGuard } from './local-auth.guard'
@@ -36,5 +38,11 @@ export class AuthController {
     @Post('logout')
     async logout(@Res() res: Response) {
         res.status(200).send()
+    }
+
+    @Get('status')
+    @UseGuards(AuthenticatedGuard)
+    authStatus(@Req() req, @Res() res: Response) {
+        res.send(req.user)
     }
 }
