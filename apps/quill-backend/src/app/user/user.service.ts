@@ -23,17 +23,15 @@ export class UserService {
     async validateUser({
         id,
         email,
+        username,
     }: FindUserParams): Promise<User | undefined> {
         return this.userRepository.findOne({
             where: {
                 id: id,
                 email: email,
+                username: username,
             },
-            select: {
-                email: true,
-                password: true,
-            },
-            cache: true,
+            select: ['id', 'email', 'username', 'password'],
         })
     }
     async findUser({

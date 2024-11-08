@@ -99,3 +99,7 @@ export type DeletePrivateMessageParams = {
     user: User
     id: number
 }
+export type ValidateUserParams = {
+    email: string
+    password: string
+}

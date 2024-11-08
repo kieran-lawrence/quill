@@ -1,8 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common'
 import { UserService } from '../user/user.service'
-import { User } from '../../utils/typeorm'
 import { compareHash } from '../../utils/helpers'
 import { Services } from '../../utils/constants'
+import { ValidateUserParams } from '../../utils/types'
 
 @Injectable()
 export class AuthService {
@@ -10,14 +10,20 @@ export class AuthService {
         @Inject(Services.USER) private readonly userService: UserService,
     ) {}
 
-    async validateUser(
-        email: string,
-        pass: string,
-    ): Promise<Omit<User, 'password'> | null> {
-        const user = await this.userService.validateUser({ email })
-        if (!user) return null
-        const userDb = await this.userService.findUser({ id: user.id })
-        const isPasswordValid = await compareHash(pass, user.password)
-        return isPasswordValid ? userDb : null
+    async validateUser(params: ValidateUserParams) {
+        const user = await this.userService.validateUser({
+            email: params.email,
+        })
+        if (!user)
+            throw new UnauthorizedException(
+                'Username or password is incorrect.',
+            )
+        const isPasswordValid = await compareHash(
+            params.password,
+            user.password,
+        )
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password, ...result } = user
+        return isPasswordValid ? result : null
     }
 }
