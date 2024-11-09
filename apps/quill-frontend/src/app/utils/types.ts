@@ -1,6 +1,7 @@
 export type User = {
     id: number
     email: string
+    username: string
     firstName: string
     lastName: string
     avatar?: string
@@ -16,6 +17,12 @@ export type PrivateMessage = {
 }
 export type Chat = {
     id: number
+    creator: User
+    recipient: User
+    messages: PrivateMessage[]
+    createdAt: string
+    lastMessageSent: PrivateMessage
+    lastMessageSentAt: string
 }
 export type GroupChat = {
     id: number

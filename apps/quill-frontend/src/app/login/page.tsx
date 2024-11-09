@@ -19,8 +19,12 @@ export default function LoginPage() {
     const router = useRouter()
 
     const onSubmit: SubmitHandler<LoginFormProps> = (data) => {
-        handleLogin(data).then(async () => {
-            router.back()
+        handleLogin(data).then(async (res) => {
+            if ('error' in res) {
+                console.error(res.error)
+            } else {
+                router.push('/')
+            }
         })
     }
 

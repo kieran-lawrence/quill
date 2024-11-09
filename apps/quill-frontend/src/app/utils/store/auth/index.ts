@@ -7,11 +7,12 @@ import {
 import { User } from '../../types'
 
 interface NestJSError {
-    status: number
     data?: {
-        message?: string
-        statusCode?: number
+        message: string
+        error: string
+        statusCode: number
     }
+    status: number
 }
 export const authApi = createApi({
     reducerPath: 'authApi',

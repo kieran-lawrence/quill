@@ -3,16 +3,19 @@ import { ReactNode } from 'react'
 import Providers from '../contexts'
 import styled from 'styled-components'
 import { Sidebar } from '../components/chats/Sidebar'
+import { AuthenticatedRoute } from '../components/AuthenticatedRoute'
 
 type Props = { children: ReactNode }
 
 export default function Layout({ children }: Props) {
     return (
         <Providers>
-            <SChatsBackground>
-                <Sidebar />
-                {children}
-            </SChatsBackground>
+            <AuthenticatedRoute>
+                <SChatsBackground>
+                    <Sidebar />
+                    {children}
+                </SChatsBackground>
+            </AuthenticatedRoute>
         </Providers>
     )
 }
