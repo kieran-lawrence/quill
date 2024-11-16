@@ -1,5 +1,7 @@
 import styled from 'styled-components'
 import { Chat, User } from '../../utils/types'
+import { Avatar } from '../Avatar'
+import { GroupUserInitials } from '../GroupUserInitials'
 
 type ChatPreviewProps = {
     user: User
@@ -18,7 +20,11 @@ export const ChatPreview = ({
         : `${user.firstName} ${user.lastName}`
     return (
         <SChatPreview tabIndex={0} onClick={onClick}>
-            <SAvatar />
+            {user.avatar !== null ? (
+                <Avatar imgSrc={`/images/${user.avatar}`} />
+            ) : (
+                <GroupUserInitials text={displayName} />
+            )}
             <SContent>
                 <SName>{displayName}</SName>
                 <SMessage>
@@ -44,15 +50,9 @@ const SChatPreview = styled.div`
     outline: none;
     transition: all 0.2s;
     &:is(:hover, :focus) {
-        background: #ff971f53;
+        background: #f4e7d8;
+        cursor: pointer;
     }
-`
-const SAvatar = styled.div`
-    display: flex;
-    height: 100%;
-    aspect-ratio: 1 / 1;
-    border-radius: 0.5rem;
-    background: #6e6e6e;
 `
 const SContent = styled.div`
     display: flex;

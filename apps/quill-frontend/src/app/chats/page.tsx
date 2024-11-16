@@ -6,10 +6,12 @@ import { Chat } from '../utils/types'
 import { ChatPreview } from '../components/chats/ChatPreview'
 import { ChatWindow } from '../components/chats/ChatWindow'
 import { useState } from 'react'
+import { useAuth } from '../contexts/auth'
 
 export default function ChatsPage() {
     const { data: chats } = useGetChatsQuery()
     const [currentChat, setCurrentChat] = useState<Chat | undefined>()
+    const { user } = useAuth()
     return (
         chats && (
             <SChatPage>
@@ -23,7 +25,11 @@ export default function ChatsPage() {
                             <ChatPreview
                                 key={chat.id}
                                 chat={chat}
-                                user={chat.recipient}
+                                user={
+                                    user?.id === chat.creator.id
+                                        ? chat.recipient
+                                        : chat.creator
+                                }
                                 onClick={() => setCurrentChat(chat)}
                             />
                         ))}
@@ -53,11 +59,13 @@ const SSearchInput = styled.div`
     display: flex;
     align-items: center;
     width: 100%;
-    background: #d599002b;
+    background: #f4e7d8;
     border-radius: 0.5rem;
     padding: 0.5rem;
     margin-bottom: 0.5rem;
     gap: 0.5rem;
+    outline: 1px solid #f4e7d8;
+    transition: all 0.2s;
     input {
         border: none;
         background: none;
@@ -68,6 +76,8 @@ const SSearchInput = styled.div`
     }
 
     &:is(:hover, :active, :focus-within) {
-        background: #ff971f53;
+        background: #f4e7d8;
+        outline: 1px solid #ff971f;
+        cursor: text;
     }
 `

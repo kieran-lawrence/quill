@@ -1,6 +1,8 @@
 import styled from 'styled-components'
 import { GroupMessage, PrivateMessage } from '../../utils/types'
 import { useAuth } from '../../contexts/auth'
+import { Avatar } from '../Avatar'
+import { GroupUserInitials } from '../GroupUserInitials'
 
 type ChatBoxProps = {
     message: PrivateMessage | GroupMessage
@@ -10,10 +12,13 @@ export const ChatBox = ({ message }: ChatBoxProps) => {
     const isAuthor = user?.id === message.author.id
     return (
         <SChatBox $isAuthor={isAuthor}>
-            <SUserAvatar
-                src="https://i.pravatar.cc/50?u=a042581f4e29026704d" // TODO: add user avatar
-                alt={message.author.firstName}
-            />
+            {message.author.avatar !== null ? (
+                <Avatar imgSrc={`/images/${message.author.avatar}`} />
+            ) : (
+                <GroupUserInitials
+                    text={`${message.author?.firstName} ${message.author?.lastName}`}
+                />
+            )}
             <SChat $isAuthor={isAuthor}>
                 {!isAuthor && (
                     <h3>{`${message.author.firstName} ${message.author.lastName}`}</h3>
@@ -32,12 +37,6 @@ const SChatBox = styled.address<{ $isAuthor: boolean }>`
     width: fit-content;
     max-width: 55%;
     font-style: normal;
-`
-const SUserAvatar = styled.img`
-    display: flex;
-    height: 4rem;
-    aspect-ratio: 1 / 1;
-    border-radius: 0.5rem;
 `
 const SChat = styled.div<{ $isAuthor: boolean }>`
     background: ${({ $isAuthor }) => ($isAuthor ? '#ff971f' : '#f4e7d8')};

@@ -45,4 +45,8 @@ Thumbs.db
 .next
 out
 
-apps/quill-backend/.env
+# env files
+*.env
+
+# Uploaded files
+apps/quill-frontend/public/images
