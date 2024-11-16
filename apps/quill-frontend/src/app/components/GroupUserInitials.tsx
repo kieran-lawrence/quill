@@ -10,6 +10,7 @@ export const GroupUserInitials = ({ text }: Props) => {
         .map((word) => word.substring(0, 1))
         .join('')
         .substring(0, 2)
+        .toUpperCase()
     return <SAvatar>{initials}</SAvatar>
 }
 
