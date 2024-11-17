@@ -3,23 +3,19 @@ import { Chat, GroupChat } from '../../utils/types'
 import { IoSearch, IoCall, IoEllipsisVertical } from 'react-icons/io5'
 import { IconContext } from 'react-icons'
 import { ChatBox } from './ChatBox'
-import { useGetPrivateMessagesQuery } from '../../utils/store/chats'
+import { getGroupChatMembers } from '../../utils/helpers'
 
 type ChatWindowProps = {
     chat: Chat | GroupChat
 }
 export const ChatWindow = ({ chat }: ChatWindowProps) => {
-    const { data: messages } = useGetPrivateMessagesQuery({
-        chatId: `${chat.id}`,
-    })
-
     return (
         <SChatWindow>
             <SChatHeader>
                 <h1>
                     {'recipient' in chat
                         ? `${chat.recipient.firstName} ${chat.recipient.lastName}`
-                        : chat.name}
+                        : chat.name || getGroupChatMembers(chat)}
                 </h1>
                 <div className="chatIcons">
                     <IconContext.Provider
@@ -32,8 +28,8 @@ export const ChatWindow = ({ chat }: ChatWindowProps) => {
                 </div>
             </SChatHeader>
             <SChatBody>
-                {messages && messages.length > 0 ? (
-                    messages.map((message) => (
+                {chat.messages && chat.messages.length > 0 ? (
+                    chat.messages.map((message) => (
                         <ChatBox key={message.id} message={message} />
                     ))
                 ) : (

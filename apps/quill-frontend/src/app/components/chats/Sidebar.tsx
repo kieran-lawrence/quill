@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import { QuillLogo } from '../QuillLogo'
 import { IoLogOutOutline, IoChatbox } from 'react-icons/io5'
 import { IconContext } from 'react-icons'
+import { IconWithText } from '../shared/IconWithText'
 
 export const Sidebar = () => {
     return (
@@ -11,7 +12,7 @@ export const Sidebar = () => {
                 <SChatGroups>
                     <IconWithText
                         icon={<IoChatbox />}
-                        text={'All chats'}
+                        text={'Chats'}
                         onClick={() => {
                             console.log('Clicked')
                             //TODO: Handle click of chats
@@ -57,38 +58,5 @@ const SLogout = styled.div`
     .sidebarIcons {
         width: 28px;
         height: 28px;
-    }
-`
-
-type IconWithTextProps = {
-    icon: JSX.Element
-    text: string
-    onClick: () => void
-}
-const IconWithText = ({ icon, text, onClick }: IconWithTextProps) => (
-    <SIconWithText tabIndex={0} onClick={onClick}>
-        {icon}
-        {text}
-    </SIconWithText>
-)
-const SIconWithText = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 0.2rem;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    border: 1px solid transparent;
-    transition: all 0.2s;
-    outline: none;
-
-    .sidebarIcons {
-        width: 26px;
-        height: 26px;
-    }
-    &:is(:hover, :focus) {
-        background: #6e6e6e69;
-        cursor: pointer;
     }
 `

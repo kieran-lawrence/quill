@@ -37,8 +37,12 @@ export class FriendsController {
     }
 
     @Get()
-    getAll(@AuthenticatedUser() user: User) {
-        return this.friendService.getFriends(user)
+    async getAll(@AuthenticatedUser() user: User) {
+        const friends = await this.friendService.getFriends(user)
+        return {
+            friends,
+            userId: user.id,
+        }
     }
 
     @Delete(':id')

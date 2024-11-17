@@ -1,9 +1,11 @@
 'use client'
+
 import { ReactNode } from 'react'
 import Providers from '../contexts'
 import styled from 'styled-components'
 import { Sidebar } from '../components/chats/Sidebar'
 import { AuthenticatedRoute } from '../components/AuthenticatedRoute'
+import { AvailableChats } from '../components/chats/AvailableChats'
 
 type Props = { children: ReactNode }
 
@@ -13,6 +15,7 @@ export default function Layout({ children }: Props) {
             <AuthenticatedRoute>
                 <SChatsBackground>
                     <Sidebar />
+                    <AvailableChats />
                     {children}
                 </SChatsBackground>
             </AuthenticatedRoute>
@@ -26,6 +29,5 @@ const SChatsBackground = styled.div`
     height: 100vh;
     background: #1e1e1e;
     padding: 0.4rem 1rem;
-    gap: 1rem;
     box-sizing: border-box;
 `

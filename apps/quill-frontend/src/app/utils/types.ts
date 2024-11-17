@@ -26,7 +26,7 @@ export type Chat = {
 }
 export type GroupChat = {
     id: number
-    name: string
+    name?: string
     creator: User
     members: User[]
     messages: GroupMessage[]
@@ -41,4 +41,17 @@ export type GroupMessage = {
     createdAt: string
     author: User
     groupChat: GroupChat
+}
+export type NestJSError = {
+    status: number
+    data?: {
+        message?: string
+        statusCode?: number
+    }
+}
+export type Friend = {
+    id: number
+    userOne: User
+    userTwo: User
+    createdAt: number
 }

@@ -4,15 +4,8 @@ import {
     FetchArgs,
     fetchBaseQuery,
 } from '@reduxjs/toolkit/query/react'
+import { NestJSError } from '../../types'
 
-interface NestJSError {
-    data?: {
-        message: string
-        error: string
-        statusCode: number
-    }
-    status: number
-}
 export const userApi = createApi({
     reducerPath: 'userApi',
     baseQuery: fetchBaseQuery({

@@ -4,16 +4,8 @@ import {
     FetchArgs,
     fetchBaseQuery,
 } from '@reduxjs/toolkit/query/react'
-import { User } from '../../types'
+import { NestJSError, User } from '../../types'
 
-interface NestJSError {
-    data?: {
-        message: string
-        error: string
-        statusCode: number
-    }
-    status: number
-}
 export const authApi = createApi({
     reducerPath: 'authApi',
     baseQuery: fetchBaseQuery({

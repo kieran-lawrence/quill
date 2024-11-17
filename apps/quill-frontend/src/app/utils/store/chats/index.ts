@@ -4,15 +4,8 @@ import {
     FetchArgs,
     fetchBaseQuery,
 } from '@reduxjs/toolkit/query/react'
-import { Chat, PrivateMessage } from '../../types'
+import { Chat, NestJSError, PrivateMessage } from '../../types'
 
-interface NestJSError {
-    status: number
-    data?: {
-        message?: string
-        statusCode?: number
-    }
-}
 export const chatsApi = createApi({
     reducerPath: 'chatsApi',
     baseQuery: fetchBaseQuery({
@@ -26,6 +19,21 @@ export const chatsApi = createApi({
                 credentials: 'include',
             }),
         }),
+        getChatById: builder.query<Chat, string>({
+            query: (id) => ({
+                url: `/${id}`,
+                method: 'GET',
+                credentials: 'include',
+            }),
+        }),
+        postCreateChat: builder.mutation<Chat, CreateChatParams>({
+            query: (chat) => ({
+                url: '/',
+                method: 'POST',
+                body: chat,
+                credentials: 'include',
+            }),
+        }),
         getPrivateMessages: builder.query<
             PrivateMessage[],
             GetPrivateMessagesParams
@@ -36,11 +44,35 @@ export const chatsApi = createApi({
                 credentials: 'include',
             }),
         }),
+        postCreatePrivateMessage: builder.mutation<
+            PrivateMessage,
+            CreatePrivateMessageParams
+        >({
+            query: ({ chatId, messageContent }) => ({
+                url: `/${chatId}/message`,
+                method: 'POST',
+                body: messageContent,
+                credentials: 'include',
+            }),
+        }),
     }),
 })
 
-export const { useGetChatsQuery, useGetPrivateMessagesQuery } = chatsApi
+export const {
+    useGetChatsQuery,
+    useGetChatByIdQuery,
+    useGetPrivateMessagesQuery,
+    usePostCreateChatMutation,
+} = chatsApi
 
 type GetPrivateMessagesParams = {
     chatId: string
+}
+type CreateChatParams = {
+    email: string
+    message?: string
+}
+type CreatePrivateMessageParams = {
+    chatId: string
+    messageContent: string
 }

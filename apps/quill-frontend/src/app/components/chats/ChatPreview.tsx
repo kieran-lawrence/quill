@@ -1,30 +1,31 @@
 import styled from 'styled-components'
-import { Chat, User } from '../../utils/types'
+import { Chat, GroupChat, User } from '../../utils/types'
 import { Avatar } from '../Avatar'
 import { GroupUserInitials } from '../GroupUserInitials'
+import { useRouter } from 'next/navigation'
+import { getGroupChatMembers } from '../../utils/helpers'
 
 type ChatPreviewProps = {
-    user: User
-    chat: Chat
-    showUsernames?: boolean
-    onClick: () => void
+    user?: Partial<User>
+    chat: Chat | GroupChat
 }
-export const ChatPreview = ({
-    user,
-    chat,
-    showUsernames,
-    onClick,
-}: ChatPreviewProps) => {
-    const displayName = showUsernames
-        ? user.username
-        : `${user.firstName} ${user.lastName}`
+export const ChatPreview = ({ user, chat }: ChatPreviewProps) => {
+    const router = useRouter()
+    const displayName =
+        'members' in chat
+            ? chat.name || getGroupChatMembers(chat)
+            : user?.id === chat.creator.id
+            ? `${chat.recipient.firstName} ${chat.recipient.lastName}`
+            : `${chat.creator.firstName} ${chat.creator.lastName}`
+
+    const handleClick = () => {
+        'members' in chat
+            ? router.push(`/chats/group/${chat.id}`)
+            : router.push(`/chats/${chat.id}`)
+    }
     return (
-        <SChatPreview tabIndex={0} onClick={onClick}>
-            {user.avatar !== null ? (
-                <Avatar imgSrc={`/images/${user.avatar}`} />
-            ) : (
-                <GroupUserInitials text={displayName} />
-            )}
+        <SChatPreview tabIndex={0} onClick={handleClick}>
+            {getImageOrInitials(chat, user)}
             <SContent>
                 <SName>{displayName}</SName>
                 <SMessage>
@@ -38,6 +39,29 @@ export const ChatPreview = ({
             </SContent>
         </SChatPreview>
     )
+}
+
+const getImageOrInitials = (chat: Chat | GroupChat, user?: Partial<User>) => {
+    if (!user) return
+    if ('members' in chat) {
+        return chat.coverImage ? (
+            <Avatar imgSrc={`/images/${chat.coverImage}`} />
+        ) : (
+            <GroupUserInitials
+                text={`${chat.name || getGroupChatMembers(chat)}`}
+            />
+        )
+    } else {
+        const chatUser =
+            user.id === chat.creator.id ? chat.recipient : chat.creator
+        return chatUser.avatar ? (
+            <Avatar imgSrc={`/images/${chatUser.avatar}`} />
+        ) : (
+            <GroupUserInitials
+                text={`${chatUser.firstName} ${chatUser.lastName}`}
+            />
+        )
+    }
 }
 
 const SChatPreview = styled.div`
