@@ -39,9 +39,10 @@ const SSidebar = styled.aside`
     justify-content: space-between;
     align-items: center;
     gap: 3rem;
-    width: 5vw;
+    min-width: 2rem;
+    width: 2vw;
     height: 100%;
-    padding: 2rem 0;
+    padding: 2rem 1rem 2rem 0;
     box-sizing: border-box;
     color: #f1f1f1;
 `

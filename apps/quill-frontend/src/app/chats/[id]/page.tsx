@@ -7,7 +7,11 @@ import { useParams } from 'next/navigation'
 
 export default function ChatsPage() {
     const params = useParams()
-    const { data } = useGetChatByIdQuery(params.id as string)
+    const { data, refetch } = useGetChatByIdQuery(params.id as string)
 
-    return <SChatContainer>{data && <ChatWindow chat={data} />}</SChatContainer>
+    return (
+        <SChatContainer>
+            {data && <ChatWindow chat={data} onMessageSend={refetch} />}
+        </SChatContainer>
+    )
 }

@@ -51,7 +51,7 @@ export const chatsApi = createApi({
             query: ({ chatId, messageContent }) => ({
                 url: `/${chatId}/message`,
                 method: 'POST',
-                body: messageContent,
+                body: { messageContent },
                 credentials: 'include',
             }),
         }),
@@ -63,6 +63,7 @@ export const {
     useGetChatByIdQuery,
     useGetPrivateMessagesQuery,
     usePostCreateChatMutation,
+    usePostCreatePrivateMessageMutation,
 } = chatsApi
 
 type GetPrivateMessagesParams = {
@@ -73,6 +74,6 @@ type CreateChatParams = {
     message?: string
 }
 type CreatePrivateMessageParams = {
-    chatId: string
+    chatId: number
     messageContent: string
 }

@@ -7,7 +7,11 @@ import { useParams } from 'next/navigation'
 
 export default function GroupChatsPage() {
     const params = useParams()
-    const { data } = useGetGroupChatByIdQuery(params.id as string)
+    const { data, refetch } = useGetGroupChatByIdQuery(params.id as string)
 
-    return <SChatContainer>{data && <ChatWindow chat={data} />}</SChatContainer>
+    return (
+        <SChatContainer>
+            {data && <ChatWindow chat={data} onMessageSend={refetch} />}
+        </SChatContainer>
+    )
 }

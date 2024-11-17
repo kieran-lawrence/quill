@@ -52,7 +52,7 @@ export const groupsApi = createApi({
             query: ({ groupId, messageContent }) => ({
                 url: `/${groupId}/message`,
                 method: 'POST',
-                body: messageContent,
+                body: { messageContent },
                 credentials: 'include',
             }),
         }),
@@ -76,6 +76,6 @@ type CreateGroupChatParams = {
     message?: string
 }
 type CreateGroupMessageParams = {
-    groupId: string
+    groupId: number
     messageContent: string
 }
