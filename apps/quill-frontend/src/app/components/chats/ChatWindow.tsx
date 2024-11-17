@@ -71,7 +71,10 @@ export const ChatWindow = ({ chat, onMessageSend }: ChatWindowProps) => {
                     <>No messages yet</>
                 )}
             </SChatBody>
-            <SMessageInputWrapper onSubmit={handleSubmit(onSubmit)}>
+            <SMessageInputWrapper
+                onSubmit={handleSubmit(onSubmit)}
+                autoComplete="off"
+            >
                 <IconContext.Provider
                     value={{ className: 'messageIcons', size: '1.6rem' }}
                 >
