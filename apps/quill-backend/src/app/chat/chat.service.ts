@@ -108,16 +108,15 @@ export class ChatService {
     }
     /** Gets a single chat based on its ID */
     async getChatById(id: number): Promise<Chat> {
-        return this.chatRepository.findOne({
-            where: [{ id }],
-            relations: [
-                'creator',
-                'recipient',
-                'messages',
-                'messages.author',
-                'lastMessageSent',
-            ],
-        })
+        return this.chatRepository
+            .createQueryBuilder('chat')
+            .where('chat.id = :id', { id })
+            .leftJoinAndSelect('chat.creator', 'creator')
+            .leftJoinAndSelect('chat.recipient', 'recipient')
+            .leftJoinAndSelect('chat.messages', 'messages')
+            .leftJoinAndSelect('messages.author', 'author')
+            .orderBy('messages.createdAt', 'DESC')
+            .getOne()
     }
     /** Get the chat without all the relations */
     async getChatOnly(id: number): Promise<Chat> {

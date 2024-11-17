@@ -67,16 +67,25 @@ export class GroupService {
             .getMany()
     }
     getGroupChatById(id: number): Promise<GroupChat> {
-        return this.groupChatRepository.findOne({
-            where: [{ id }],
-            relations: [
-                'creator',
-                'members',
-                'messages',
-                'messages.author',
-                'lastMessageSent',
-            ],
-        })
+        return this.groupChatRepository
+            .createQueryBuilder('groupChat')
+            .where('groupChat.id = :id', { id })
+            .leftJoinAndSelect('groupChat.creator', 'creator')
+            .leftJoinAndSelect('groupChat.members', 'members')
+            .leftJoinAndSelect('groupChat.messages', 'messages')
+            .leftJoinAndSelect('messages.author', 'author')
+            .orderBy('messages.createdAt', 'DESC')
+            .getOne()
+        // return this.groupChatRepository.findOne({
+        //     where: [{ id }],
+        //     relations: [
+        //         'creator',
+        //         'members',
+        //         'messages',
+        //         'messages.author',
+        //         'lastMessageSent',
+        //     ],
+        // })
     }
     save(chat: GroupChat): Promise<GroupChat> {
         return this.groupChatRepository.save(chat)
