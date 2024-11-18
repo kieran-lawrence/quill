@@ -1,11 +1,8 @@
 import styled from 'styled-components'
 import { Chat, GroupChat } from '../../utils/types'
-import {
-    IoSearch,
-    IoCall,
-    IoEllipsisVertical,
-    IoPaperPlaneOutline,
-} from 'react-icons/io5'
+import { IoSearch, IoCall, IoPaperPlaneOutline } from 'react-icons/io5'
+import { LuChevronLeftSquare, LuChevronRightSquare } from 'react-icons/lu'
+
 import { FiPaperclip } from 'react-icons/fi'
 import { IconContext } from 'react-icons'
 import { ChatBox } from './ChatBox'
@@ -17,11 +14,18 @@ import { usePostCreateGroupMessageMutation } from '../../utils/store/groups'
 type ChatWindowProps = {
     chat: Chat | GroupChat
     onMessageSend: () => void
+    onShowOptions?: () => void
+    optionsVisible?: boolean
 }
 type CreateMessageParams = {
     message: string
 }
-export const ChatWindow = ({ chat, onMessageSend }: ChatWindowProps) => {
+export const ChatWindow = ({
+    chat,
+    onMessageSend,
+    onShowOptions,
+    optionsVisible,
+}: ChatWindowProps) => {
     const { register, handleSubmit, reset } = useForm<CreateMessageParams>()
     const [createMessage, { error }] = usePostCreatePrivateMessageMutation()
     const [createGroupMessage, { error: groupError }] =
@@ -54,11 +58,18 @@ export const ChatWindow = ({ chat, onMessageSend }: ChatWindowProps) => {
                 <h1>{chatName}</h1>
                 <div className="chatIcons">
                     <IconContext.Provider
-                        value={{ color: '#1c1c1c8d', size: '1.6rem' }}
+                        value={{
+                            className: 'optionIcons',
+                            size: '1.5rem',
+                        }}
                     >
                         <IoSearch />
                         <IoCall />
-                        <IoEllipsisVertical />
+                        {isGroupChat && optionsVisible ? (
+                            <LuChevronRightSquare onClick={onShowOptions} />
+                        ) : (
+                            <LuChevronLeftSquare onClick={onShowOptions} />
+                        )}
                     </IconContext.Provider>
                 </div>
             </SChatHeader>
@@ -111,6 +122,14 @@ const SChatHeader = styled.div`
     .chatIcons {
         display: flex;
         gap: 1rem;
+    }
+    .optionIcons {
+        cursor: pointer;
+        color: #1c1c1c8d;
+        transition: color 0.2s;
+        &:hover {
+            color: #ff971f;
+        }
     }
 `
 const SChatBody = styled.div`
