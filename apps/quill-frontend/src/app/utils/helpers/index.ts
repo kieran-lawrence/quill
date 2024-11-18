@@ -1,4 +1,4 @@
-import { GroupChat } from '../types'
+import { Chat, GroupChat, User } from '../types'
 
 export const getGroupChatMembers = (chat: GroupChat) => {
     let members = ''
@@ -6,4 +6,20 @@ export const getGroupChatMembers = (chat: GroupChat) => {
         members += `${member.firstName}, `
     })
     return members.replace(/,\s*$/, '')
+}
+
+export const isGroupChatCreator = (chat: GroupChat, user?: Partial<User>) => {
+    return chat.creator.id === user?.id
+}
+
+/** Returns the display name of the chat */
+export const getChatDisplayName = (
+    chat: GroupChat | Chat,
+    user?: Partial<User>,
+) => {
+    return 'members' in chat
+        ? chat.name || getGroupChatMembers(chat)
+        : user?.id === chat.creator.id
+        ? `${chat.recipient.firstName} ${chat.recipient.lastName}`
+        : `${chat.creator.firstName} ${chat.creator.lastName}`
 }

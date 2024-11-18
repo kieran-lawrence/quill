@@ -43,7 +43,6 @@ export const AvailableChats = () => {
                             />
                         </SCreateButton>
                     </SActionsContainer>
-
                     {data &&
                         data.map((chat: Chat | GroupChat, index) => (
                             <ChatPreview key={index} chat={chat} user={user} />

@@ -3,7 +3,7 @@ import { Chat, GroupChat, User } from '../../utils/types'
 import { Avatar } from '../Avatar'
 import { GroupUserInitials } from '../GroupUserInitials'
 import { useRouter } from 'next/navigation'
-import { getGroupChatMembers } from '../../utils/helpers'
+import { getChatDisplayName, getGroupChatMembers } from '../../utils/helpers'
 
 type ChatPreviewProps = {
     user?: Partial<User>
@@ -11,18 +11,16 @@ type ChatPreviewProps = {
 }
 export const ChatPreview = ({ user, chat }: ChatPreviewProps) => {
     const router = useRouter()
-    const displayName =
-        'members' in chat
-            ? chat.name || getGroupChatMembers(chat)
-            : user?.id === chat.creator.id
-            ? `${chat.recipient.firstName} ${chat.recipient.lastName}`
-            : `${chat.creator.firstName} ${chat.creator.lastName}`
+    const isGroupChat = 'members' in chat
+    const displayName = getChatDisplayName(chat, user)
 
+    /** Navigate to the appropriate chat on click dependant on type */
     const handleClick = () => {
-        'members' in chat
+        isGroupChat
             ? router.push(`/chats/group/${chat.id}`)
             : router.push(`/chats/${chat.id}`)
     }
+
     return (
         <SChatPreview tabIndex={0} onClick={handleClick}>
             {getImageOrInitials(chat, user)}
