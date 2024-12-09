@@ -11,6 +11,7 @@ import { GroupChat, GroupMessage } from '../../utils/typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import {
     CreateGroupChatParams,
+    DeleteGroupChatParams,
     ModifyGroupChatMemberParams,
     UpdateGroupChatParams,
 } from '../../utils/types'
@@ -76,16 +77,6 @@ export class GroupService {
             .leftJoinAndSelect('messages.author', 'author')
             .orderBy('messages.createdAt', 'DESC')
             .getOne()
-        // return this.groupChatRepository.findOne({
-        //     where: [{ id }],
-        //     relations: [
-        //         'creator',
-        //         'members',
-        //         'messages',
-        //         'messages.author',
-        //         'lastMessageSent',
-        //     ],
-        // })
     }
     save(chat: GroupChat): Promise<GroupChat> {
         return this.groupChatRepository.save(chat)
@@ -139,6 +130,7 @@ export class GroupService {
         groupChat.members = updatedMembers
         return this.groupChatRepository.save(groupChat)
     }
+
     async addGroupChatUsers({
         groupId,
         users,
@@ -160,5 +152,19 @@ export class GroupService {
             groupChat.members.push(user),
         )
         return this.groupChatRepository.save(groupChat)
+    }
+
+    async deleteGroupChat({ groupId, user }: DeleteGroupChatParams) {
+        const groupChat = await this.getGroupChatById(groupId)
+        if (!groupChat) throw new BadRequestException('Group not found')
+        if (groupChat.creator.id !== user.id)
+            throw new UnauthorizedException(
+                'Only the group owner can delete the group',
+            )
+        await this.groupChatRepository.update(groupId, {
+            lastMessageSent: null,
+        })
+
+        return this.groupChatRepository.delete(groupId)
     }
 }

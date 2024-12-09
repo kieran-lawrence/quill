@@ -22,6 +22,8 @@ export class GroupMessage {
     @ManyToOne(() => User, (user) => user.email)
     author: User
 
-    @ManyToOne(() => GroupChat, (groupChat) => groupChat.messages)
+    @ManyToOne(() => GroupChat, (groupChat) => groupChat.messages, {
+        onDelete: 'CASCADE',
+    })
     groupChat: GroupChat
 }

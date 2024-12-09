@@ -1,6 +1,7 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
     Inject,
     Param,
@@ -28,6 +29,12 @@ export class GroupController {
     @Get(':id')
     async getById(@Param('id') id: number) {
         return this.groupService.getGroupChatById(id)
+    }
+
+    @Delete(':id')
+    @UsePipes(ValidationPipe)
+    delete(@Param('id') id: number, @AuthenticatedUser() user: User) {
+        return this.groupService.deleteGroupChat({ groupId: id, user })
     }
 
     @Get()
