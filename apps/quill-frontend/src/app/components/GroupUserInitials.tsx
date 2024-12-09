@@ -2,8 +2,9 @@ import styled from 'styled-components'
 
 type Props = {
     text: string
+    size?: string
 }
-export const GroupUserInitials = ({ text }: Props) => {
+export const GroupUserInitials = ({ text, size = '4rem' }: Props) => {
     // Split the name into words and take the first letter of each word, then extract the first 2 letters
     const initials = text
         ?.split(' ')
@@ -11,15 +12,15 @@ export const GroupUserInitials = ({ text }: Props) => {
         .join('')
         .substring(0, 2)
         .toUpperCase()
-    return <SAvatar>{initials}</SAvatar>
+    return <SAvatar $size={size}>{initials}</SAvatar>
 }
 
-const SAvatar = styled.div`
+const SAvatar = styled.div<{ $size: string }>`
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 4rem;
-    width: 4rem;
+    height: ${(props) => props.$size};
+    width: ${(props) => props.$size};
     padding: 0.5rem;
     box-sizing: border-box;
     border-radius: 0.5rem;
