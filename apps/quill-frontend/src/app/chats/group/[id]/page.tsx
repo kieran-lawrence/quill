@@ -24,7 +24,7 @@ export default function GroupChatsPage() {
                     />
                 )}
             </SChatContainer>
-            <ChatInfo isVisible={showInfo} />
+            {data && <ChatInfo isVisible={showInfo} chat={data} />}
         </>
     )
 }
