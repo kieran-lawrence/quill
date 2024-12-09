@@ -56,6 +56,14 @@ export const groupsApi = createApi({
                 credentials: 'include',
             }),
         }),
+        postUpdateGroupChat: builder.mutation<void, UpdateGroupChatParams>({
+            query: ({ groupId, ...chat }) => ({
+                url: `/${groupId}/update`,
+                method: 'POST',
+                body: chat,
+                credentials: 'include',
+            }),
+        }),
     }),
 })
 
@@ -65,6 +73,7 @@ export const {
     usePostCreateGroupChatMutation,
     useGetGroupMessagesQuery,
     usePostCreateGroupMessageMutation,
+    usePostUpdateGroupChatMutation,
 } = groupsApi
 
 type GetGroupMessagesParams = {
@@ -78,4 +87,9 @@ type CreateGroupChatParams = {
 type CreateGroupMessageParams = {
     groupId: number
     messageContent: string
+}
+type UpdateGroupChatParams = {
+    groupId: number
+    name?: string
+    coverImage?: string
 }
