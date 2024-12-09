@@ -8,23 +8,43 @@ import { Avatar } from '../Avatar'
 import { isGroupChatCreator } from '../../utils/helpers'
 import { useState } from 'react'
 import { RenameGroupMenu } from '../menu/RenameGroupMenu'
+import { DeleteGroupMenu } from '../menu/DeleteGroupMenu'
 
 type Props = {
     isVisible: boolean
     chat: GroupChat
 }
+type ActionProps = {
+    isRenaming: boolean
+    isDeleting: boolean
+    isChangingPhoto: boolean
+}
 
 export const ChatInfo = ({ isVisible, chat }: Props) => {
     const { user } = useAuth()
     const isCreator = isGroupChatCreator(chat, user)
-    const [editing, setEditing] = useState(false)
+    const [editing, setEditing] = useState<ActionProps>({
+        isRenaming: false,
+        isDeleting: false,
+        isChangingPhoto: false,
+    })
 
     return (
         <>
-            {editing && (
+            {editing.isRenaming && (
                 <RenameGroupMenu
                     groupId={chat.id}
-                    onCancel={() => setEditing(false)}
+                    onCancel={() =>
+                        setEditing({ ...editing, isRenaming: false })
+                    }
+                />
+            )}
+            {editing.isDeleting && (
+                <DeleteGroupMenu
+                    groupId={chat.id}
+                    onCancel={() =>
+                        setEditing({ ...editing, isDeleting: false })
+                    }
                 />
             )}
             <SChatInfo $isVisible={isVisible}>
@@ -32,11 +52,23 @@ export const ChatInfo = ({ isVisible, chat }: Props) => {
                     <h3>Chat Actions</h3>
                     <ul className="actionsList">
                         {isCreator && (
-                            <li onClick={() => setEditing(!editing)}>
+                            <li
+                                onClick={() =>
+                                    setEditing({ ...editing, isRenaming: true })
+                                }
+                            >
                                 Rename Group
                             </li>
                         )}
-                        {isCreator && <li>Delete Group</li>}
+                        {isCreator && (
+                            <li
+                                onClick={() =>
+                                    setEditing({ ...editing, isDeleting: true })
+                                }
+                            >
+                                Delete Group
+                            </li>
+                        )}
                         {isCreator && <li>Change Cover Photo</li>}
                         {!isCreator && <li>Leave</li>}
                     </ul>

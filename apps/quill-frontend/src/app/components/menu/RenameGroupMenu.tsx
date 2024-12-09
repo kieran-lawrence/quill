@@ -3,6 +3,7 @@ import { usePostUpdateGroupChatMutation } from '../../utils/store/groups'
 import { ActionMenu } from './ActionMenu'
 import { useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
+import { NestJSError } from '../../utils/types'
 
 type RenameGroupMenuprops = {
     groupId: number
@@ -19,19 +20,18 @@ export const RenameGroupMenu = ({
         updateGroup({
             groupId,
             name,
-        })
-            .then(() => {
+        }).then((res) => {
+            if ('error' in res) {
+                const error = res.error as NestJSError
+                toast.error(error.data?.message || 'Something went wrong')
+            } else {
                 toast.success('Group renamed successfully')
                 setTimeout(() => {
                     location.reload()
                     onCancel()
                 }, 2000)
-            })
-            .catch((error) => {
-                toast.error(
-                    'Failed to rename group. An error occurred.\n' + error,
-                )
-            })
+            }
+        })
     }
     return (
         <ActionMenu

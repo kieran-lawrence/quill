@@ -64,6 +64,13 @@ export const groupsApi = createApi({
                 credentials: 'include',
             }),
         }),
+        postDeleteGroupChat: builder.mutation<void, number>({
+            query: (groupId) => ({
+                url: `/${groupId}`,
+                method: 'DELETE',
+                credentials: 'include',
+            }),
+        }),
     }),
 })
 
@@ -74,6 +81,7 @@ export const {
     useGetGroupMessagesQuery,
     usePostCreateGroupMessageMutation,
     usePostUpdateGroupChatMutation,
+    usePostDeleteGroupChatMutation,
 } = groupsApi
 
 type GetGroupMessagesParams = {
