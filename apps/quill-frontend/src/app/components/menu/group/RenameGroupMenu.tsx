@@ -1,9 +1,9 @@
 import styled from 'styled-components'
-import { usePostUpdateGroupChatMutation } from '../../utils/store/groups'
-import { ActionMenu } from './ActionMenu'
+import { usePostUpdateGroupChatMutation } from '../../../utils/store/groups'
+import { ActionMenu } from '../ActionMenu'
 import { useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
-import { NestJSError } from '../../utils/types'
+import { NestJSError } from '../../../utils/types'
 
 type RenameGroupMenuprops = {
     groupId: number

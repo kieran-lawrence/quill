@@ -1,6 +1,6 @@
-import { usePostDeleteGroupChatMutation } from '../../utils/store/groups'
-import { NestJSError } from '../../utils/types'
-import { ActionMenu } from './ActionMenu'
+import { usePostDeleteGroupChatMutation } from '../../../utils/store/groups'
+import { NestJSError } from '../../../utils/types'
+import { ActionMenu } from '../ActionMenu'
 import toast, { Toaster } from 'react-hot-toast'
 
 type DeleteGroupMenuprops = {

@@ -7,8 +7,9 @@ import { GroupUserInitials } from '../GroupUserInitials'
 import { Avatar } from '../Avatar'
 import { isGroupChatCreator } from '../../utils/helpers'
 import { useState } from 'react'
-import { RenameGroupMenu } from '../menu/RenameGroupMenu'
-import { DeleteGroupMenu } from '../menu/DeleteGroupMenu'
+import { RenameGroupMenu } from '../menu/group/RenameGroupMenu'
+import { DeleteGroupMenu } from '../menu/group/DeleteGroupMenu'
+import { ChangeGroupPhotoMenu } from '../menu/group/ChangeGroupPhotoMenu'
 
 type Props = {
     isVisible: boolean
@@ -47,6 +48,14 @@ export const ChatInfo = ({ isVisible, chat }: Props) => {
                     }
                 />
             )}
+            {editing.isChangingPhoto && (
+                <ChangeGroupPhotoMenu
+                    group={chat}
+                    onCancel={() =>
+                        setEditing({ ...editing, isChangingPhoto: false })
+                    }
+                />
+            )}
             <SChatInfo $isVisible={isVisible}>
                 <SChatActions $isVisible={isVisible}>
                     <h3>Chat Actions</h3>
@@ -69,7 +78,18 @@ export const ChatInfo = ({ isVisible, chat }: Props) => {
                                 Delete Group
                             </li>
                         )}
-                        {isCreator && <li>Change Cover Photo</li>}
+                        {isCreator && (
+                            <li
+                                onClick={() =>
+                                    setEditing({
+                                        ...editing,
+                                        isChangingPhoto: true,
+                                    })
+                                }
+                            >
+                                Change Cover Photo
+                            </li>
+                        )}
                         {!isCreator && <li>Leave</li>}
                     </ul>
                 </SChatActions>
