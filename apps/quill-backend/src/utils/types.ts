@@ -38,6 +38,7 @@ export type CreateGroupChatParams = {
 }
 export type UpdateGroupChatParams = {
     user: User
+    file?: Express.Multer.File
 } & Partial<GroupChat>
 export type ModifyGroupChatMemberParams = {
     groupId: number

@@ -7,7 +7,9 @@ import {
     Param,
     Post,
     Put,
+    UploadedFile,
     UseGuards,
+    UseInterceptors,
     UsePipes,
     ValidationPipe,
 } from '@nestjs/common'
@@ -18,6 +20,8 @@ import { AuthenticatedUser } from '../../utils/decorators'
 import { User } from '../../utils/typeorm'
 import { CreateGroupChatDto } from './dtos/CreateGroupChat.dto'
 import { EditGroupChatDto } from './dtos/EditGroupChat.dto'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { multerOptions } from '../../utils/helpers'
 
 @Controller(Routes.GROUP)
 @UseGuards(AuthenticatedGuard)
@@ -43,12 +47,15 @@ export class GroupController {
     }
 
     @Post(':id/update')
+    @UseInterceptors(FileInterceptor('avatar', multerOptions))
     update(
         @Param('id') id: number,
         @AuthenticatedUser() user: User,
         @Body() { name }: EditGroupChatDto,
+        @UploadedFile()
+        file: Express.Multer.File,
     ) {
-        return this.groupService.updateGroupName({ id, user, name })
+        return this.groupService.updateGroup({ id, user, name, file })
     }
 
     @Post(':id/members/remove')

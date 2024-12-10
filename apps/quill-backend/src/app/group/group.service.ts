@@ -89,20 +89,23 @@ export class GroupService {
         return this.getGroupChatById(id)
     }
 
-    async updateGroupName({
+    async updateGroup({
         id,
         user,
         name,
+        file,
     }: UpdateGroupChatParams): Promise<GroupChat> {
         const group = await this.getGroupChatById(id)
         if (!group) throw new BadRequestException('Group not found')
         if (group.creator.id !== user.id)
             throw new UnauthorizedException(
-                'Only the group creator can change the group name',
+                'Only the group creator can update the group',
             )
-        group.name = name
+        if (name) group.name = name
+        if (file) group.coverImage = file.filename
         return this.groupChatRepository.save(group)
     }
+
     async removeGroupChatUser({
         groupId,
         userId,
