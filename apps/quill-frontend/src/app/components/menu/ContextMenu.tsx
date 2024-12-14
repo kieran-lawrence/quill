@@ -17,10 +17,16 @@ export const ContextMenu = ({
     width,
     handleClose,
 }: ContextMenuProps) => {
+    const screenWidth = window.innerWidth
+    const adjustedLeft =
+        points.x + width * (screenWidth / 100) > screenWidth
+            ? points.x - width * (screenWidth / 100)
+            : points.x
+
     return (
         <SContextMenuWrapper
             $top={points.y}
-            $left={points.x}
+            $left={adjustedLeft}
             $width={width}
             onMouseLeave={handleClose}
         >
