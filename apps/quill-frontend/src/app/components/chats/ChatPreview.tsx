@@ -28,10 +28,12 @@ export const ChatPreview = ({ user, chat }: ChatPreviewProps) => {
                 <SName>{displayName}</SName>
                 <SMessage>
                     {chat.lastMessageSent
-                        ? `${chat.lastMessageSent.messageContent.slice(
-                              0,
-                              30,
-                          )}...`
+                        ? chat.lastMessageSent.messageContent.length > 30
+                            ? `${chat.lastMessageSent.messageContent.slice(
+                                  0,
+                                  30,
+                              )}...`
+                            : chat.lastMessageSent.messageContent
                         : `No messages yet`}
                 </SMessage>
             </SContent>
