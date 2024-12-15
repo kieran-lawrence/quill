@@ -55,6 +55,27 @@ export const chatsApi = createApi({
                 credentials: 'include',
             }),
         }),
+        postEditPrivateMessage: builder.mutation<
+            PrivateMessage,
+            UpdatePrivateMessageParams
+        >({
+            query: ({ chatId, ...message }) => ({
+                url: `/${chatId}/message/update`,
+                method: 'POST',
+                body: message,
+                credentials: 'include',
+            }),
+        }),
+        postDeletePrivateMessage: builder.mutation<
+            PrivateMessage,
+            UpdatePrivateMessageParams
+        >({
+            query: ({ chatId, messageId }) => ({
+                url: `/${chatId}/message/${messageId}`,
+                method: 'DELETE',
+                credentials: 'include',
+            }),
+        }),
     }),
 })
 
@@ -64,6 +85,8 @@ export const {
     useGetPrivateMessagesQuery,
     usePostCreateChatMutation,
     usePostCreatePrivateMessageMutation,
+    usePostEditPrivateMessageMutation,
+    usePostDeletePrivateMessageMutation,
 } = chatsApi
 
 type GetPrivateMessagesParams = {
@@ -76,4 +99,9 @@ type CreateChatParams = {
 type CreatePrivateMessageParams = {
     chatId: number
     messageContent: string
+}
+type UpdatePrivateMessageParams = {
+    chatId: number
+    messageId: number
+    messageContent?: string
 }

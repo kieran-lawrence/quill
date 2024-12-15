@@ -45,6 +45,27 @@ export const groupsApi = createApi({
                 }),
             },
         ),
+        postEditGroupMessage: builder.mutation<
+            GroupMessage,
+            UpdateGroupMessageParams
+        >({
+            query: ({ groupId, ...message }) => ({
+                url: `/${groupId}/message/update`,
+                method: 'PUT',
+                body: message,
+                credentials: 'include',
+            }),
+        }),
+        postDeleteGroupMessage: builder.mutation<
+            void,
+            UpdateGroupMessageParams
+        >({
+            query: ({ messageId, groupId }) => ({
+                url: `/${groupId}/message/${messageId}`,
+                method: 'DELETE',
+                credentials: 'include',
+            }),
+        }),
         postCreateGroupMessage: builder.mutation<
             GroupMessage,
             CreateGroupMessageParams
@@ -88,6 +109,8 @@ export const {
     usePostCreateGroupChatMutation,
     useGetGroupMessagesQuery,
     usePostCreateGroupMessageMutation,
+    usePostEditGroupMessageMutation,
+    usePostDeleteGroupMessageMutation,
     usePostUpdateGroupChatMutation,
     usePostDeleteGroupChatMutation,
     usePostChangeCoverImageMutation,
@@ -109,4 +132,9 @@ type UpdateGroupChatParams = {
     groupId: number
     name?: string
     formData?: FormData
+}
+type UpdateGroupMessageParams = {
+    groupId: number
+    messageId: number
+    messageContent?: string
 }

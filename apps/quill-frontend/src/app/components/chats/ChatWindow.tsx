@@ -76,7 +76,13 @@ export const ChatWindow = ({
             <SChatBody>
                 {chat.messages && chat.messages.length > 0 ? (
                     chat.messages.map((message) => (
-                        <ChatBox key={message.id} message={message} />
+                        <ChatBox
+                            key={message.id}
+                            message={message}
+                            isGroupChat={isGroupChat}
+                            chatId={chat.id}
+                            onMessageUpdate={onMessageSend}
+                        />
                     ))
                 ) : (
                     <>No messages yet</>
