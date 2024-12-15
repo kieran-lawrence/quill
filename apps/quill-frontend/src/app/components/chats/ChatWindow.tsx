@@ -10,6 +10,7 @@ import { getGroupChatMembers } from '../../utils/helpers'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { usePostCreatePrivateMessageMutation } from '../../utils/store/chats'
 import { usePostCreateGroupMessageMutation } from '../../utils/store/groups'
+import { NoMessagesYet } from './NoMessagesYet'
 
 type ChatWindowProps = {
     chat: Chat | GroupChat
@@ -94,7 +95,7 @@ export const ChatWindow = ({
                         />
                     ))
                 ) : (
-                    <>No messages yet</>
+                    <NoMessagesYet />
                 )}
             </SChatBody>
             <SMessageInputWrapper
