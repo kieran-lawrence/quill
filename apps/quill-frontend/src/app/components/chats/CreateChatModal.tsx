@@ -64,21 +64,11 @@ export const CreateChatModal = ({
                     setShowModal(false)
                     onCreateGroupChat()
                 })
-                // dispatch(postNewGroupChatThunk({members}))
-                // .unwrap().then(({ data }) => {
-                //     setShowCreateChatModal(false);
-                //     navigate(`/groups/${data.id}`);
-                // }).catch((err) => console.log(err));
             } else {
                 createChat({ email: users[0] }).then(() => {
                     setShowModal(false)
                     onCreateChat()
                 })
-                // dispatch(postNewChatThunk({email:members[0]}))
-                // .unwrap().then(({ data }) => {
-                //     setShowCreateChatModal(false);
-                //     navigate(`/chats/${data.id}`);
-                // }).catch((err) => console.log(err));
             }
         } catch (err) {
             console.log(err)
