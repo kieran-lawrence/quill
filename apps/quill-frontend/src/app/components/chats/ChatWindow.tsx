@@ -1,8 +1,8 @@
 import styled from 'styled-components'
-import { Chat, GroupChat } from '../../utils/types'
+import { Chat, GroupChat, NestJSError } from '../../utils/types'
 import { IoSearch, IoCall, IoPaperPlaneOutline } from 'react-icons/io5'
 import { LuChevronLeftSquare, LuChevronRightSquare } from 'react-icons/lu'
-
+import toast, { Toaster } from 'react-hot-toast'
 import { FiPaperclip } from 'react-icons/fi'
 import { IconContext } from 'react-icons'
 import { ChatBox } from './ChatBox'
@@ -51,9 +51,18 @@ export const ChatWindow = ({
                   onMessageSend()
                   reset()
               })
+        if (error || groupError) {
+            const errorMessage =
+                (error as NestJSError | undefined) ||
+                (groupError as NestJSError | undefined)
+            toast.error(
+                `Failed to send message: ${errorMessage?.data?.message}`,
+            )
+        }
     }
     return (
         <SChatWindow>
+            <Toaster />
             <SChatHeader>
                 <h1>{chatName}</h1>
                 <div className="chatIcons">

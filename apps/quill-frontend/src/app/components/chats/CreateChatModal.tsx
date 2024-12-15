@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { IoClose } from 'react-icons/io5'
-import { useGetFriendsQuery } from '../../utils/store/friend'
-import { User } from '../../utils/types'
+import { NestJSError, User } from '../../utils/types'
 import { QuillButton } from '../shared/QuillButton'
 import { useFriends } from '../../utils/hooks'
-import { useForm } from 'react-hook-form'
+import toast, { Toaster } from 'react-hot-toast'
 import { usePostCreateChatMutation } from '../../utils/store/chats'
 import { usePostCreateGroupChatMutation } from '../../utils/store/groups'
 
@@ -71,13 +70,17 @@ export const CreateChatModal = ({
                 })
             }
         } catch (err) {
-            console.log(err)
+            const errorMessage =
+                (chatError as NestJSError | undefined) ||
+                (groupError as NestJSError | undefined)
+            toast.error(`Failed to create chat: ${errorMessage?.data?.message}`)
         }
         setSelectedUsers([])
     }
     return (
         <SCreateChatModal ref={formRef} onClick={handleOverlayClick}>
             <SCreateChatForm onSubmit={handleSubmit}>
+                <Toaster />
                 <SCreateChatHeader>
                     <h2>Create New Chat</h2>
                     <IoClose
