@@ -4,7 +4,8 @@ import {
     FetchArgs,
     fetchBaseQuery,
 } from '@reduxjs/toolkit/query/react'
-import { GroupChat, GroupMessage, NestJSError } from '../../types'
+import { NestJSError } from '../../types'
+import { GroupChat, GroupMessage } from '@quill/data'
 
 export const groupsApi = createApi({
     reducerPath: 'groupsApi',
