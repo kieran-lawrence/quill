@@ -97,12 +97,16 @@ export const useWebSocket = () => {
     )
     // Listens for messages from the WebSocket server
     const listenForMessage = useCallback(
-        <T>(event: string, action: (data: T) => void) => {
+        <T>(event: string, cb: (data: T) => void) => {
             if (socketRef.current) {
-                socketRef.current.on(event, (data: T) => {
-                    console.log(data)
-                    action(data)
-                })
+                socketRef.current.on(event, cb)
+
+                // Clean up the event listener on unmount
+                return () => {
+                    if (socketRef.current) {
+                        socketRef.current.off(event, cb)
+                    }
+                }
             }
         },
         [],

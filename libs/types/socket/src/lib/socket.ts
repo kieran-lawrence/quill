@@ -1,5 +1,8 @@
 import { PrivateMessage, Chat } from '@quill/data'
 
+export type NewPrivateMessageEventParams = {
+    recipientId: number
+} & MessageReceivedEventParams
 export type MessageReceivedEventParams = {
     message: PrivateMessage
     chat: Chat

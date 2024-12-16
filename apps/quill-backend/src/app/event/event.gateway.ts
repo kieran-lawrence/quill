@@ -12,7 +12,7 @@ import { Server } from 'socket.io'
 import { AuthenticatedSocket, ISessionStore } from '../../utils/interfaces'
 import { Services } from '../../utils/constants'
 import { CreateGroupMessageResponse } from '@quill/data'
-import { MessageReceivedEventParams } from '@quill/socket'
+import { NewPrivateMessageEventParams } from '@quill/socket'
 
 @WebSocketGateway({
     cors: { origin: ['http://localhost:3000'], credentials: true },
@@ -36,6 +36,9 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
         })
 
         if (client.user) {
+            console.log(
+                `User: ${client.user.firstName} connected to room: private-chat-${client.user.id}`,
+            )
             client.join(`private-chat-${client.user.id}`)
             this.sessions.saveSession(client.user.id, client)
         }
@@ -43,15 +46,6 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     handleDisconnect(client: AuthenticatedSocket) {
         if (client.user) this.sessions.deleteSession(client.user.id)
-    }
-
-    @SubscribeMessage('onPrivateChatJoin')
-    async privateChatJoin(
-        @ConnectedSocket() client: AuthenticatedSocket,
-        @MessageBody() { chatId }: { chatId: number },
-    ) {
-        if (!client.user) return
-        client.join(`private-chat-${chatId}`)
     }
 
     @SubscribeMessage('onGroupChatJoin')
@@ -66,10 +60,11 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage('onPrivateMessageCreation')
     privateMessageEvent(
         @MessageBody()
-        { message, chat }: MessageReceivedEventParams,
+        { message, chat, recipientId }: NewPrivateMessageEventParams,
     ) {
+        console.log(`Sending message to room: private-chat-${recipientId}`)
         this.server
-            .to(`private-chat-${chat.id}`)
+            .to(`private-chat-${recipientId}`)
             .emit('messageReceived', { message, chat })
     }
 

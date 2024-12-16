@@ -1,16 +1,21 @@
 import styled from 'styled-components'
-import { Chat, GroupChat, NestJSError } from '../../utils/types'
+import { NestJSError } from '../../utils/types'
+import { GroupChat, Chat } from '@quill/data'
+import { MessageReceivedEventParams } from '@quill/socket'
 import { IoSearch, IoCall, IoPaperPlaneOutline } from 'react-icons/io5'
 import { LuChevronLeftSquare, LuChevronRightSquare } from 'react-icons/lu'
 import toast, { Toaster } from 'react-hot-toast'
 import { FiPaperclip } from 'react-icons/fi'
 import { IconContext } from 'react-icons'
 import { ChatBox } from './ChatBox'
-import { getGroupChatMembers } from '../../utils/helpers'
+import { getChatRecipient, getGroupChatMembers } from '../../utils/helpers'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { usePostCreatePrivateMessageMutation } from '../../utils/store/chats'
 import { usePostCreateGroupMessageMutation } from '../../utils/store/groups'
 import { NoMessagesYet } from './NoMessagesYet'
+import { useWebSocket } from '../../utils/hooks'
+import { useEffect } from 'react'
+import { useAuth } from '../../contexts/auth'
 
 type ChatWindowProps = {
     chat: Chat | GroupChat
@@ -27,6 +32,7 @@ export const ChatWindow = ({
     onShowOptions,
     optionsVisible,
 }: ChatWindowProps) => {
+    const { user } = useAuth()
     const { register, handleSubmit, reset } = useForm<CreateMessageParams>()
     const [createMessage, { error }] = usePostCreatePrivateMessageMutation()
     const [createGroupMessage, { error: groupError }] =
@@ -35,6 +41,26 @@ export const ChatWindow = ({
     const chatName = isGroupChat
         ? chat.name || getGroupChatMembers(chat)
         : `${chat.recipient.firstName} ${chat.recipient.lastName}`
+    const { connected, sendMessage, listenForMessage } = useWebSocket()
+
+    useEffect(() => {
+        listenForMessage(
+            'messageReceived',
+            (data: MessageReceivedEventParams) => {
+                console.log(data)
+                //TODO: Update state with incoming message
+            },
+        )
+    }, [listenForMessage, connected])
+
+    /** Provides a single method in which to dispatch websocket events related to Chats */
+    const sendMessageToSocket = <T extends object>(event: string, data: T) => {
+        if (!connected) {
+            console.error('Unable to establish WebSocket connection')
+            return
+        }
+        sendMessage(event, data)
+    }
 
     const onSubmit: SubmitHandler<CreateMessageParams> = (data) => {
         isGroupChat
@@ -48,9 +74,15 @@ export const ChatWindow = ({
             : createMessage({
                   chatId: chat.id,
                   messageContent: data.message,
-              }).then(() => {
+              }).then((resp) => {
+                  const message = resp.data?.message
                   onMessageSend()
                   reset()
+                  sendMessageToSocket('onPrivateMessageCreation', {
+                      message,
+                      chat,
+                      recipientId: getChatRecipient(chat, user).id,
+                  })
               })
         if (error || groupError) {
             const errorMessage =
@@ -75,11 +107,13 @@ export const ChatWindow = ({
                     >
                         <IoSearch />
                         <IoCall />
-                        {isGroupChat && optionsVisible ? (
-                            <LuChevronRightSquare onClick={onShowOptions} />
-                        ) : (
-                            <LuChevronLeftSquare onClick={onShowOptions} />
-                        )}
+                        {isGroupChat ? (
+                            optionsVisible ? (
+                                <LuChevronRightSquare onClick={onShowOptions} />
+                            ) : (
+                                <LuChevronLeftSquare onClick={onShowOptions} />
+                            )
+                        ) : null}
                     </IconContext.Provider>
                 </div>
             </SChatHeader>
