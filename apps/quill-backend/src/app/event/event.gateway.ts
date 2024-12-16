@@ -1,13 +1,18 @@
 import {
     WebSocketGateway,
+    SubscribeMessage,
     OnGatewayConnection,
     OnGatewayDisconnect,
     WebSocketServer,
+    ConnectedSocket,
+    MessageBody,
 } from '@nestjs/websockets'
 import { Inject } from '@nestjs/common'
 import { Server } from 'socket.io'
 import { AuthenticatedSocket, ISessionStore } from '../../utils/interfaces'
 import { Services } from '../../utils/constants'
+import { CreateGroupMessageResponse } from '@quill/data'
+import { MessageReceivedEventParams } from '@quill/socket'
 
 @WebSocketGateway({
     cors: { origin: ['http://localhost:3000'], credentials: true },
@@ -38,5 +43,44 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     handleDisconnect(client: AuthenticatedSocket) {
         if (client.user) this.sessions.deleteSession(client.user.id)
+    }
+
+    @SubscribeMessage('onPrivateChatJoin')
+    async privateChatJoin(
+        @ConnectedSocket() client: AuthenticatedSocket,
+        @MessageBody() { chatId }: { chatId: number },
+    ) {
+        if (!client.user) return
+        client.join(`private-chat-${chatId}`)
+    }
+
+    @SubscribeMessage('onGroupChatJoin')
+    async groupChatJoin(
+        @ConnectedSocket() client: AuthenticatedSocket,
+        @MessageBody() { chatId }: { chatId: number },
+    ) {
+        if (!client.user) return
+        client.join(`group-chat-${chatId}`)
+    }
+
+    @SubscribeMessage('onPrivateMessageCreation')
+    privateMessageEvent(
+        @MessageBody()
+        { message, chat }: MessageReceivedEventParams,
+    ) {
+        this.server
+            .to(`private-chat-${chat.id}`)
+            .emit('messageReceived', { message, chat })
+    }
+
+    @SubscribeMessage('onGroupMessageCreation')
+    groupMessageEvent(
+        @ConnectedSocket() client: AuthenticatedSocket,
+        @MessageBody() { chat, message }: CreateGroupMessageResponse,
+    ) {
+        if (!client.user) return
+        this.server
+            .to(`group-chat-${chat.id}`)
+            .emit('groupMessageReceived', { message, chat })
     }
 }
