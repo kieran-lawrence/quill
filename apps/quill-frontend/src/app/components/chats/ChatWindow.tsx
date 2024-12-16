@@ -40,7 +40,9 @@ export const ChatWindow = ({
     const isGroupChat = 'members' in chat
     const chatName = isGroupChat
         ? chat.name || getGroupChatMembers(chat)
-        : `${chat.recipient.firstName} ${chat.recipient.lastName}`
+        : `${getChatRecipient(chat, user).firstName} ${
+              getChatRecipient(chat, user).lastName
+          }`
     const { connected, sendMessage, listenForMessage } = useWebSocket()
 
     useEffect(() => {
