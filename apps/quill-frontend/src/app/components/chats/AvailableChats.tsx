@@ -8,7 +8,7 @@ import { useState } from 'react'
 import { CreateChatModal } from './CreateChatModal'
 import { IoAdd, IoSearch } from 'react-icons/io5'
 import { ChatPreview } from './ChatPreview'
-import { Chat, GroupChat } from '../../utils/types'
+import { Chat, GroupChat } from '@quill/data'
 
 export const AvailableChats = () => {
     const { data: chats, refetch } = useGetChatsQuery()
