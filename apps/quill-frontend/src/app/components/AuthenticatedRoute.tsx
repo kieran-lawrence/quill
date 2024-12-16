@@ -1,11 +1,11 @@
 'use client'
 
 import { FC } from 'react'
-import Link from 'next/link'
 import { useAuth } from '../contexts/auth'
 import styled from 'styled-components'
 import { LoadingSpinner } from './LoadingSpinner'
 import { useRouter } from 'next/navigation'
+
 export const AuthenticatedRoute: FC<React.PropsWithChildren> = ({
     children,
 }) => {

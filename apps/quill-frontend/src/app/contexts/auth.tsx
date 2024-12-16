@@ -5,7 +5,7 @@ import {
     useEffect,
     useState,
 } from 'react'
-import { User } from '../utils/types'
+import { User } from '@quill/data'
 import { useGetAuthStatusQuery } from '../utils/store/auth'
 
 type AuthUser = Partial<User>

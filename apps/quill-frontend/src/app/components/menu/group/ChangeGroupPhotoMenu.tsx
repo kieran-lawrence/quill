@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { usePostChangeCoverImageMutation } from '../../../utils/store/groups'
-import { GroupChat, NestJSError } from '../../../utils/types'
+import { NestJSError } from '../../../utils/types'
+import { GroupChat } from '@quill/data'
 import { ActionMenu } from '../ActionMenu'
 import toast, { Toaster } from 'react-hot-toast'
 import { Avatar } from '../../Avatar'

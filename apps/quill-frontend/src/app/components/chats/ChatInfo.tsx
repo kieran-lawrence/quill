@@ -1,7 +1,7 @@
 'use client'
 
 import styled from 'styled-components'
-import { GroupChat } from '../../utils/types'
+import { GroupChat } from '@quill/data'
 import { useAuth } from '../../contexts/auth'
 import { GroupUserInitials } from '../GroupUserInitials'
 import { Avatar } from '../Avatar'

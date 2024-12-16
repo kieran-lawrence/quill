@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { GroupMessage, PrivateMessage } from '../../utils/types'
+import { GroupMessage, PrivateMessage } from '@quill/data'
 import { useAuth } from '../../contexts/auth'
 import { Avatar } from '../Avatar'
 import { GroupUserInitials } from '../GroupUserInitials'

@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { Chat, GroupChat, User } from '../../utils/types'
+import { Chat, GroupChat, User } from '@quill/data'
 import { Avatar } from '../Avatar'
 import { GroupUserInitials } from '../GroupUserInitials'
 import { useRouter } from 'next/navigation'

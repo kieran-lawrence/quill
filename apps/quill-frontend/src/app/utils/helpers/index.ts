@@ -1,4 +1,4 @@
-import { Chat, GroupChat, User } from '../types'
+import { Chat, GroupChat, User } from '@quill/data'
 
 export const getGroupChatMembers = (chat: GroupChat) => {
     let members = ''
@@ -34,4 +34,9 @@ export const copyToClipboard = (text: string, onCompletion: () => void) => {
             onCompletion()
         },
     )
+}
+
+/** Returns the recipient of the chat */
+export const getChatRecipient = (chat: Chat, user?: Partial<User>) => {
+    return user?.id === chat?.creator.id ? chat?.recipient : chat?.creator
 }
