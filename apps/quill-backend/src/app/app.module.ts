@@ -8,6 +8,7 @@ import { ChatModule } from './chat/chat.module'
 import { MessageModule } from './message/message.module'
 import { GroupModule } from './group/group.module'
 import { FriendModule } from './friend/friend.module'
+import { EventModule } from './event/event.module';
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { FriendModule } from './friend/friend.module'
         MessageModule,
         GroupModule,
         FriendModule,
+        EventModule,
     ],
     controllers: [],
     providers: [],
