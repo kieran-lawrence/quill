@@ -6,11 +6,13 @@ import { Services } from '../../../utils/constants'
 import { GroupService } from '../../group/group.service'
 import {
     CreateGroupMessageParams,
-    CreateGroupMessageResponse,
     EditGroupMessageParams,
-    EditGroupMessageResponse,
     DeleteGroupMessageParams,
 } from '../../../utils/types'
+import {
+    CreateGroupMessageResponse,
+    EditGroupMessageResponse,
+} from '@quill/data'
 
 @Injectable()
 export class GroupMessageService {

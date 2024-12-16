@@ -17,7 +17,7 @@ export class PrivateMessage {
     messageContent: string
 
     @CreateDateColumn({ name: 'created_at' })
-    createdAt: Date
+    createdAt: string
 
     @ManyToOne(() => User, (user) => user.email)
     author: User

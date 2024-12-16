@@ -74,6 +74,7 @@ export default function SuccessPage() {
                             handleFileUpload(e)
                         },
                     })}
+                    accept=".jpg, .jpeg, .png"
                 />
                 <QuillButton type="filled" text="Save" />
             </SProfileForm>

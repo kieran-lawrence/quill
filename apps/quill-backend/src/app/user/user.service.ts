@@ -63,7 +63,6 @@ export class UserService {
         if (avatar && avatar.filename) userExists.avatar = avatar.filename
         if (data.firstName) userExists.firstName = data.firstName
         if (data.lastName) userExists.lastName = data.lastName
-        if (data.avatar) userExists.avatar = data.avatar
         return this.userRepository.save(userExists)
     }
 }

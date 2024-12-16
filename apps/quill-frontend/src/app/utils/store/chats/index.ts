@@ -4,7 +4,8 @@ import {
     FetchArgs,
     fetchBaseQuery,
 } from '@reduxjs/toolkit/query/react'
-import { Chat, NestJSError, PrivateMessage } from '../../types'
+import { NestJSError } from '../../types'
+import { CreatePrivateMessageResponse, PrivateMessage, Chat } from '@quill/data'
 
 export const chatsApi = createApi({
     reducerPath: 'chatsApi',
@@ -45,7 +46,7 @@ export const chatsApi = createApi({
             }),
         }),
         postCreatePrivateMessage: builder.mutation<
-            PrivateMessage,
+            CreatePrivateMessageResponse,
             CreatePrivateMessageParams
         >({
             query: ({ chatId, messageContent }) => ({

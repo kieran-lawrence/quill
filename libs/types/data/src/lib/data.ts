@@ -46,5 +46,23 @@ export type Friend = {
     id: number
     userOne: User
     userTwo: User
-    createdAt: number
+    createdAt: string
+}
+export type CreateGroupMessageResponse = {
+    message: GroupMessage
+    chat: GroupChat
+}
+export type EditGroupMessageResponse = {
+    messageId: number
+    message: GroupMessage
+    updatedChat: GroupChat
+}
+export type CreatePrivateMessageResponse = {
+    message: PrivateMessage
+    chat: Chat
+}
+export type EditPrivateMessageResponse = {
+    messageId: number
+    message: PrivateMessage
+    updatedChat: Chat
 }

@@ -17,7 +17,7 @@ export class GroupMessage {
     messageContent: string
 
     @CreateDateColumn({ name: 'created_at' })
-    createdAt: number
+    createdAt: string
 
     @ManyToOne(() => User, (user) => user.email)
     author: User

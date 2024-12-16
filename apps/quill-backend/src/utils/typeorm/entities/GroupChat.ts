@@ -36,14 +36,14 @@ export class GroupChat {
     messages: GroupMessage[]
 
     @CreateDateColumn({ name: 'created_at' })
-    createdAt: number
+    createdAt: string
 
     @OneToOne(() => GroupMessage)
     @JoinColumn({ name: 'last_message_sent' })
     lastMessageSent: GroupMessage
 
     @UpdateDateColumn({ name: 'updated_at' })
-    lastMessageSentAt: Date
+    lastMessageSentAt: string
 
     @Column({ nullable: true })
     coverImage?: string

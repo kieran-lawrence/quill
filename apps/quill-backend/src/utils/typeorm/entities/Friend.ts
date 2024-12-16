@@ -21,5 +21,5 @@ export class Friend {
     userTwo: User
 
     @CreateDateColumn()
-    createdAt: Date
+    createdAt: string
 }

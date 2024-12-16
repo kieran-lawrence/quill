@@ -30,12 +30,12 @@ export class Chat {
     messages: PrivateMessage[]
 
     @CreateDateColumn({ name: 'created_at' })
-    createdAt: Date
+    createdAt: string
 
     @OneToOne(() => PrivateMessage)
     @JoinColumn({ name: 'last_message_sent' })
     lastMessageSent: PrivateMessage
 
     @UpdateDateColumn({ name: 'updated_at' })
-    lastMessageSentAt: Date
+    lastMessageSentAt: string
 }

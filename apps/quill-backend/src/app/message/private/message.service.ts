@@ -11,11 +11,13 @@ import { Services } from '../../../utils/constants'
 import { ChatService } from '../../chat/chat.service'
 import {
     CreatePrivateMessageParams,
-    CreatePrivateMessageResponse,
     DeletePrivateMessageParams,
     EditPrivateMessageParams,
-    EditPrivateMessageResponse,
 } from '../../../utils/types'
+import {
+    CreatePrivateMessageResponse,
+    EditPrivateMessageResponse,
+} from '@quill/data'
 
 @Injectable()
 export class PrivateMessageService {

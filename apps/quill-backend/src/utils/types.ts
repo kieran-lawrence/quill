@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Chat, GroupChat, GroupMessage, PrivateMessage, User } from './typeorm'
+import { GroupChat, PrivateMessage, User } from './typeorm'
 export type CreateUserParams = {
     email: string
     firstName: string
@@ -14,8 +13,11 @@ export type FindUserParams = Partial<{
 }>
 export type UpdateUserParams = {
     user: User
-    data: any
-    avatar?: any
+    data: {
+        firstName?: string
+        lastName?: string
+    }
+    avatar?: Express.Multer.File
 }
 export type CreateChatParams = {
     user: User
@@ -63,19 +65,10 @@ export type CreateGroupMessageParams = {
     groupId: number
     user: User
 }
-export type CreateGroupMessageResponse = {
-    message: GroupMessage
-    chat: GroupChat
-}
 export type EditGroupMessageParams = {
     user: User
     id: number
     messageContent: string
-}
-export type EditGroupMessageResponse = {
-    messageId: number
-    message: GroupMessage
-    updatedChat: GroupChat
 }
 export type DeleteGroupMessageParams = {
     user: User
@@ -86,19 +79,10 @@ export type CreatePrivateMessageParams = {
     chatId: number
     user: User
 }
-export type CreatePrivateMessageResponse = {
-    message: PrivateMessage
-    chat: Chat
-}
 export type EditPrivateMessageParams = {
     user: User
     id: number
     messageContent: string
-}
-export type EditPrivateMessageResponse = {
-    messageId: number
-    message: PrivateMessage
-    updatedChat: Chat
 }
 export type DeletePrivateMessageParams = {
     user: User
