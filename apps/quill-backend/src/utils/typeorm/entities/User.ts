@@ -9,6 +9,7 @@ import {
 } from 'typeorm'
 import { PrivateMessage } from './PrivateMessage'
 import { GroupChat } from './GroupChat'
+import { OnlineStatus } from '@quill/data'
 
 @Entity()
 export class User {
@@ -40,4 +41,11 @@ export class User {
 
     @ManyToMany(() => GroupChat, (groupChat) => groupChat.members)
     groupChats: GroupChat[]
+
+    @Column({
+        type: 'enum',
+        enum: ['online', 'offline', 'away', 'busy'],
+        default: 'offline',
+    })
+    onlineStatus: OnlineStatus
 }
