@@ -14,6 +14,7 @@ import { User } from '../../utils/typeorm'
 import { Express } from 'express'
 import 'multer'
 import { multerOptions } from '../../utils/helpers'
+import { UpdateUserDto } from './dtos/UpdateUser.dto'
 
 @Controller(Routes.USER)
 export class UserController {
@@ -25,10 +26,10 @@ export class UserController {
     @UseInterceptors(FileInterceptor('avatar', multerOptions))
     updateUser(
         @AuthenticatedUser() user: User,
-        @Body() data,
+        @Body() data: UpdateUserDto,
         @UploadedFile()
         file: Express.Multer.File,
     ) {
-        return this.userService.updateUser({ user, data, avatar: file })
+        return this.userService.updateUser({ user, ...data, avatar: file })
     }
 }

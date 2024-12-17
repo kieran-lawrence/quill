@@ -57,12 +57,19 @@ export class UserService {
         const newUser = this.userRepository.create({ ...userDetails, password })
         return this.userRepository.save(newUser)
     }
-    async updateUser({ user, data, avatar }: UpdateUserParams): Promise<User> {
+    async updateUser({
+        user,
+        firstName,
+        lastName,
+        onlineStatus,
+        avatar,
+    }: UpdateUserParams): Promise<User> {
         const userExists = await this.findUser({ id: user.id })
         if (!user) throw new NotFoundException('Unable to find user')
         if (avatar && avatar.filename) userExists.avatar = avatar.filename
-        if (data.firstName) userExists.firstName = data.firstName
-        if (data.lastName) userExists.lastName = data.lastName
+        if (firstName) userExists.firstName = firstName
+        if (lastName) userExists.lastName = lastName
+        if (onlineStatus) userExists.onlineStatus = onlineStatus
         return this.userRepository.save(userExists)
     }
 }

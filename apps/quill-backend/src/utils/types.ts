@@ -1,3 +1,4 @@
+import { OnlineStatus } from '@quill/data'
 import { GroupChat, PrivateMessage, User } from './typeorm'
 export type CreateUserParams = {
     email: string
@@ -13,10 +14,9 @@ export type FindUserParams = Partial<{
 }>
 export type UpdateUserParams = {
     user: User
-    data: {
-        firstName?: string
-        lastName?: string
-    }
+    firstName?: string
+    lastName?: string
+    onlineStatus?: OnlineStatus
     avatar?: Express.Multer.File
 }
 export type CreateChatParams = {
