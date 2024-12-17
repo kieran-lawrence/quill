@@ -61,10 +61,11 @@ export class ChatService {
             .leftJoinAndSelect('chat.creator', 'creator')
             .leftJoinAndSelect('chat.recipient', 'recipient')
             .leftJoinAndSelect('chat.messages', 'messages')
+            .leftJoinAndSelect('messages.author', 'author')
             .where('creator.id = :id', { id })
             .orWhere('recipient.id = :id', { id })
             .leftJoinAndSelect('chat.lastMessageSent', 'lastMessageSent')
-            .orderBy('chat.lastMessageSentAt', 'DESC')
+            .orderBy('messages.createdAt', 'DESC')
             .getMany()
     }
     /** Gets a single chat between two users */

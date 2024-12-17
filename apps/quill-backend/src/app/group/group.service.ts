@@ -60,11 +60,12 @@ export class GroupService {
             .createQueryBuilder('groupChat')
             .leftJoinAndSelect('groupChat.members', 'member')
             .leftJoinAndSelect('groupChat.messages', 'messages')
+            .leftJoinAndSelect('messages.author', 'author')
             .where('member.id IN (:members)', { members: id })
             .leftJoinAndSelect('groupChat.members', 'members')
             .leftJoinAndSelect('groupChat.lastMessageSent', 'lastMessageSent')
             .leftJoinAndSelect('groupChat.creator', 'creator')
-            .orderBy('groupChat.lastMessageSentAt', 'DESC')
+            .orderBy('messages.createdAt', 'DESC')
             .getMany()
     }
     getGroupChatById(id: number): Promise<GroupChat> {
