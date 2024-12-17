@@ -17,7 +17,6 @@ const mockUsers: User[] = [
         password: 'test1234',
         messages: [],
         groupChats: [],
-        presence: undefined,
     },
     {
         id: 2,
@@ -28,7 +27,6 @@ const mockUsers: User[] = [
         password: 'test1234',
         messages: [],
         groupChats: [],
-        presence: undefined,
     },
     {
         id: 2,
@@ -39,7 +37,6 @@ const mockUsers: User[] = [
         password: 'test1234',
         messages: [],
         groupChats: [],
-        presence: undefined,
     },
 ]
 const mockChats: Chat[] = [
@@ -48,8 +45,8 @@ const mockChats: Chat[] = [
         creator: mockUsers[0],
         recipient: mockUsers[1],
         messages: [],
-        lastMessageSentAt: new Date(),
-        createdAt: new Date(),
+        lastMessageSentAt: '2024-11-17T08:47:50.405386Z',
+        createdAt: '2024-11-17T08:47:50.405386Z',
         lastMessageSent: null,
     },
     {
@@ -57,8 +54,8 @@ const mockChats: Chat[] = [
         creator: mockUsers[0],
         recipient: mockUsers[2],
         messages: [],
-        lastMessageSentAt: new Date(),
-        createdAt: new Date(),
+        lastMessageSentAt: '2024-11-17T08:47:50.405386Z',
+        createdAt: '2024-11-17T08:47:50.405386Z',
         lastMessageSent: null,
     },
     {
@@ -70,20 +67,20 @@ const mockChats: Chat[] = [
                 id: 1,
                 author: mockUsers[0],
                 messageContent: 'test',
-                createdAt: new Date(),
+                createdAt: '2024-11-17T08:47:50.405386Z',
                 chat: {
                     id: 2,
                     creator: mockUsers[0],
                     recipient: mockUsers[2],
                     messages: [],
-                    lastMessageSentAt: new Date(),
-                    createdAt: new Date(),
+                    lastMessageSentAt: '2024-11-17T08:47:50.405386Z',
+                    createdAt: '2024-11-17T08:47:50.405386Z',
                     lastMessageSent: null,
                 },
             },
         ],
-        lastMessageSentAt: new Date(),
-        createdAt: new Date(),
+        lastMessageSentAt: '2024-11-17T08:47:50.405386Z',
+        createdAt: '2024-11-17T08:47:50.405386Z',
         lastMessageSent: null,
     },
 ]

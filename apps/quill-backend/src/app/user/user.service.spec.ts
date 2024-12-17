@@ -44,7 +44,6 @@ describe('UserService', () => {
             lastName: 'test',
             messages: [],
             groupChats: [],
-            presence: undefined,
         })
         await service.findUser({ id: 1 })
         expect(service.findUser).toHaveBeenCalledWith({ id: 1 })
@@ -87,7 +86,6 @@ describe('UserService', () => {
                 lastName: 'test',
                 messages: [],
                 groupChats: [],
-                presence: undefined,
             })
             await service.createUser({
                 email: 'a@a.com',
@@ -105,7 +103,6 @@ describe('UserService', () => {
                 lastName: 'test',
                 messages: [],
                 groupChats: [],
-                presence: undefined,
             })
         })
     })
