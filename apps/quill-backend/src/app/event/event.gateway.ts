@@ -13,6 +13,7 @@ import { AuthenticatedSocket, ISessionStore } from '../../utils/interfaces'
 import { Services } from '../../utils/constants'
 import { CreateGroupMessageResponse } from '@quill/data'
 import { NewPrivateMessageEventParams } from '@quill/socket'
+import { UserService } from '../user/user.service'
 
 @WebSocketGateway({
     cors: { origin: ['http://localhost:3000'], credentials: true },
@@ -21,11 +22,12 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(
         @Inject(Services.SESSION_STORE)
         private readonly sessions: ISessionStore,
+        @Inject(Services.USER) private userService: UserService,
     ) {}
 
     @WebSocketServer() server: Server = new Server()
 
-    handleConnection(client: AuthenticatedSocket) {
+    async handleConnection(client: AuthenticatedSocket) {
         this.server.use((socket: AuthenticatedSocket, next) => {
             const user = socket.handshake.auth.user
             if (!user) {
@@ -41,11 +43,20 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
             )
             client.join(`private-chat-${client.user.id}`)
             this.sessions.saveSession(client.user.id, client)
+            await this.userService.updateUser({
+                user: client.user,
+                onlineStatus: 'online',
+            })
         }
     }
 
-    handleDisconnect(client: AuthenticatedSocket) {
-        if (client.user) this.sessions.deleteSession(client.user.id)
+    async handleDisconnect(client: AuthenticatedSocket) {
+        if (!client.user) return
+        this.sessions.deleteSession(client.user.id)
+        await this.userService.updateUser({
+            user: client.user,
+            onlineStatus: 'offline',
+        })
     }
 
     @SubscribeMessage('onGroupChatJoin')
