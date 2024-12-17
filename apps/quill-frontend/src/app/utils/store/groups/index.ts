@@ -1,141 +1,95 @@
-import {
-    BaseQueryFn,
-    createApi,
-    FetchArgs,
-    fetchBaseQuery,
-} from '@reduxjs/toolkit/query/react'
-import { NestJSError } from '../../types'
 import { GroupChat, GroupMessage } from '@quill/data'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { updateGroupMessage } from '../../api'
 
-export const groupsApi = createApi({
-    reducerPath: 'groupsApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:3001/api/group',
-    }) as BaseQueryFn<string | FetchArgs, unknown, NestJSError>,
-    endpoints: (builder) => ({
-        getGroupChats: builder.query<GroupChat[], void>({
-            query: () => ({
-                url: `/`,
-                method: 'GET',
-                credentials: 'include',
-            }),
-        }),
-        getGroupChatById: builder.query<GroupChat, string>({
-            query: (groupId) => ({
-                url: `/${groupId}`,
-                method: 'GET',
-                credentials: 'include',
-            }),
-        }),
-        postCreateGroupChat: builder.mutation<GroupChat, CreateGroupChatParams>(
-            {
-                query: (chat) => ({
-                    url: '/',
-                    method: 'POST',
-                    body: chat,
-                    credentials: 'include',
-                }),
-            },
-        ),
-        getGroupMessages: builder.query<GroupMessage[], GetGroupMessagesParams>(
-            {
-                query: ({ groupId }) => ({
-                    url: `/${groupId}/message`,
-                    method: 'GET',
-                    credentials: 'include',
-                }),
-            },
-        ),
-        postEditGroupMessage: builder.mutation<
-            GroupMessage,
-            UpdateGroupMessageParams
-        >({
-            query: ({ groupId, ...message }) => ({
-                url: `/${groupId}/message/update`,
-                method: 'PUT',
-                body: message,
-                credentials: 'include',
-            }),
-        }),
-        postDeleteGroupMessage: builder.mutation<
-            void,
-            UpdateGroupMessageParams
-        >({
-            query: ({ messageId, groupId }) => ({
-                url: `/${groupId}/message/${messageId}`,
-                method: 'DELETE',
-                credentials: 'include',
-            }),
-        }),
-        postCreateGroupMessage: builder.mutation<
-            GroupMessage,
-            CreateGroupMessageParams
-        >({
-            query: ({ groupId, messageContent }) => ({
-                url: `/${groupId}/message`,
-                method: 'POST',
-                body: { messageContent },
-                credentials: 'include',
-            }),
-        }),
-        postUpdateGroupChat: builder.mutation<void, UpdateGroupChatParams>({
-            query: ({ groupId, ...chat }) => ({
-                url: `/${groupId}/update`,
-                method: 'POST',
-                body: chat,
-                credentials: 'include',
-            }),
-        }),
-        postDeleteGroupChat: builder.mutation<void, number>({
-            query: (groupId) => ({
-                url: `/${groupId}`,
-                method: 'DELETE',
-                credentials: 'include',
-            }),
-        }),
-        postChangeCoverImage: builder.mutation<void, UpdateGroupChatParams>({
-            query: ({ groupId, formData }) => ({
-                url: `/${groupId}/update`,
-                method: 'POST',
-                body: formData,
-                credentials: 'include',
-            }),
-        }),
-    }),
+interface GroupState {
+    groups: GroupChat[]
+}
+
+const initialState: GroupState = {
+    groups: [],
+}
+
+const groupSlice = createSlice({
+    name: 'group',
+    initialState,
+    reducers: {
+        setGroupsState: (state, action: PayloadAction<GroupChat[]>) => {
+            state.groups = action.payload
+        },
+        addGroupToState: (state, action: PayloadAction<GroupChat>) => {
+            state.groups.push(action.payload)
+        },
+        updateGroupState: (state, action: PayloadAction<GroupChat>) => {
+            const index = state.groups.findIndex(
+                (group) => group.id === action.payload.id,
+            )
+            if (index !== -1) {
+                state.groups[index] = action.payload
+            }
+        },
+        deleteGroupState: (state, action: PayloadAction<number>) => {
+            state.groups = state.groups.filter(
+                (group) => group.id !== action.payload,
+            )
+        },
+        addGroupMessageState: (
+            state,
+            action: PayloadAction<{ groupId: number; message: GroupMessage }>,
+        ) => {
+            const { groupId, message } = action.payload
+            const group = state.groups.find((group) => group.id === groupId)
+            if (group) {
+                const existingMessage = group.messages.find(
+                    (msg) => msg.id === message.id,
+                )
+                if (!existingMessage) {
+                    group.messages.unshift(message)
+                }
+            }
+        },
+        updateGroupMessageState: (
+            state,
+            action: PayloadAction<{ groupId: number; message: GroupMessage }>,
+        ) => {
+            const { groupId, message } = action.payload
+            const group = state.groups.find((group) => group.id === groupId)
+            if (group) {
+                const index = group.messages.findIndex(
+                    (msg) => msg.id === message.id,
+                )
+                if (index !== -1) {
+                    group.messages[index] = message
+                }
+            }
+        },
+        deleteGroupMessageState: (
+            state,
+            action: PayloadAction<{ groupId: number; messageId: number }>,
+        ) => {
+            const { groupId, messageId } = action.payload
+            const group = state.groups.find((group) => group.id === groupId)
+            if (group) {
+                group.messages = group.messages.filter(
+                    (msg) => msg.id !== messageId,
+                )
+            }
+        },
+    },
 })
 
-export const {
-    useGetGroupChatsQuery,
-    useGetGroupChatByIdQuery,
-    usePostCreateGroupChatMutation,
-    useGetGroupMessagesQuery,
-    usePostCreateGroupMessageMutation,
-    usePostEditGroupMessageMutation,
-    usePostDeleteGroupMessageMutation,
-    usePostUpdateGroupChatMutation,
-    usePostDeleteGroupChatMutation,
-    usePostChangeCoverImageMutation,
-} = groupsApi
+export const getGroupById = (state: GroupState, groupId: number) => {
+    return state.groups.find((group) => group.id === groupId)
+}
 
-type GetGroupMessagesParams = {
-    groupId: string
-}
-type CreateGroupChatParams = {
-    members: string[]
-    name?: string
-    message?: string
-}
-type CreateGroupMessageParams = {
-    groupId: number
-    messageContent: string
-}
-type UpdateGroupChatParams = {
-    groupId: number
-    name?: string
-    formData?: FormData
-}
-type UpdateGroupMessageParams = {
-    groupId: number
-    messageId: number
-    messageContent?: string
-}
+export const {
+    addGroupToState,
+    setGroupsState,
+    updateGroupState,
+    addGroupMessageState,
+    updateGroupMessageState,
+    deleteGroupMessageState,
+    deleteGroupState,
+} = groupSlice.actions
+
+export default groupSlice.reducer

@@ -1,108 +1,88 @@
-import {
-    BaseQueryFn,
-    createApi,
-    FetchArgs,
-    fetchBaseQuery,
-} from '@reduxjs/toolkit/query/react'
-import { NestJSError } from '../../types'
-import { CreatePrivateMessageResponse, PrivateMessage, Chat } from '@quill/data'
+import { Chat, PrivateMessage } from '@quill/data'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-export const chatsApi = createApi({
-    reducerPath: 'chatsApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:3001/api/chat',
-    }) as BaseQueryFn<string | FetchArgs, unknown, NestJSError>,
-    endpoints: (builder) => ({
-        getChats: builder.query<Chat[], void>({
-            query: () => ({
-                url: `/`,
-                method: 'GET',
-                credentials: 'include',
-            }),
-        }),
-        getChatById: builder.query<Chat, string>({
-            query: (id) => ({
-                url: `/${id}`,
-                method: 'GET',
-                credentials: 'include',
-            }),
-        }),
-        postCreateChat: builder.mutation<Chat, CreateChatParams>({
-            query: (chat) => ({
-                url: '/',
-                method: 'POST',
-                body: chat,
-                credentials: 'include',
-            }),
-        }),
-        getPrivateMessages: builder.query<
-            PrivateMessage[],
-            GetPrivateMessagesParams
-        >({
-            query: ({ chatId }) => ({
-                url: `/${chatId}/message`,
-                method: 'GET',
-                credentials: 'include',
-            }),
-        }),
-        postCreatePrivateMessage: builder.mutation<
-            CreatePrivateMessageResponse,
-            CreatePrivateMessageParams
-        >({
-            query: ({ chatId, messageContent }) => ({
-                url: `/${chatId}/message`,
-                method: 'POST',
-                body: { messageContent },
-                credentials: 'include',
-            }),
-        }),
-        postEditPrivateMessage: builder.mutation<
-            PrivateMessage,
-            UpdatePrivateMessageParams
-        >({
-            query: ({ chatId, ...message }) => ({
-                url: `/${chatId}/message/update`,
-                method: 'POST',
-                body: message,
-                credentials: 'include',
-            }),
-        }),
-        postDeletePrivateMessage: builder.mutation<
-            PrivateMessage,
-            UpdatePrivateMessageParams
-        >({
-            query: ({ chatId, messageId }) => ({
-                url: `/${chatId}/message/${messageId}`,
-                method: 'DELETE',
-                credentials: 'include',
-            }),
-        }),
-    }),
+interface ChatState {
+    chats: Chat[]
+}
+
+const initialState: ChatState = {
+    chats: [],
+}
+
+const chatSlice = createSlice({
+    name: 'chat',
+    initialState,
+    reducers: {
+        setChatState: (state, action: PayloadAction<Chat[]>) => {
+            state.chats = action.payload
+        },
+        addChatToState: (state, action: PayloadAction<Chat>) => {
+            state.chats.push(action.payload)
+        },
+        updateChatState: (state, action: PayloadAction<Chat>) => {
+            const index = state.chats.findIndex(
+                (chat) => chat.id === action.payload.id,
+            )
+            if (index !== -1) {
+                state.chats[index] = action.payload
+            }
+        },
+        addMessageState: (
+            state,
+            action: PayloadAction<{ chatId: number; message: PrivateMessage }>,
+        ) => {
+            const { chatId, message } = action.payload
+            const chat = state.chats.find((chat) => chat.id === chatId)
+            if (chat) {
+                const existingMessage = chat.messages.find(
+                    (msg) => msg.id === message.id,
+                )
+                if (!existingMessage) {
+                    chat.messages.unshift(message)
+                }
+            }
+        },
+        updatePrivateMessageState: (
+            state,
+            action: PayloadAction<{ chatId: number; message: PrivateMessage }>,
+        ) => {
+            const { chatId, message } = action.payload
+            const chat = state.chats.find((chat) => chat.id === chatId)
+            if (chat) {
+                const index = chat.messages.findIndex(
+                    (msg) => msg.id === message.id,
+                )
+                if (index !== -1) {
+                    chat.messages[index] = message
+                }
+            }
+        },
+        deletePrivateMessageState: (
+            state,
+            action: PayloadAction<{ chatId: number; messageId: number }>,
+        ) => {
+            const { chatId, messageId } = action.payload
+            const chat = state.chats.find((chat) => chat.id === chatId)
+            if (chat) {
+                chat.messages = chat.messages.filter(
+                    (msg) => msg.id !== messageId,
+                )
+            }
+        },
+    },
 })
 
-export const {
-    useGetChatsQuery,
-    useGetChatByIdQuery,
-    useGetPrivateMessagesQuery,
-    usePostCreateChatMutation,
-    usePostCreatePrivateMessageMutation,
-    usePostEditPrivateMessageMutation,
-    usePostDeletePrivateMessageMutation,
-} = chatsApi
+export const getChatById = (state: ChatState, chatId: number) => {
+    return state.chats.find((chat) => chat.id === chatId)
+}
 
-type GetPrivateMessagesParams = {
-    chatId: string
-}
-type CreateChatParams = {
-    email: string
-    message?: string
-}
-type CreatePrivateMessageParams = {
-    chatId: number
-    messageContent: string
-}
-type UpdatePrivateMessageParams = {
-    chatId: number
-    messageId: number
-    messageContent?: string
-}
+export const {
+    addChatToState,
+    setChatState,
+    updateChatState,
+    addMessageState,
+    updatePrivateMessageState,
+    deletePrivateMessageState,
+} = chatSlice.actions
+
+export default chatSlice.reducer

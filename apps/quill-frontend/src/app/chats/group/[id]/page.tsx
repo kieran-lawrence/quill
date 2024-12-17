@@ -2,29 +2,31 @@
 
 import { useState } from 'react'
 import { ChatWindow } from '../../../components/chats/ChatWindow'
-import { useGetGroupChatByIdQuery } from '../../../utils/store/groups'
 import { SChatContainer } from '../../../utils/styles/shared'
 import { useParams } from 'next/navigation'
 import { ChatInfo } from '../../../components/chats/ChatInfo'
+import { useAppSelector } from '../../../utils/store'
+import { getGroupById } from '../../../utils/store/groups'
 
 export default function GroupChatsPage() {
-    const params = useParams()
-    const { data, refetch } = useGetGroupChatByIdQuery(params.id as string)
+    const { id } = useParams()
+    const group = useAppSelector((state) =>
+        getGroupById(state.groups, parseInt(id as string)),
+    )
     const [showInfo, setShowInfo] = useState(false)
 
     return (
         <>
             <SChatContainer>
-                {data && (
+                {group && (
                     <ChatWindow
-                        chat={data}
-                        onMessageSend={refetch}
+                        chat={group}
                         onShowOptions={() => setShowInfo(!showInfo)}
                         optionsVisible={showInfo}
                     />
                 )}
             </SChatContainer>
-            {data && <ChatInfo isVisible={showInfo} chat={data} />}
+            {group && <ChatInfo isVisible={showInfo} chat={group} />}
         </>
     )
 }

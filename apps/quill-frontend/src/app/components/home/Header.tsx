@@ -2,14 +2,14 @@ import styled from 'styled-components'
 import { QuillLogo } from '../QuillLogo'
 import { Dancing_Script } from 'next/font/google'
 import Link from 'next/link'
-import { useGetAuthStatusQuery } from '../../utils/store/auth'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '../../contexts/auth'
 
 const dancingScript = Dancing_Script({
     subsets: ['latin'],
 })
 export const Header = () => {
-    const { data: user } = useGetAuthStatusQuery()
+    const { user } = useAuth()
     const router = useRouter()
     const handleClick = () =>
         user ? router.push('/chats') : router.push('/login')

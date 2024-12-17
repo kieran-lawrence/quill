@@ -7,9 +7,9 @@ import { useAuth } from '../../contexts/auth'
 import { Avatar } from '../../components/Avatar'
 import { useState } from 'react'
 import { GroupUserInitials } from '../../components/GroupUserInitials'
-import { usePostUpdateUserMutation } from '../../utils/store/user'
 import { useForm } from 'react-hook-form'
-import { PiSealWarningBold } from 'react-icons/pi'
+import { updateUser } from '../../utils/api'
+import toast, { Toaster } from 'react-hot-toast'
 
 interface ProfileProps {
     avatar?: string
@@ -21,7 +21,6 @@ export default function SuccessPage() {
     const [imgPath, setImgPath] = useState('')
     const router = useRouter()
     const { user } = useAuth()
-    const [postUpdateUser, { error }] = usePostUpdateUserMutation()
 
     const handleSkip = () => {
         router.push('/chats')
@@ -39,23 +38,25 @@ export default function SuccessPage() {
     const onSubmit = () => {
         const formData = new FormData()
         if (file) formData.append('avatar', file)
-        return postUpdateUser(formData).then(() => handleSkip())
+        return updateUser(formData).then((resp) => {
+            if ('status' in resp) {
+                const errorMessage = resp?.message
+                toast.error(
+                    errorMessage || 'An error occurred fetching your chats.',
+                )
+            } else {
+                handleSkip()
+            }
+        })
     }
 
     return (
         <SSuccessPage>
             <Header />
+            <Toaster />
             <h2>Thank you for registering</h2>
             <SProfileForm onSubmit={handleSubmit(onSubmit)}>
                 <h3>Finish setting up your profile:</h3>
-                {error && (
-                    <SError>
-                        <PiSealWarningBold color={'#d34e22'} size={24} />
-                        {'data' in error
-                            ? error.data?.message
-                            : 'An unknown error has occurred'}
-                    </SError>
-                )}
                 {imgPath ? (
                     <Avatar imgSrc={imgPath} />
                 ) : (
@@ -129,13 +130,4 @@ const SProfileForm = styled.form`
             cursor: pointer;
         }
     }
-`
-const SError = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    color: #d34e22;
-    font-size: 18px;
-    font-weight: 400;
 `

@@ -2,13 +2,12 @@
 
 import styled from 'styled-components'
 import Link from 'next/link'
-import { PiSealWarningBold } from 'react-icons/pi'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
-import { usePostRegisterMutation } from '../utils/store/auth'
 import { useAuth } from '../contexts/auth'
 import { Header } from '../components/home/Header'
 import { QuillButton } from '../components/shared/QuillButton'
+import { register } from '../utils/api'
 
 interface RegisterFormProps {
     firstName: string
@@ -20,12 +19,11 @@ interface RegisterFormProps {
 
 export default function Register() {
     const { user } = useAuth()
-    const [handleRegister, { isLoading, error }] = usePostRegisterMutation()
-    const { register, handleSubmit } = useForm<RegisterFormProps>()
+    const { register: formReg, handleSubmit } = useForm<RegisterFormProps>()
     const router = useRouter()
 
     const onSubmit: SubmitHandler<RegisterFormProps> = (data) => {
-        handleRegister(data).then(() => {
+        register(data).then(() => {
             router.push('/register/success')
         })
     }
@@ -39,14 +37,6 @@ export default function Register() {
             <div className="registrationWrapper">
                 <h1>Create your free account</h1>
                 <h2>Let your conversations flow</h2>
-                {error && (
-                    <SError>
-                        <PiSealWarningBold color={'#d34e22'} size={24} />
-                        {'data' in error
-                            ? error.data?.message
-                            : 'An unknown error has occurred'}
-                    </SError>
-                )}
                 <SRegisterForm onSubmit={handleSubmit(onSubmit)}>
                     <SNameInputsWrapper>
                         <SInput
@@ -54,7 +44,7 @@ export default function Register() {
                             type="text"
                             placeholder="First Name"
                             required
-                            {...register('firstName')}
+                            {...formReg('firstName')}
                             $width="50%"
                         />
                         <SInput
@@ -62,7 +52,7 @@ export default function Register() {
                             type="text"
                             placeholder="Last Name"
                             required
-                            {...register('lastName')}
+                            {...formReg('lastName')}
                             $width="50%"
                         />
                     </SNameInputsWrapper>
@@ -71,27 +61,23 @@ export default function Register() {
                         type="text"
                         placeholder="Username"
                         required
-                        {...register('username')}
+                        {...formReg('username')}
                     />
                     <SInput
                         id="emailInput"
                         type="email"
                         placeholder="Email"
                         required
-                        {...register('email')}
+                        {...formReg('email')}
                     />
                     <SInput
                         id="passwordInput"
                         type="password"
                         placeholder="Password"
                         required
-                        {...register('password')}
+                        {...formReg('password')}
                     />
-                    <QuillButton
-                        type="filled"
-                        isDisabled={isLoading}
-                        text={isLoading ? 'Loading...' : 'Register'}
-                    ></QuillButton>
+                    <QuillButton type="filled" text={'Register'}></QuillButton>
                 </SRegisterForm>
                 <small>
                     By continuing you agree to our{' '}

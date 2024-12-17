@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import { NestJSError } from '../../utils/types'
 import { GroupChat, Chat } from '@quill/data'
 import { MessageReceivedEventParams } from '@quill/socket'
 import { IoSearch, IoCall, IoPaperPlaneOutline } from 'react-icons/io5'
@@ -10,33 +9,37 @@ import { IconContext } from 'react-icons'
 import { ChatBox } from './ChatBox'
 import { getChatRecipient, getGroupChatMembers } from '../../utils/helpers'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { usePostCreatePrivateMessageMutation } from '../../utils/store/chats'
-import { usePostCreateGroupMessageMutation } from '../../utils/store/groups'
 import { NoMessagesYet } from './NoMessagesYet'
 import { useWebSocket } from '../../utils/hooks'
 import { useEffect } from 'react'
 import { useAuth } from '../../contexts/auth'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '../../utils/store'
+import { addMessageState } from '../../utils/store/chats'
+import { createGroupMessage, createPrivateMessage } from '../../utils/api'
+import { addGroupMessageState } from '../../utils/store/groups'
 
 type ChatWindowProps = {
     chat: Chat | GroupChat
-    onMessageSend: () => void
     onShowOptions?: () => void
     optionsVisible?: boolean
 }
 type CreateMessageParams = {
     message: string
 }
+
 export const ChatWindow = ({
     chat,
-    onMessageSend,
     onShowOptions,
     optionsVisible,
 }: ChatWindowProps) => {
     const { user } = useAuth()
-    const { register, handleSubmit, reset } = useForm<CreateMessageParams>()
-    const [createMessage, { error }] = usePostCreatePrivateMessageMutation()
-    const [createGroupMessage, { error: groupError }] =
-        usePostCreateGroupMessageMutation()
+    const dispatch = useDispatch<AppDispatch>()
+    const {
+        register,
+        handleSubmit,
+        reset: clearForm,
+    } = useForm<CreateMessageParams>()
     const isGroupChat = 'members' in chat
     const chatName = isGroupChat
         ? chat.name || getGroupChatMembers(chat)
@@ -49,11 +52,16 @@ export const ChatWindow = ({
         listenForMessage(
             'messageReceived',
             (data: MessageReceivedEventParams) => {
-                console.log(data)
-                //TODO: Update state with incoming message
+                data &&
+                    dispatch(
+                        addMessageState({
+                            chatId: data.chat.id,
+                            message: data.message,
+                        }),
+                    )
             },
         )
-    }, [listenForMessage, connected])
+    }, [listenForMessage, connected, dispatch, chat.id])
 
     /** Provides a single method in which to dispatch websocket events related to Chats */
     const sendMessageToSocket = <T extends object>(event: string, data: T) => {
@@ -69,31 +77,48 @@ export const ChatWindow = ({
             ? createGroupMessage({
                   groupId: chat.id,
                   messageContent: data.message,
-              }).then(() => {
-                  onMessageSend()
-                  reset()
+              }).then((resp) => {
+                  if ('status' in resp) {
+                      const errorMessage = resp?.message
+                      toast.error(
+                          errorMessage ||
+                              'Unable to send message. An error occurred.',
+                      )
+                  } else {
+                      dispatch(
+                          addGroupMessageState({
+                              groupId: chat.id,
+                              message: resp.message,
+                          }),
+                      )
+                      clearForm()
+                  }
               })
-            : createMessage({
+            : createPrivateMessage({
                   chatId: chat.id,
                   messageContent: data.message,
               }).then((resp) => {
-                  const message = resp.data?.message
-                  onMessageSend()
-                  reset()
-                  sendMessageToSocket('onPrivateMessageCreation', {
-                      message,
-                      chat,
-                      recipientId: getChatRecipient(chat, user).id,
-                  })
+                  if ('status' in resp) {
+                      const errorMessage = resp?.message
+                      toast.error(
+                          errorMessage ||
+                              'Unable to send message. An error occurred.',
+                      )
+                  } else {
+                      dispatch(
+                          addMessageState({
+                              chatId: chat.id,
+                              message: resp.message,
+                          }),
+                      )
+                      clearForm()
+                      sendMessageToSocket('onPrivateMessageCreation', {
+                          message: resp.message,
+                          chat,
+                          recipientId: getChatRecipient(chat, user).id,
+                      })
+                  }
               })
-        if (error || groupError) {
-            const errorMessage =
-                (error as NestJSError | undefined) ||
-                (groupError as NestJSError | undefined)
-            toast.error(
-                `Failed to send message: ${errorMessage?.data?.message}`,
-            )
-        }
     }
     return (
         <SChatWindow>
@@ -127,7 +152,7 @@ export const ChatWindow = ({
                             message={message}
                             isGroupChat={isGroupChat}
                             chatId={chat.id}
-                            onMessageUpdate={onMessageSend}
+                            //onMessageUpdate={onMessageSend}
                         />
                     ))
                 ) : (

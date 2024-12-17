@@ -1,19 +1,40 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { User } from '@quill/data'
-import { useGetFriendsQuery } from '../store/friend'
 import toast from 'react-hot-toast'
 import { io, Socket } from 'socket.io-client'
 import { useAuth } from '../../contexts/auth'
+import { getFriends } from '../api'
 
 /** A hook that returns all of a users friends, and allows for searching of friends */
 export const useFriends = () => {
     const [searchTerm, setSearchTerm] = useState('')
-    const { data, error, isLoading } = useGetFriendsQuery()
+    const [friends, setFriends] = useState<User[] | null>(null)
+    useEffect(() => {
+        const fetchFriends = async () => {
+            getFriends().then((res) => {
+                if ('status' in res) {
+                    toast.error('Failed to fetch friends')
+                    return
+                }
+                /**
+                 * Transforms the server response into a list of users
+                 * This is required because the schema for a Friend is {userOne:User,userTwo:User}
+                 * so we need to figure out which is not the current user in the Friend object
+                 */
+                const friendsResponse = res.friends.map((friend) =>
+                    friend?.userOne.id === res.userId
+                        ? friend?.userTwo
+                        : friend?.userOne,
+                )
+                setFriends(friendsResponse)
+            })
+        }
+        fetchFriends()
+    }, [])
 
-    error && toast.error('Failed to fetch friends')
     /** If there is no `searchTerm`, returns all users friends, else returns friends filtered by `searchTerm` */
-    const filteredFriends = data
-        ? data.reduce<User[]>((filtered, friend) => {
+    const filteredFriends = friends
+        ? friends.reduce<User[]>((filtered, friend) => {
               if (
                   friend.username
                       .toLowerCase()
@@ -43,8 +64,6 @@ export const useFriends = () => {
         searchTerm,
         setSearchTerm,
         filterFriends,
-        error,
-        isLoading,
     }
 }
 

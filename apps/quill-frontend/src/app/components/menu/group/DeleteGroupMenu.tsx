@@ -1,7 +1,9 @@
-import { usePostDeleteGroupChatMutation } from '../../../utils/store/groups'
-import { NestJSError } from '../../../utils/types'
+import { useDispatch } from 'react-redux'
+import { deleteGroup } from '../../../utils/api'
 import { ActionMenu } from '../ActionMenu'
 import toast, { Toaster } from 'react-hot-toast'
+import { AppDispatch } from '../../../utils/store'
+import { deleteGroupState } from '../../../utils/store/groups'
 
 type DeleteGroupMenuprops = {
     groupId: number
@@ -11,18 +13,19 @@ export const DeleteGroupMenu = ({
     groupId,
     onCancel,
 }: DeleteGroupMenuprops) => {
-    const [deleteGroup] = usePostDeleteGroupChatMutation()
+    const dispatch = useDispatch<AppDispatch>()
+
     const onDeleteGroup = () => {
-        deleteGroup(groupId).then((res) => {
-            if ('error' in res) {
-                const error = res.error as NestJSError
-                toast.error(error.data?.message || 'Something went wrong')
+        deleteGroup(groupId).then((resp) => {
+            if ('status' in resp) {
+                const errorMessage = resp?.message
+                toast.error(
+                    errorMessage || 'An error occurred deleting this group.',
+                )
             } else {
                 toast.success('Group deleted successfully')
-                setTimeout(() => {
-                    location.reload()
-                    onCancel()
-                }, 2000)
+                dispatch(deleteGroupState(groupId))
+                onCancel()
             }
         })
     }

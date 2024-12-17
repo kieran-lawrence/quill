@@ -1,30 +1,25 @@
 import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { IoClose } from 'react-icons/io5'
-import { NestJSError } from '../../utils/types'
 import { User } from '@quill/data'
 import { QuillButton } from '../shared/QuillButton'
 import { useFriends } from '../../utils/hooks'
 import toast, { Toaster } from 'react-hot-toast'
-import { usePostCreateChatMutation } from '../../utils/store/chats'
-import { usePostCreateGroupChatMutation } from '../../utils/store/groups'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '../../utils/store'
+import { addChatToState } from '../../utils/store/chats'
+import { createChat } from '../../utils/api/chat'
+import { createGroup } from '../../utils/api'
+import { addGroupToState } from '../../utils/store/groups'
 
 type Props = {
     setShowModal: React.Dispatch<React.SetStateAction<boolean>>
-    onCreateChat: () => void
-    onCreateGroupChat: () => void
 }
-export const CreateChatModal = ({
-    setShowModal,
-    onCreateChat,
-    onCreateGroupChat,
-}: Props) => {
+export const CreateChatModal = ({ setShowModal }: Props) => {
     const formRef = useRef<HTMLDivElement>(null)
+    const dispatch = useDispatch<AppDispatch>()
     const [selectedUsers, setSelectedUsers] = useState<User[]>([])
     const { friends, filterFriends, searchTerm, setSearchTerm } = useFriends()
-    const [createChat, { error: chatError }] = usePostCreateChatMutation()
-    const [createGroupChat, { error: groupError }] =
-        usePostCreateGroupChatMutation()
 
     /** Toggles selected users which appear in the search input */
     const updateSelectedUsers = (user: User) => {
@@ -58,24 +53,33 @@ export const CreateChatModal = ({
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         const users = selectedUsers.map((recipient) => recipient.email)
-        try {
-            if (users.length > 1) {
-                createGroupChat({ members: users }).then(() => {
+
+        if (users.length > 1) {
+            createGroup({ members: users }).then((resp) => {
+                if ('status' in resp) {
+                    const errorMessage = resp?.message
+                    toast.error(
+                        errorMessage || 'An error occurred creating the chat',
+                    )
+                } else {
                     setShowModal(false)
-                    onCreateGroupChat()
-                })
-            } else {
-                createChat({ email: users[0] }).then(() => {
+                    dispatch(addGroupToState(resp))
+                }
+            })
+        } else {
+            createChat({ email: users[0] }).then((resp) => {
+                if ('status' in resp) {
+                    const errorMessage = resp?.message
+                    toast.error(
+                        errorMessage || 'An error occurred creating the chat',
+                    )
+                } else {
                     setShowModal(false)
-                    onCreateChat()
-                })
-            }
-        } catch (err) {
-            const errorMessage =
-                (chatError as NestJSError | undefined) ||
-                (groupError as NestJSError | undefined)
-            toast.error(`Failed to create chat: ${errorMessage?.data?.message}`)
+                    dispatch(addChatToState(resp))
+                }
+            })
         }
+
         setSelectedUsers([])
     }
     return (

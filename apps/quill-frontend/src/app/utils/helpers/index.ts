@@ -24,16 +24,9 @@ export const getChatDisplayName = (
         : `${chat.creator.firstName} ${chat.creator.lastName}`
 }
 
-/** Copies the provided text to the clipboard, calls the onCompletion function regardless of success or failure */
-export const copyToClipboard = (text: string, onCompletion: () => void) => {
-    navigator.clipboard.writeText(text).then(
-        () => {
-            onCompletion()
-        },
-        (err) => {
-            onCompletion()
-        },
-    )
+/** Copies the provided text to the clipboard */
+export const copyToClipboard = (text: string) => {
+    return navigator.clipboard.writeText(text)
 }
 
 /** Returns the recipient of the chat */

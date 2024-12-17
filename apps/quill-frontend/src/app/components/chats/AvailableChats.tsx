@@ -1,32 +1,62 @@
 'use client'
 
 import styled from 'styled-components'
-import { useGetChatsQuery } from '../../utils/store/chats'
-import { useGetGroupChatsQuery } from '../../utils/store/groups'
 import { useAuth } from '../../contexts/auth'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CreateChatModal } from './CreateChatModal'
 import { IoAdd, IoSearch } from 'react-icons/io5'
 import { ChatPreview } from './ChatPreview'
 import { Chat, GroupChat } from '@quill/data'
+import { getChats, getGroups } from '../../utils/api'
+import { AppDispatch, useAppSelector } from '../../utils/store'
+import { setChatState } from '../../utils/store/chats'
+import { useDispatch } from 'react-redux'
+import toast, { Toaster } from 'react-hot-toast'
+import { setGroupsState } from '../../utils/store/groups'
 
 export const AvailableChats = () => {
-    const { data: chats, refetch } = useGetChatsQuery()
-    const { data: groupChats, refetch: refetchGroupChats } =
-        useGetGroupChatsQuery()
     const [showCreateChatModal, setShowCreateChatModal] = useState(false)
     const { user } = useAuth()
-    const data = [...(chats || []), ...(groupChats || [])]
+    const dispatch = useDispatch<AppDispatch>()
+    const chats = useAppSelector((state) => state.chats.chats)
+    const groups = useAppSelector((state) => state.groups.groups)
+    const data = [...chats, ...groups]
+
+    useEffect(() => {
+        const fetchChats = async () => {
+            Promise.all([getChats(), getGroups()]).then((responses) => {
+                const [chatsResp, groupsResp] = responses
+
+                if ('status' in chatsResp) {
+                    const errorMessage = chatsResp?.message
+                    toast.error(
+                        errorMessage ||
+                            'An error occurred fetching your chats.',
+                    )
+                } else {
+                    dispatch(setChatState(chatsResp))
+                }
+
+                if ('status' in groupsResp) {
+                    const errorMessage = groupsResp?.message
+                    toast.error(
+                        errorMessage ||
+                            'An error occurred fetching your groups.',
+                    )
+                } else {
+                    dispatch(setGroupsState(groupsResp))
+                }
+            })
+        }
+        fetchChats()
+    }, [dispatch])
 
     return (
-        chats && (
+        data && (
             <SAvailableChats>
+                <Toaster />
                 {showCreateChatModal && (
-                    <CreateChatModal
-                        setShowModal={setShowCreateChatModal}
-                        onCreateChat={refetch}
-                        onCreateGroupChat={refetchGroupChats}
-                    />
+                    <CreateChatModal setShowModal={setShowCreateChatModal} />
                 )}
                 <SChatOverview>
                     <SActionsContainer>

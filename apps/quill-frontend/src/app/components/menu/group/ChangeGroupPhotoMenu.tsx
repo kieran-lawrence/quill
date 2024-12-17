@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { usePostChangeCoverImageMutation } from '../../../utils/store/groups'
 import { NestJSError } from '../../../utils/types'
 import { GroupChat } from '@quill/data'
 import { ActionMenu } from '../ActionMenu'
@@ -9,6 +8,10 @@ import { GroupUserInitials } from '../../GroupUserInitials'
 import { getGroupChatMembers } from '../../../utils/helpers'
 import styled from 'styled-components'
 import { useForm } from 'react-hook-form'
+import { updateGroupCoverImage } from '../../../utils/api'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '../../../utils/store'
+import { updateGroupState } from '../../../utils/store/groups'
 
 type ChangeGroupPhotoMenuprops = {
     group: GroupChat
@@ -19,7 +22,7 @@ export const ChangeGroupPhotoMenu = ({
     onCancel,
 }: ChangeGroupPhotoMenuprops) => {
     const { register } = useForm<{ avatar?: string }>()
-    const [updateGroup] = usePostChangeCoverImageMutation()
+    const dispatch = useDispatch<AppDispatch>()
     const [coverImage, setCoverImage] = useState('')
     const [file, setFile] = useState<File>()
 
@@ -30,16 +33,17 @@ export const ChangeGroupPhotoMenu = ({
             return
         }
         formData.append('avatar', file)
-        updateGroup({ groupId: group.id, formData }).then((res) => {
-            if ('error' in res) {
-                const error = res.error as NestJSError
-                toast.error(error.data?.message || 'Something went wrong')
+        updateGroupCoverImage({ groupId: group.id, formData }).then((res) => {
+            if ('status' in res) {
+                const errorMessage = res?.message
+                toast.error(
+                    errorMessage ||
+                        'An error occurred updating the group photo.',
+                )
             } else {
-                toast.success('Group updated successfully')
-                setTimeout(() => {
-                    location.reload()
-                    onCancel()
-                }, 2000)
+                toast.success('Group photo updated successfully')
+                onCancel()
+                dispatch(updateGroupState(res))
             }
         })
     }

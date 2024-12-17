@@ -1,12 +1,12 @@
 'use client'
 import styled from 'styled-components'
 import { useForm, SubmitHandler } from 'react-hook-form'
-import { PiSealWarningBold } from 'react-icons/pi'
 import { Header } from '../components/home/Header'
 import { QuillButton } from '../components/shared/QuillButton'
 import Link from 'next/link'
-import { usePostLoginMutation } from '../utils/store/auth'
 import { useRouter } from 'next/navigation'
+import { login } from '../utils/api'
+import toast, { Toaster } from 'react-hot-toast'
 
 type LoginFormProps = {
     email: string
@@ -15,33 +15,23 @@ type LoginFormProps = {
 
 export default function LoginPage() {
     const { register, handleSubmit } = useForm<LoginFormProps>()
-    const [handleLogin, { isLoading, error }] = usePostLoginMutation()
     const router = useRouter()
 
     const onSubmit: SubmitHandler<LoginFormProps> = (data) => {
-        handleLogin(data).then(async (res) => {
-            if ('error' in res) {
-                console.error(res.error)
-            } else {
-                router.push('/')
-            }
+        login(data).then(async (success) => {
+            success
+                ? router.push('/chats')
+                : toast.error('Login Failed. Please try again.')
         })
     }
 
     return (
         <SLoginPage>
+            <Toaster />
             <Header />
             <div className="loginWrapper">
                 <h2>Login</h2>
                 <h3>Join the conversation.</h3>
-                {error && (
-                    <SError>
-                        <PiSealWarningBold color={'#d34e22'} size={24} />
-                        {'data' in error
-                            ? error.data?.message
-                            : 'An unknown error has occurred'}
-                    </SError>
-                )}
                 <SLoginForm onSubmit={handleSubmit(onSubmit)}>
                     <SInput
                         id="emailInput"
@@ -59,9 +49,9 @@ export default function LoginPage() {
                     />
                     <Link href="/forgot-password">Forgot your password?</Link>
                     <QuillButton
-                        text={isLoading ? 'Loading...' : 'Log In'}
+                        text={'Log In'}
                         type="filled"
-                        isDisabled={isLoading}
+                        isDisabled={false}
                     />
                 </SLoginForm>
                 <SDivider />

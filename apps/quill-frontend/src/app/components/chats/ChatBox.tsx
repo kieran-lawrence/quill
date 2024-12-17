@@ -7,26 +7,29 @@ import { useState, KeyboardEvent } from 'react'
 import { ContextMenu } from '../menu/ContextMenu'
 import { copyToClipboard } from '../../utils/helpers'
 import {
-    usePostDeleteGroupMessageMutation,
-    usePostEditGroupMessageMutation,
+    deleteGroupMessage,
+    deletePrivateMessage,
+    editPrivateMessage,
+    updateGroupMessage,
+} from '../../utils/api'
+import toast, { Toaster } from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '../../utils/store'
+import {
+    deleteGroupMessageState,
+    updateGroupMessageState,
 } from '../../utils/store/groups'
 import {
-    usePostEditPrivateMessageMutation,
-    usePostDeletePrivateMessageMutation,
+    deletePrivateMessageState,
+    updatePrivateMessageState,
 } from '../../utils/store/chats'
 
 type ChatBoxProps = {
     message: PrivateMessage | GroupMessage
     isGroupChat: boolean
     chatId: number
-    onMessageUpdate: () => void
 }
-export const ChatBox = ({
-    message,
-    isGroupChat,
-    chatId,
-    onMessageUpdate,
-}: ChatBoxProps) => {
+export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
     const { user } = useAuth()
     const isAuthor = user?.id === message.author.id
 
@@ -34,10 +37,7 @@ export const ChatBox = ({
     const [points, setPoints] = useState({ x: 0, y: 0 })
     const [isEditing, setIsEditing] = useState(false)
     const [messageContent, setMessageContent] = useState(message.messageContent)
-    const [editGroupMessage] = usePostEditGroupMessageMutation()
-    const [deleteGroupMessage] = usePostDeleteGroupMessageMutation()
-    const [editPrivateMessage] = usePostEditPrivateMessageMutation()
-    const [deletePrivateMessage] = usePostDeletePrivateMessageMutation()
+    const dispatch = useDispatch<AppDispatch>()
 
     const onContextMenu = (e: React.MouseEvent) => {
         e.preventDefault()
@@ -45,24 +45,54 @@ export const ChatBox = ({
         setPoints({ x: e.clientX, y: e.clientY })
     }
     const copyText = () => {
-        copyToClipboard(message.messageContent, () => setShowContextMenu(false))
+        copyToClipboard(message.messageContent).then(() =>
+            setShowContextMenu(false),
+        )
     }
     const editMessage = () => {
         if (isGroupChat) {
-            editGroupMessage({ groupId: 1, messageId: 1, messageContent }).then(
-                () => {
+            updateGroupMessage({
+                groupId: chatId,
+                messageId: message.id,
+                messageContent,
+            }).then((resp) => {
+                if ('status' in resp) {
+                    const errorMessage = resp?.message
+                    toast.error(
+                        errorMessage ||
+                            'An error occurred updating this message.',
+                    )
+                } else {
                     setIsEditing(false)
-                    onMessageUpdate()
-                },
-            )
+                    dispatch(
+                        updateGroupMessageState({
+                            groupId: chatId,
+                            message: resp.message,
+                        }),
+                    )
+                }
+            })
         } else {
             editPrivateMessage({
                 chatId,
                 messageId: message.id,
                 messageContent,
-            }).then(() => {
-                setIsEditing(false)
-                onMessageUpdate()
+            }).then((resp) => {
+                if ('status' in resp) {
+                    const errorMessage = resp?.message
+                    toast.error(
+                        errorMessage ||
+                            'An error occurred updating this message.',
+                    )
+                } else {
+                    setIsEditing(false)
+                    dispatch(
+                        updatePrivateMessageState({
+                            chatId,
+                            message: resp.message,
+                        }),
+                    )
+                }
             })
         }
     }
@@ -72,14 +102,40 @@ export const ChatBox = ({
             ? deleteGroupMessage({
                   groupId: chatId,
                   messageId: message.id,
-              }).then(() => {
-                  setShowContextMenu(false)
-                  onMessageUpdate()
+              }).then((resp) => {
+                  if ('status' in resp) {
+                      const errorMessage = resp?.message
+                      toast.error(
+                          errorMessage ||
+                              'An error occurred deleting this message.',
+                      )
+                  } else {
+                      setShowContextMenu(false)
+                      dispatch(
+                          deleteGroupMessageState({
+                              groupId: chatId,
+                              messageId: message.id,
+                          }),
+                      )
+                  }
               })
             : deletePrivateMessage({ chatId, messageId: message.id }).then(
-                  () => {
-                      setShowContextMenu(false)
-                      onMessageUpdate()
+                  (resp) => {
+                      if ('status' in resp) {
+                          const errorMessage = resp?.message
+                          toast.error(
+                              errorMessage ||
+                                  'An error occurred deleting this message.',
+                          )
+                      } else {
+                          setShowContextMenu(false)
+                          dispatch(
+                              deletePrivateMessageState({
+                                  chatId,
+                                  messageId: message.id,
+                              }),
+                          )
+                      }
                   },
               )
     }
@@ -96,6 +152,7 @@ export const ChatBox = ({
 
     return (
         <SChatBox $isAuthor={isAuthor}>
+            <Toaster />
             {message.author.avatar !== null ? (
                 <Avatar imgSrc={`/images/${message.author.avatar}`} />
             ) : (

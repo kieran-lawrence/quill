@@ -4,4 +4,7 @@ export type NestJSError = {
         message?: string
         statusCode?: number
     }
+    message?: string
+    error?: string
+    statusCode?: number
 }
