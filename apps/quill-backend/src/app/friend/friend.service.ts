@@ -22,9 +22,15 @@ export class FriendService {
 
     async addFriend({ user, email }: AddFriendParams): Promise<Friend> {
         const userTwo = await this.userService.findUser({ email })
-        if (!userTwo) throw new NotFoundException('User does not exist')
+        if (!userTwo)
+            throw new NotFoundException(
+                'A user with that email does not exist.',
+            )
         const friends = await this.isFriends(user.id, userTwo.id)
-        if (friends) throw new ConflictException('Already friends')
+        if (friends)
+            throw new ConflictException(
+                'You are already friends with this user!',
+            )
         const newFriend = await this.friendRepository.create({
             userOne: user,
             userTwo,
