@@ -132,11 +132,13 @@ export const AvailableChats = () => {
 const SAvailableChats = styled.div`
     display: flex;
     height: 100%;
-    background: #f2f2f2;
+    background: ${({ theme }) => theme.colors.backgroundPrimary};
+    box-shadow: ${({ theme }) => `2px 0 2px ${theme.colors.shadow}`};
     border-top-left-radius: 0.5rem;
     border-bottom-left-radius: 0.5rem;
     min-width: 10rem;
     max-width: 20vw;
+    z-index: 1;
 `
 const SChatOverview = styled.div`
     display: flex;
@@ -158,14 +160,14 @@ const SCreateButton = styled.button`
     place-items: center;
     border-radius: 0.5rem;
     box-sizing: border-box;
-    background: #f4e7d8;
-    outline: 1px solid #f4e7d8;
+    background: ${({ theme }) => theme.colors.blueAccent};
+    outline: ${({ theme }) => `1px solid ${theme.colors.blueAccent}`};
     border: none;
     padding: 0.5rem;
     transition: all 0.2s;
 
     &:is(:hover, :active, :focus-within) {
-        outline: 1px solid #ff971f;
+        outline: ${({ theme }) => `1px solid ${theme.colors.blueStrong}`};
         cursor: pointer;
     }
 `
@@ -173,11 +175,11 @@ const SSearchInput = styled.div`
     display: flex;
     align-items: center;
     width: 100%;
-    background: #f4e7d8;
+    background: ${({ theme }) => theme.colors.blueAccent};
     border-radius: 0.5rem;
     padding: 0.5rem;
     gap: 0.5rem;
-    outline: 1px solid #f4e7d8;
+    outline: ${({ theme }) => `1px solid ${theme.colors.blueAccent}`};
     transition: all 0.2s;
     input {
         border: none;
@@ -189,7 +191,7 @@ const SSearchInput = styled.div`
     }
 
     &:is(:hover, :active, :focus-within) {
-        outline: 1px solid #ff971f;
+        outline: ${({ theme }) => `1px solid ${theme.colors.blueStrong}`};
         cursor: text;
     }
 `
@@ -197,16 +199,17 @@ const SFriendsButton = styled.button`
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: inherit;
+    background: ${({ theme }) => theme.colors.blueWeak};
+    margin-bottom: 0.5rem;
     border-radius: 0.5rem;
     padding: 0.5rem;
-    outline: 1px solid #f2f2f2;
+    outline: ${({ theme }) => `1px solid ${theme.colors.blueWeak}`};
     transition: all 0.2s;
     border: none;
     font-weight: 500;
     font-size: 1.1rem;
     &:is(:hover, :active, :focus-within) {
-        outline: 1px solid #ff971f;
+        outline: ${({ theme }) => `1px solid ${theme.colors.blueStrong}`};
         cursor: pointer;
     }
 `

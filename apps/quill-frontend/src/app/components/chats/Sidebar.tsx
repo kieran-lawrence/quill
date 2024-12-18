@@ -39,12 +39,13 @@ const SSidebar = styled.aside`
     justify-content: space-between;
     align-items: center;
     gap: 3rem;
-    min-width: 2rem;
-    width: 2vw;
+    min-width: 4rem;
+    width: 4rem;
     height: 100%;
     padding: 2rem 1rem 2rem 0;
     box-sizing: border-box;
-    color: #f1f1f1;
+    font-size: 0.9rem;
+    color: ${({ theme }) => theme.colors.text.light};
 `
 const SChatGroups = styled.div`
     flex: 1;

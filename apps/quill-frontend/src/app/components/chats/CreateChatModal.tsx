@@ -131,7 +131,7 @@ const SFriendWrapper = styled.div`
     height: 100%;
 
     h3 {
-        font-weight: 600;
+        font-weight: 500;
         padding-bottom: 0.4rem;
     }
     h4 {
@@ -148,7 +148,7 @@ export const SFriendsList = styled.div`
     border-radius: 0.5rem;
 
     &:is(:hover, :focus-within) {
-        background: #f2f2f2;
+        background: ${({ theme }) => theme.colors.blueWeak};
         cursor: pointer;
     }
 `
@@ -166,12 +166,12 @@ export const SFriendInfo = styled.section`
 
     div:last-child {
         font-size: 0.9rem;
-        font-weight: 300;
-        color: #8c8c8c;
+        font-weight: 400;
+        color: ${({ theme }) => theme.colors.text.weak};
     }
 `
 export const SSearchInputWrapper = styled.div`
-    background: #f2f2f2;
+    background: ${({ theme }) => theme.colors.backgroundSecondary};
     display: flex;
     gap: 0.4rem;
     padding: 0.3rem;
@@ -182,7 +182,7 @@ export const SSearchInputWrapper = styled.div`
     scrollbar-width: none;
     flex-wrap: wrap;
     margin-bottom: 1rem;
-    outline: 1px solid #f28140;
+    outline: ${({ theme }) => `1px solid ${theme.colors.backgroundSecondary}`};
 
     input {
         background: none;
@@ -192,6 +192,8 @@ export const SSearchInputWrapper = styled.div`
         padding: 0.7rem 0.4rem;
     }
     &:is(:hover, :focus-within) {
+        outline: ${({ theme }) => `1px solid ${theme.colors.blueStrong}`};
+
         cursor: text;
     }
 `
@@ -201,8 +203,8 @@ export const SSelectedFriendWrapper = styled.div`
     justify-content: space-evenly;
     gap: 0.4rem;
     border-radius: 0.5rem;
-    background: #f28140;
-    color: #fff;
+    background: ${({ theme }) => theme.colors.blueStrong};
+    color: ${({ theme }) => theme.colors.text.light};
     font-size: 1rem;
     padding: 0.5rem 0.8rem;
     box-sizing: border-box;
@@ -212,13 +214,13 @@ export const SSelectedFriendWrapper = styled.div`
         place-items: center;
     }
     .removeFriendIcon {
-        background: #00000011;
+        background: ${({ theme }) => theme.colors.shadow};
         border-radius: 0.5rem;
         transition: all 0.2s;
         cursor: pointer;
 
         &:hover {
-            background: #00000022;
+            opacity: 0.8;
         }
     }
 `

@@ -43,7 +43,7 @@ export const SContextMenuWrapper = styled.div<{
     border-radius: 1rem;
     box-sizing: border-box;
     position: fixed;
-    background-color: #f2f2f2;
+    background-color: #f9fafc;
     color: #1e1e1e;
     box-shadow: 0 0 0.3rem #000000b2;
     top: ${(props) => props.$top}px;

@@ -37,7 +37,7 @@ export default function AddFriendModal({ onClose }: Props) {
         <Modal
             title="Add Friend"
             onClose={onClose}
-            modalSize={{ width: 25, height: 25 }}
+            modalSize={{ width: 35, height: 25 }}
         >
             <SAddFriendForm onSubmit={handleSubmit}>
                 <Toaster />
@@ -69,13 +69,13 @@ const SAddFriendForm = styled.form`
     padding: 0.1rem;
 `
 export const SSearchInputWrapper = styled.div`
-    background: #f2f2f2;
+    background: ${({ theme }) => theme.colors.backgroundSecondary};
     display: flex;
     padding: 0.3rem;
     border-radius: 0.8rem;
     box-sizing: border-box;
     margin-bottom: 1rem;
-    outline: 1px solid #f28140;
+    outline: ${({ theme }) => `1px solid ${theme.colors.blueAccent}`};
 
     input {
         background: none;
@@ -86,6 +86,7 @@ export const SSearchInputWrapper = styled.div`
         flex: 1;
     }
     &:is(:hover, :focus-within) {
+        outline: ${({ theme }) => `1px solid ${theme.colors.blueStrong}`};
         cursor: text;
     }
 `

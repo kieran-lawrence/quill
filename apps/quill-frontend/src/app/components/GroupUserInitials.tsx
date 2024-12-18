@@ -24,7 +24,7 @@ const SAvatar = styled.div<{ $size: string }>`
     padding: 0.5rem;
     box-sizing: border-box;
     border-radius: 0.5rem;
-    background: #562e00;
+    background: ${({ theme }) => theme.colors.dark};
     font-size: 2.5rem;
-    color: #f1f1f1;
+    color: ${({ theme }) => theme.colors.text.light};
 `

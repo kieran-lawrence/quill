@@ -4,6 +4,7 @@ import { Dancing_Script } from 'next/font/google'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../../contexts/auth'
+import { QuillButton } from '../shared/QuillButton'
 
 const dancingScript = Dancing_Script({
     subsets: ['latin'],
@@ -27,9 +28,11 @@ export const Header = () => {
                     <li>Support</li>
                     <li>Discover</li>
                 </ul>
-                <SButton onClick={handleClick}>
-                    {user ? 'Open Quill' : 'Get Started'}
-                </SButton>
+                <QuillButton
+                    onClick={handleClick}
+                    type="filled"
+                    text={user ? 'Open Quill' : 'Get Started'}
+                />
             </SNav>
         </SHeader>
     )
@@ -68,20 +71,5 @@ const SNav = styled.nav`
         li {
             cursor: pointer;
         }
-    }
-`
-const SButton = styled.button`
-    border: none;
-    background: #f28140;
-    padding: 12px 20px;
-    font-size: 18px;
-    font-weight: 600;
-    border-radius: 8px;
-    color: #f8f8f8;
-    outline: 2px solid #f28140;
-    transition: all 0.1s;
-    &:hover {
-        cursor: pointer;
-        outline-offset: 4px;
     }
 `

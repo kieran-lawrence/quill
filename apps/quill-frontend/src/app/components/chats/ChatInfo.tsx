@@ -141,11 +141,12 @@ const SChatActions = styled.div<{ $isVisible: boolean }>`
     height: 50%;
     border-radius: 0.5rem;
     box-sizing: border-box;
-    background: #f2f2f2;
+    background: ${({ theme }) => theme.colors.backgroundPrimary};
     transition: all 0.2s;
 
     h3 {
         margin-bottom: 1rem;
+        font-weight: 500;
     }
     .actionsList {
         list-style: none;
@@ -159,7 +160,7 @@ const SChatActions = styled.div<{ $isVisible: boolean }>`
             border-radius: 0.5rem;
             &:is(:hover, :focus) {
                 cursor: pointer;
-                background: #f4e7d8;
+                background: ${({ theme }) => theme.colors.blueAccent};
             }
         }
     }
@@ -172,9 +173,13 @@ const SChatMembers = styled.div<{ $isVisible: boolean }>`
     flex: 1;
     border-radius: 0.5rem;
     box-sizing: border-box;
-    background: #f4e7d8;
+    background: ${({ theme }) => theme.colors.blueAccent};
     transition: all 0.2s;
     gap: 0.5rem;
+
+    h3 {
+        font-weight: 500;
+    }
 `
 const SMemberWrapper = styled.address`
     display: flex;
@@ -184,8 +189,8 @@ const SMemberWrapper = styled.address`
     font-weight: 500;
 
     p {
-        color: #562e00;
-        padding-left: 0.5rem;
+        font-size: 0.9rem;
+        color: ${({ theme }) => theme.colors.blueStrong};
         font-weight: 400;
     }
 `

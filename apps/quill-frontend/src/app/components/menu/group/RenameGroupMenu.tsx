@@ -59,7 +59,7 @@ export const RenameGroupMenu = ({
 const SRenameGroupInput = styled.input`
     padding: 0.4rem 0.8rem;
     border: none;
-    background: #f2f2f2;
+    background: #f9fafc;
     border-radius: 0.5rem;
     outline: none;
     font-size: 1.1rem;

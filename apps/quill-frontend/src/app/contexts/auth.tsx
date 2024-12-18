@@ -35,7 +35,7 @@ export const useAuth = () => {
 
     useEffect(() => {
         authStatus().then((res) => {
-            if ('status' in res) {
+            if ('error' in res) {
                 return
             } else {
                 updateAuthUser(res)

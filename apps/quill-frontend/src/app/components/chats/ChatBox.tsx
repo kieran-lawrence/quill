@@ -224,8 +224,10 @@ const SChatBox = styled.address<{ $isAuthor: boolean }>`
     font-style: normal;
 `
 const SChat = styled.div<{ $isAuthor: boolean }>`
-    background: ${({ $isAuthor }) => ($isAuthor ? '#ff971f' : '#f4e7d8')};
-    color: ${({ $isAuthor }) => ($isAuthor ? '#f6f6f6' : '#1e1e1e')};
+    background: ${({ $isAuthor, theme }) =>
+        $isAuthor ? theme.colors.blueStrong : theme.colors.blueWeak};
+    color: ${({ $isAuthor, theme }) =>
+        $isAuthor ? theme.colors.text.light : theme.colors.text.primary};
     flex: 1;
     display: flex;
     justify-content: center;
@@ -237,21 +239,21 @@ const SChat = styled.div<{ $isAuthor: boolean }>`
     h3 {
         font-size: 1.1rem;
         font-weight: 500;
-        color: #562e00;
+        color: ${({ theme }) => theme.colors.text.accent};
     }
     .editBox {
         border: none;
         outline: none;
         padding: 1rem;
         border-radius: 0.5rem;
-        background: ${({ $isAuthor }) => ($isAuthor ? '#cf7b1a' : '#cfc3b6')};
+        background: ${({ theme }) => theme.colors.text.accent};
     }
     .editActions {
         padding-left: 0.5rem;
         font-size: 0.8rem;
 
         a {
-            color: #6a5742;
+            color: ${({ theme }) => theme.colors.text.accent};
             text-decoration: none;
             cursor: pointer;
         }

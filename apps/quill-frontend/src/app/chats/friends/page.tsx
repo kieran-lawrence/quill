@@ -79,9 +79,10 @@ export const SFriendsContainer = styled.div`
     height: 100%;
     flex: 1;
     flex-direction: column;
-    background: #f2f2f2;
+    background: ${({ theme }) => theme.colors.backgroundPrimary};
     border-top-right-radius: 0.5rem;
     border-bottom-right-radius: 0.5rem;
+    padding: 0 1rem;
 `
 const SHeading = styled.div`
     display: flex;
@@ -91,21 +92,22 @@ const SHeading = styled.div`
     height: 3rem;
     width: 100%;
     padding: 1rem;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 `
 const SFilterButton = styled.button`
     display: grid;
     place-items: center;
     border-radius: 0.5rem;
-    background: #f4e7d8;
-    outline: 1px solid #f4e7d8;
+    background: ${({ theme }) => theme.colors.blueAccent};
+    outline: ${({ theme }) => `1px solid ${theme.colors.blueAccent}`};
     border: none;
     padding: 0.5rem 1rem;
     transition: all 0.2s;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    font-weight: 400;
 
     &:is(:hover, :active, :focus-within) {
-        outline: 1px solid #ff971f;
+        outline: ${({ theme }) => `1px solid ${theme.colors.blueStrong}`};
         cursor: pointer;
     }
 `
@@ -114,13 +116,13 @@ const SAddFriendButton = styled.button`
     justify-content: center;
     align-items: center;
     border-radius: 0.5rem;
-    background: #ff971f;
-    outline: 1px solid #ff971f;
+    background: ${({ theme }) => theme.colors.blueStrong};
+    outline: ${({ theme }) => `1px solid ${theme.colors.blueStrong}`};
     border: none;
     padding: 0.5rem 1rem;
-    font-size: 1rem;
-    color: #f2f2f2;
-    font-weight: 600;
+    font-size: 1.1rem;
+    color: ${({ theme }) => theme.colors.text.light};
+    font-weight: 500;
 
     &:is(:hover, :active, :focus-within) {
         opacity: 0.8;
@@ -145,9 +147,10 @@ const SFriendWrapper = styled.address`
     width: 50%;
     padding: 0.5rem;
     border-radius: 0.5rem;
+    transition: all 0.2s;
 
     &:is(:hover, :active, :focus-within) {
-        outline: 1px solid #ff971f;
+        background: ${({ theme }) => theme.colors.blueWeak};
         cursor: pointer;
     }
 `

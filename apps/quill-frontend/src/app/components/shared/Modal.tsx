@@ -51,9 +51,10 @@ const SModalOverlay = styled.div`
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: #0000008e;
+    background: ${({ theme }) => theme.colors.shadow};
     display: grid;
     place-items: center;
+    z-index: 2;
 `
 
 const SModalContent = styled.div<{
@@ -61,8 +62,8 @@ const SModalContent = styled.div<{
 }>`
     width: ${({ $modalSize }) => $modalSize?.width}vw;
     height: ${({ $modalSize }) => $modalSize?.height}vh;
-    background: #f4e7d8;
-    box-shadow: 0 0 0.3rem #000000b2;
+    background: ${({ theme }) => theme.colors.backgroundPrimary};
+    box-shadow: ${({ theme }) => `0 0 0.3rem ${theme.colors.shadow}`};
     border-radius: 1rem;
     display: flex;
     flex-direction: column;
@@ -77,14 +78,20 @@ const SModalHeader = styled.div`
     justify-content: space-between;
     align-items: center;
 
+    h2 {
+        font-weight: 500;
+    }
+
     .closeIcon {
+        color: ${({ theme }) => theme.colors.text.primary};
         padding: 0.2rem;
-        background: #00000011;
+        background: ${({ theme }) => theme.colors.shadow};
         border-radius: 0.5rem;
         transition: all 0.2s;
+
         cursor: pointer;
         &:hover {
-            background: #00000022;
+            opacity: 0.7;
         }
     }
 `

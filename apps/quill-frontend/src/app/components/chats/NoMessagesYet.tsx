@@ -15,7 +15,7 @@ const SContainer = styled.div`
     align-items: flex-end;
     height: 100%;
     font-size: 1.3rem;
-    color: #5c5c5c;
+    color: ${({ theme }) => theme.colors.text.primary};
 `
 
 const messages = [

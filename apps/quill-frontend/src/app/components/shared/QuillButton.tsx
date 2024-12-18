@@ -20,15 +20,18 @@ export const QuillButton = ({
 }
 const SButton = styled.button<Omit<QuillButtonProps, 'text'>>`
     border: none;
-    background: ${(props) =>
-        props.type === 'filled' ? '#f28140' : 'transparent'};
+    background: ${({ type, theme }) =>
+        type === 'filled' ? theme.colors.blueStrong : 'transparent'};
     padding: 12px 20px;
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 500;
     border-radius: 8px;
-    color: ${(props) => (props.type === 'filled' ? '#f8f8f8' : '#111')};
-    outline: 2px solid #f28140;
-    transition: all 0.1s;
+    color: ${({ type, theme }) =>
+        type === 'filled'
+            ? theme.colors.text.light
+            : theme.colors.text.primary};
+    outline: ${({ theme }) => `2px solid ${theme.colors.blueStrong}`};
+    transition: all 0.2s;
     &:hover {
         cursor: pointer;
         outline-offset: ${(props) => props.outlineOffset ?? 0};

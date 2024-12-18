@@ -2,7 +2,7 @@ type LogoProps = {
     size?: number
     fill?: string
 }
-export const QuillLogo = ({ size = 40, fill = '#F28140' }: LogoProps) => {
+export const QuillLogo = ({ size = 40, fill = '#FF7A55' }: LogoProps) => {
     return (
         <svg
             width={size}

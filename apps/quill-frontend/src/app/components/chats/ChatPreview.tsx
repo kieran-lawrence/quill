@@ -83,7 +83,7 @@ const SChatPreview = styled.div`
     outline: none;
     transition: all 0.2s;
     &:is(:hover, :focus) {
-        background: #f4e7d8;
+        background: ${({ theme }) => theme.colors.blueWeak};
         cursor: pointer;
     }
 `
@@ -101,11 +101,11 @@ const SNameContainer = styled.div`
     gap: 0.5rem;
 `
 const SName = styled.div`
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 500;
 `
 const SMessage = styled.div`
     font-size: 0.9rem;
     font-weight: 400;
-    color: #5c5c5c;
+    color: ${({ theme }) => theme.colors.text.primary};
 `

@@ -31,7 +31,7 @@ const SIconWithText = styled.div`
         height: 26px;
     }
     &:is(:hover, :focus) {
-        background: #6e6e6e69;
+        background: ${({ theme }) => theme.colors.orangeStrong};
         cursor: pointer;
     }
 `

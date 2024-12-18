@@ -211,7 +211,7 @@ const SChatHeader = styled.div`
 
         p {
             font-size: 0.9rem;
-            color: #1c1c1c8d;
+            color: ${({ theme }) => theme.colors.text.weak};
         }
     }
     .chatIcons {
@@ -220,10 +220,10 @@ const SChatHeader = styled.div`
     }
     .optionIcons {
         cursor: pointer;
-        color: #1c1c1c8d;
+        color: ${({ theme }) => theme.colors.text.weak};
         transition: color 0.2s;
         &:hover {
-            color: #ff971f;
+            color: ${({ theme }) => theme.colors.blueStrong};
         }
     }
 `
@@ -240,8 +240,9 @@ const SMessageInputWrapper = styled.form`
     align-items: center;
     gap: 1rem;
     border-radius: 0.5rem;
-    background: #f4e7d8;
-    outline: 1px solid #f4e7d8;
+    background: ${({ theme }) => theme.colors.blueAccent};
+    outline: ${({ theme }) => `1px solid ${theme.colors.blueAccent}`};
+    color: ${({ theme }) => theme.colors.text.primary};
     padding: 0 1rem;
     transition: all 0.2s;
     .messageInput {
@@ -254,7 +255,7 @@ const SMessageInputWrapper = styled.form`
     }
     .messageIcons {
         size: 2rem;
-        color: #562e00;
+        color: ${({ theme }) => theme.colors.blueStrong};
         cursor: pointer;
     }
     button {
@@ -264,7 +265,7 @@ const SMessageInputWrapper = styled.form`
     }
 
     &:is(:hover, :active, :focus-within) {
-        outline: 1px solid #ff971f;
+        outline: ${({ theme }) => `1px solid ${theme.colors.blueStrong}`};
         cursor: text;
     }
 `
