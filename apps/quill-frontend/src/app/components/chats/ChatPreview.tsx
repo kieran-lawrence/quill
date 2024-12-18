@@ -3,7 +3,12 @@ import { Chat, GroupChat, User } from '@quill/data'
 import { Avatar } from '../Avatar'
 import { GroupUserInitials } from '../GroupUserInitials'
 import { useRouter } from 'next/navigation'
-import { getChatDisplayName, getGroupChatMembers } from '../../utils/helpers'
+import {
+    getChatDisplayName,
+    getChatRecipient,
+    getGroupChatMembers,
+} from '../../utils/helpers'
+import { OnlineStatus } from '../OnlineStatus'
 
 type ChatPreviewProps = {
     user?: Partial<User>
@@ -13,6 +18,7 @@ export const ChatPreview = ({ user, chat }: ChatPreviewProps) => {
     const router = useRouter()
     const isGroupChat = 'members' in chat
     const displayName = getChatDisplayName(chat, user)
+    const chatUser = !isGroupChat && getChatRecipient(chat, user)
 
     /** Navigate to the appropriate chat on click dependant on type */
     const handleClick = () => {
@@ -25,7 +31,12 @@ export const ChatPreview = ({ user, chat }: ChatPreviewProps) => {
         <SChatPreview tabIndex={0} onClick={handleClick}>
             {getImageOrInitials(chat, user)}
             <SContent>
-                <SName>{displayName}</SName>
+                <SNameContainer>
+                    <SName>{displayName}</SName>
+                    {chatUser && (
+                        <OnlineStatus status={chatUser.onlineStatus} />
+                    )}
+                </SNameContainer>
                 <SMessage>
                     {chat.lastMessageSent
                         ? chat.lastMessageSent.messageContent.length > 30
@@ -85,6 +96,11 @@ const SContent = styled.div`
     padding: 0.3rem 0;
     gap: 0.5rem;
     flex: 1;
+`
+const SNameContainer = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 `
 const SName = styled.div`
     font-size: 1.1rem;

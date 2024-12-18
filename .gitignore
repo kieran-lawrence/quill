@@ -47,6 +47,7 @@ out
 
 # env files
 *.env
+*.env.local
 
 # Uploaded files
 apps/quill-frontend/public/images
