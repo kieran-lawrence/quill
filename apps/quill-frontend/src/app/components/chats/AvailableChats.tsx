@@ -14,6 +14,8 @@ import { useDispatch } from 'react-redux'
 import toast, { Toaster } from 'react-hot-toast'
 import { setGroupsState } from '../../utils/store/groups'
 import { useWebSocketConnection } from '../../utils/hooks'
+import { useRouter } from 'next/navigation'
+import { PiHandWavingBold } from 'react-icons/pi'
 
 export const AvailableChats = () => {
     const [showCreateChatModal, setShowCreateChatModal] = useState(false)
@@ -22,6 +24,7 @@ export const AvailableChats = () => {
     const chats = useAppSelector((state) => state.chats.chats)
     const groups = useAppSelector((state) => state.groups.groups)
     const data = [...chats, ...groups]
+    const router = useRouter()
 
     // Establish WebSocket connection
     useWebSocketConnection()
@@ -77,6 +80,12 @@ export const AvailableChats = () => {
                             />
                         </SCreateButton>
                     </SActionsContainer>
+                    <SFriendsButton
+                        onClick={() => router.push('/chats/friends')}
+                    >
+                        <PiHandWavingBold size={26} />
+                        Friends
+                    </SFriendsButton>
                     {data &&
                         data.map((chat: Chat | GroupChat, index) => (
                             <ChatPreview key={index} chat={chat} user={user} />
@@ -149,5 +158,22 @@ const SSearchInput = styled.div`
     &:is(:hover, :active, :focus-within) {
         outline: 1px solid #ff971f;
         cursor: text;
+    }
+`
+const SFriendsButton = styled.button`
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: inherit;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    outline: 1px solid #f2f2f2;
+    transition: all 0.2s;
+    border: none;
+    font-weight: 500;
+    font-size: 1.1rem;
+    &:is(:hover, :active, :focus-within) {
+        outline: 1px solid #ff971f;
+        cursor: pointer;
     }
 `

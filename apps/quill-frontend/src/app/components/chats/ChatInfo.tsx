@@ -104,7 +104,7 @@ export const ChatInfo = ({ isVisible, chat }: Props) => {
                                 />
                             ) : (
                                 <GroupUserInitials
-                                    text={`member`}
+                                    text={`${member.firstName} ${member.lastName}`}
                                     size="3.5rem"
                                 />
                             )}

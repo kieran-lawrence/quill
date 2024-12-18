@@ -47,7 +47,8 @@ export const useFriends = () => {
                       .includes(searchTerm.toLowerCase()) ||
                   friend.lastName
                       .toLowerCase()
-                      .includes(searchTerm.toLowerCase())
+                      .includes(searchTerm.toLowerCase()) ||
+                  friend.onlineStatus.includes(searchTerm.toLowerCase())
               ) {
                   filtered.push(friend)
               }

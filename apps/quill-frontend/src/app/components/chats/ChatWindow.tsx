@@ -148,7 +148,6 @@ export const ChatWindow = ({
                             message={message}
                             isGroupChat={isGroupChat}
                             chatId={chat.id}
-                            //onMessageUpdate={onMessageSend}
                         />
                     ))
                 ) : (
