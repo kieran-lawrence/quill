@@ -8,10 +8,13 @@ import { PiHandWavingBold } from 'react-icons/pi'
 import { OnlineStatus } from '../../components/OnlineStatus'
 import { useAppSelector } from '../../utils/store'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import AddFriendModal from '../../components/AddFriendModal'
 
 export default function FriendsPage() {
     const { friends, setSearchTerm } = useFriends()
     const chats = useAppSelector((state) => state.chats.chats)
+    const [showAddFriendModal, setShowAddFriendModal] = useState(false)
     const router = useRouter()
 
     const handleFriendMessage = (friendId: number) => {
@@ -24,6 +27,9 @@ export default function FriendsPage() {
 
     return (
         <SFriendsContainer>
+            {showAddFriendModal && (
+                <AddFriendModal onClose={() => setShowAddFriendModal(false)} />
+            )}
             <SHeading>
                 <PiHandWavingBold size={26} />
                 Friends
@@ -36,6 +42,9 @@ export default function FriendsPage() {
                 {/* <SFilterButton onClick={() => setSearchTerm('')}>
                     Pending
                 </SFilterButton> */}
+                <SAddFriendButton onClick={() => setShowAddFriendModal(true)}>
+                    Add Friend
+                </SAddFriendButton>
             </SHeading>
             <SFriendsWrapper>
                 {friends &&
@@ -91,7 +100,7 @@ const SFilterButton = styled.button`
     background: #f4e7d8;
     outline: 1px solid #f4e7d8;
     border: none;
-    padding: 0.5rem;
+    padding: 0.5rem 1rem;
     transition: all 0.2s;
     font-size: 1rem;
 
@@ -99,6 +108,25 @@ const SFilterButton = styled.button`
         outline: 1px solid #ff971f;
         cursor: pointer;
     }
+`
+const SAddFriendButton = styled.button`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0.5rem;
+    background: #ff971f;
+    outline: 1px solid #ff971f;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    color: #f2f2f2;
+    font-weight: 600;
+
+    &:is(:hover, :active, :focus-within) {
+        opacity: 0.8;
+        cursor: pointer;
+    }
+    transition: all 0.2s;
 `
 const SFriendsWrapper = styled.div`
     display: flex;

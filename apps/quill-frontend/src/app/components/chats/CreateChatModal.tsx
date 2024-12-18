@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import styled from 'styled-components'
-import { IoClose } from 'react-icons/io5'
 import { User } from '@quill/data'
 import { QuillButton } from '../shared/QuillButton'
 import { useFriends } from '../../utils/hooks'
@@ -8,47 +7,29 @@ import toast, { Toaster } from 'react-hot-toast'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../../utils/store'
 import { addChatToState } from '../../utils/store/chats'
-import { createChat } from '../../utils/api/chat'
-import { createGroup } from '../../utils/api'
+import { createChat, createGroup } from '../../utils/api'
 import { addGroupToState } from '../../utils/store/groups'
+import { Modal } from '../shared/Modal'
+import { IoClose } from 'react-icons/io5'
 
 type Props = {
-    setShowModal: React.Dispatch<React.SetStateAction<boolean>>
+    onClose: () => void
 }
-export const CreateChatModal = ({ setShowModal }: Props) => {
-    const formRef = useRef<HTMLDivElement>(null)
+
+export const CreateChatModal = ({ onClose }: Props) => {
     const dispatch = useDispatch<AppDispatch>()
     const [selectedUsers, setSelectedUsers] = useState<User[]>([])
     const { friends, filterFriends, searchTerm, setSearchTerm } = useFriends()
 
-    /** Toggles selected users which appear in the search input */
     const updateSelectedUsers = (user: User) => {
         const exists = selectedUsers.find((u) => u.id === user.id)
         if (!exists) {
-            // User is not selected, add them to selected users
             setSelectedUsers((prev) => [...prev, user])
         } else {
-            // User is selected, remove them from selected users
             setSelectedUsers((prev) => prev.filter((u) => u.id !== user.id))
         }
         setSearchTerm('')
     }
-
-    /** Hides the modal when user clicks on ref element but not its contents */
-    const handleOverlayClick = (
-        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    ) => {
-        const { current } = formRef
-        if (current === e.target) setShowModal(false)
-    }
-
-    /** Effect to hide the modal when escape key is pressed */
-    useEffect(() => {
-        const handleKeydown = (e: KeyboardEvent) =>
-            e.key === 'Escape' && setShowModal(false)
-        document.addEventListener('keydown', handleKeydown)
-        return () => document.removeEventListener('keydown', handleKeydown)
-    }, [formRef, setShowModal])
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -57,24 +38,22 @@ export const CreateChatModal = ({ setShowModal }: Props) => {
         if (users.length > 1) {
             createGroup({ members: users }).then((resp) => {
                 if ('status' in resp) {
-                    const errorMessage = resp?.message
                     toast.error(
-                        errorMessage || 'An error occurred creating the chat',
+                        resp?.message || 'An error occurred creating the chat',
                     )
                 } else {
-                    setShowModal(false)
+                    onClose()
                     dispatch(addGroupToState(resp))
                 }
             })
         } else {
             createChat({ email: users[0] }).then((resp) => {
                 if ('status' in resp) {
-                    const errorMessage = resp?.message
                     toast.error(
-                        errorMessage || 'An error occurred creating the chat',
+                        resp?.message || 'An error occurred creating the chat',
                     )
                 } else {
-                    setShowModal(false)
+                    onClose()
                     dispatch(addChatToState(resp))
                 }
             })
@@ -82,37 +61,29 @@ export const CreateChatModal = ({ setShowModal }: Props) => {
 
         setSelectedUsers([])
     }
+
     return (
-        <SCreateChatModal ref={formRef} onClick={handleOverlayClick}>
+        <Modal title="Create New Chat" onClose={onClose}>
             <SCreateChatForm onSubmit={handleSubmit}>
                 <Toaster />
-                <SCreateChatHeader>
-                    <h2>Create New Chat</h2>
-                    <IoClose
-                        size={26}
-                        onClick={() => setShowModal(false)}
-                        className="closeIcon"
-                    />
-                </SCreateChatHeader>
                 <SFriendWrapper>
                     <h3>Select Friends</h3>
                     <SSearchInputWrapper>
-                        {selectedUsers &&
-                            selectedUsers.map((recipient) => (
-                                <SSelectedFriendWrapper key={recipient.id}>
-                                    {recipient.username}
-                                    <div
-                                        onClick={() =>
-                                            updateSelectedUsers(recipient)
-                                        }
-                                    >
-                                        <IoClose
-                                            size={26}
-                                            className="removeFriendIcon"
-                                        />
-                                    </div>
-                                </SSelectedFriendWrapper>
-                            ))}
+                        {selectedUsers.map((recipient) => (
+                            <SSelectedFriendWrapper key={recipient.id}>
+                                {recipient.username}
+                                <div
+                                    onClick={() =>
+                                        updateSelectedUsers(recipient)
+                                    }
+                                >
+                                    <IoClose
+                                        size={26}
+                                        className="removeFriendIcon"
+                                    />
+                                </div>
+                            </SSelectedFriendWrapper>
+                        ))}
                         <input
                             placeholder="Search friends"
                             onChange={filterFriends}
@@ -120,8 +91,8 @@ export const CreateChatModal = ({ setShowModal }: Props) => {
                         />
                     </SSearchInputWrapper>
                     <h4>Friends:</h4>
-                    {friends &&
-                        friends.map((friend) => (
+                    <SFriendsContainer>
+                        {friends.map((friend) => (
                             <SFriendsList
                                 onClick={() => updateSelectedUsers(friend)}
                                 key={friend.id}
@@ -132,51 +103,28 @@ export const CreateChatModal = ({ setShowModal }: Props) => {
                                 </SFriendInfo>
                             </SFriendsList>
                         ))}
+                    </SFriendsContainer>
                 </SFriendWrapper>
                 <QuillButton type="filled" text="Create Chat" />
             </SCreateChatForm>
-        </SCreateChatModal>
+        </Modal>
     )
 }
-const SCreateChatModal = styled.div`
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: #0000008e;
-    display: grid;
-    place-items: center;
-`
+
 const SCreateChatForm = styled.form`
-    width: 40%;
-    height: 50%;
-    background: #f4e7d8;
-    box-shadow: 0 0 0.3rem #000000b2;
-    border-radius: 1rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 2rem;
-    gap: 2rem;
-    box-sizing: border-box;
+    height: 100%;
+    overflow-y: scroll;
+    padding: 0.1rem;
 `
-const SCreateChatHeader = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 
-    .closeIcon {
-        padding: 0.2rem;
-        background: #00000011;
-        border-radius: 0.5rem;
-        transition: all 0.2s;
-        cursor: pointer;
-        &:hover {
-            background: #00000022;
-        }
-    }
+const SFriendsContainer = styled.div`
+    overflow-y: auto;
+    max-height: 200px;
 `
+
 const SFriendWrapper = styled.div`
     display: flex;
     flex-direction: column;

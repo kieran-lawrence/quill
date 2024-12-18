@@ -14,6 +14,9 @@ export const addFriend = async ({ email }: AddFriendParams) =>
         method: 'POST',
         credentials: 'include',
         body: JSON.stringify({ email }),
+        headers: {
+            'Content-Type': 'application/json',
+        },
     }).then(async (res) => res.json())
 
 type AddFriendParams = {

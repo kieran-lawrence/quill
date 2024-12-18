@@ -63,7 +63,9 @@ export const AvailableChats = () => {
             <SAvailableChats>
                 <Toaster />
                 {showCreateChatModal && (
-                    <CreateChatModal setShowModal={setShowCreateChatModal} />
+                    <CreateChatModal
+                        onClose={() => setShowCreateChatModal(false)}
+                    />
                 )}
                 <SChatOverview>
                     <SActionsContainer>

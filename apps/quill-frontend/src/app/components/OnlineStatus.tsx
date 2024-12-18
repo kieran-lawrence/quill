@@ -18,15 +18,15 @@ export const OnlineStatus = ({ status }: { status: Status }) => {
                   borderColour: '2px solid #859293',
               }
 
-    return <SOnlineStatus status={colour} />
+    return <SOnlineStatus $status={colour} />
 }
 
-const SOnlineStatus = styled.div<{ status: StatusColour }>`
+const SOnlineStatus = styled.div<{ $status: StatusColour }>`
     width: 0.55rem;
     height: 0.55rem;
     border-radius: 50%;
     box-sizing: border-box;
-    background-color: ${({ status }) => status.backgroundColour};
-    border: ${({ status }) => status.borderColour};
+    background-color: ${({ $status }) => $status.backgroundColour};
+    border: ${({ $status }) => $status.borderColour};
     transition: background-color 0.2s;
 `
