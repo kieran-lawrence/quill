@@ -40,8 +40,7 @@ export const ActionMenu = ({
 const SActionMenu = styled.div`
     width: 20vw;
     height: fit-content;
-    background: #f4e7d8;
-    box-shadow: 0 0 0.3rem #000000b2;
+    background: ${({ theme }) => theme.colors.backgroundSecondary};
     border-radius: 1rem;
     display: flex;
     flex-direction: column;
@@ -49,9 +48,13 @@ const SActionMenu = styled.div`
     padding: 2rem;
     gap: 1rem;
     box-sizing: border-box;
+    z-index: 2;
 
-    p {
+    h2 {
         font-weight: 500;
+    }
+    p {
+        font-weight: 400;
     }
     .buttonWrapper {
         display: flex;
@@ -59,14 +62,28 @@ const SActionMenu = styled.div`
         justify-content: flex-end;
         gap: 0.5rem;
 
+        .confirm {
+            background: ${({ theme }) => theme.colors.blueStrong};
+            color: ${({ theme }) => theme.colors.text.light};
+            border: none;
+        }
+        .cancel {
+            border: 2px solid ${({ theme }) => theme.colors.blueStrong};
+        }
         .confirm,
         .cancel {
             padding: 0.4rem 0.8rem;
             border-radius: 0.5rem;
-            border: none;
+
             outline: none;
             cursor: pointer;
             font-size: 1rem;
+            font-weight: 500;
+
+            &:is(:hover, :focus) {
+                opacity: 0.8;
+            }
+            transition: all 0.2s;
         }
     }
 `

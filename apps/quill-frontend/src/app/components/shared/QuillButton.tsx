@@ -3,7 +3,6 @@ import styled from 'styled-components'
 type QuillButtonProps = {
     text: string
     type: 'filled' | 'outlined'
-    outlineOffset?: string
     isDisabled?: boolean
     onClick?: () => void
 }
@@ -30,10 +29,10 @@ const SButton = styled.button<Omit<QuillButtonProps, 'text'>>`
         type === 'filled'
             ? theme.colors.text.light
             : theme.colors.text.primary};
-    outline: ${({ theme }) => `2px solid ${theme.colors.blueStrong}`};
+    outline: none;
     transition: all 0.2s;
     &:hover {
         cursor: pointer;
-        outline-offset: ${(props) => props.outlineOffset ?? 0};
+        opacity: 0.8;
     }
 `

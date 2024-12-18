@@ -28,5 +28,5 @@ const SLoadingContainer = styled.div`
     place-items: center;
     height: 100vh;
     width: 100vw;
-    background: #00000032;
+    background: ${({ theme }) => theme.colors.shadow};
 `

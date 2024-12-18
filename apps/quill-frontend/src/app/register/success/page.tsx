@@ -121,12 +121,14 @@ const SProfileForm = styled.form`
         height: 2.5rem;
         cursor: pointer;
         background-color: transparent;
-        border: 2px solid #f28140;
+        border: ${({ theme }) => `2px solid ${theme.colors.blueStrong}`};
         outline: none;
         margin-right: 1rem;
+        transition: all 0.2s;
 
         &:is(:hover, :focus, :focus-within) {
-            background: #f281403a;
+            background: ${({ theme }) => theme.colors.blueStrong};
+            color: ${({ theme }) => theme.colors.text.light};
             cursor: pointer;
         }
     }

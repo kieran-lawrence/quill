@@ -43,9 +43,9 @@ export const SContextMenuWrapper = styled.div<{
     border-radius: 1rem;
     box-sizing: border-box;
     position: fixed;
-    background-color: #f9fafc;
-    color: #1e1e1e;
-    box-shadow: 0 0 0.3rem #000000b2;
+    background-color: ${({ theme }) => theme.colors.backgroundSecondary};
+    color: ${({ theme }) => theme.colors.text.primary};
+    box-shadow: ${({ theme }) => `0 0 0.2rem ${theme.colors.shadow}`};
     top: ${(props) => props.$top}px;
     left: ${(props) => props.$left}px;
     width: ${(props) => props.$width}vw;
@@ -65,7 +65,7 @@ export const SContextMenuWrapper = styled.div<{
         border-radius: 0.5rem;
 
         &:is(:hover, :focus) {
-            background: #f4e7d8;
+            background: ${({ theme }) => theme.colors.blueAccent};
             cursor: pointer;
         }
     }

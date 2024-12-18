@@ -14,7 +14,7 @@ export const SFocusedContentContainer = styled.div`
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: #0000008e;
+    background: ${({ theme }) => theme.colors.shadow};
     display: grid;
     place-items: center;
 `

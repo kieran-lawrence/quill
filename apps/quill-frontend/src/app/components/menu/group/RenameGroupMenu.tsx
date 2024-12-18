@@ -57,12 +57,17 @@ export const RenameGroupMenu = ({
 }
 
 const SRenameGroupInput = styled.input`
-    padding: 0.4rem 0.8rem;
+    padding: 0.5rem 1rem;
     border: none;
-    background: #f9fafc;
+    background: ${({ theme }) => theme.colors.blueAccent};
     border-radius: 0.5rem;
-    outline: none;
+    outline: ${({ theme }) => `1px solid ${theme.colors.blueAccent}`};
     font-size: 1.1rem;
     width: 100%;
     box-sizing: border-box;
+    transition: all 0.2s;
+
+    &:is(:hover, :focus, :active) {
+        outline: ${({ theme }) => `1px solid ${theme.colors.blueStrong}`};
+    }
 `

@@ -23,7 +23,9 @@ export const ChangeGroupPhotoMenu = ({
 }: ChangeGroupPhotoMenuprops) => {
     const { register } = useForm<{ avatar?: string }>()
     const dispatch = useDispatch<AppDispatch>()
-    const [coverImage, setCoverImage] = useState('')
+    const [coverImage, setCoverImage] = useState(
+        group.coverImage ? `/images/${group.coverImage}` : '',
+    )
     const [file, setFile] = useState<File>()
 
     const onChangeGroupPhoto = () => {
@@ -97,12 +99,13 @@ const SFileUploadInput = styled.input`
         height: 2.5rem;
         cursor: pointer;
         background-color: transparent;
-        border: 2px solid #f28140;
+        border: ${({ theme }) => `2px solid ${theme.colors.blueStrong}`};
         outline: none;
         margin-right: 1rem;
 
         &:is(:hover, :focus, :focus-within) {
-            background: #f281403a;
+            background: ${({ theme }) => theme.colors.blueStrong};
+            color: ${({ theme }) => theme.colors.text.light};
             cursor: pointer;
         }
     }

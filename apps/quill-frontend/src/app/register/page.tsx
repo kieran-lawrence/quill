@@ -133,23 +133,23 @@ const SInput = styled.input<{ $width?: string }>`
     font-size: 16px;
     border: 1px solid white;
     border-radius: 4px;
-    background: #f5f5f5;
+    background: ${({ theme }) => theme.colors.backgroundSecondary};
     padding: 16px 32px;
-    border: 1px solid #ccc;
+    border: ${({ theme }) => `1px solid ${theme.colors.text.accent}`};
     outline: none;
     box-sizing: border-box;
     width: ${(props) => props.$width || '100%'};
 
     &:focus,
     &:active {
-        border: 1px solid #e9353b;
+        border: ${({ theme }) => `1px solid ${theme.colors.blueStrong}`};
     }
 `
 
 const SDivider = styled.hr`
     height: 1px;
     width: 12vw;
-    background: #adadad;
+    background: ${({ theme }) => theme.colors.text.accent};
     border: none;
     margin: 16px 0;
 `
@@ -157,15 +157,6 @@ const SRegisterCta = styled.div`
     display: flex;
     gap: 8px;
     font-size: 15px;
-`
-const SError = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    color: #d34e22;
-    font-size: 18px;
-    font-weight: 400;
 `
 const SNameInputsWrapper = styled.div`
     display: flex;
