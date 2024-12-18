@@ -6,9 +6,22 @@ import { GroupUserInitials } from '../../components/GroupUserInitials'
 import { Avatar } from '../../components/Avatar'
 import { PiHandWavingBold } from 'react-icons/pi'
 import { OnlineStatus } from '../../components/OnlineStatus'
+import { useAppSelector } from '../../utils/store'
+import { useRouter } from 'next/navigation'
 
 export default function FriendsPage() {
     const { friends, setSearchTerm } = useFriends()
+    const chats = useAppSelector((state) => state.chats.chats)
+    const router = useRouter()
+
+    const handleFriendMessage = (friendId: number) => {
+        const chat = chats.find(
+            (chat) =>
+                chat.creator.id === friendId || chat.recipient.id === friendId,
+        )
+        chat && router.push(`/chats/${chat.id}`)
+    }
+
     return (
         <SFriendsContainer>
             <SHeading>
@@ -20,14 +33,17 @@ export default function FriendsPage() {
                 <SFilterButton onClick={() => setSearchTerm('')}>
                     All
                 </SFilterButton>
-                <SFilterButton onClick={() => setSearchTerm('')}>
+                {/* <SFilterButton onClick={() => setSearchTerm('')}>
                     Pending
-                </SFilterButton>
+                </SFilterButton> */}
             </SHeading>
             <SFriendsWrapper>
                 {friends &&
                     friends.map((friend) => (
-                        <SFriendWrapper key={friend.id}>
+                        <SFriendWrapper
+                            key={friend.id}
+                            onClick={() => handleFriendMessage(friend.id)}
+                        >
                             {friend.avatar ? (
                                 <Avatar
                                     imgSrc={`/images/${friend.avatar}`}
