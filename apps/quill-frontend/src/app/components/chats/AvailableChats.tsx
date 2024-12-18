@@ -13,6 +13,7 @@ import { setChatState } from '../../utils/store/chats'
 import { useDispatch } from 'react-redux'
 import toast, { Toaster } from 'react-hot-toast'
 import { setGroupsState } from '../../utils/store/groups'
+import { useWebSocketConnection } from '../../utils/hooks'
 
 export const AvailableChats = () => {
     const [showCreateChatModal, setShowCreateChatModal] = useState(false)
@@ -21,6 +22,9 @@ export const AvailableChats = () => {
     const chats = useAppSelector((state) => state.chats.chats)
     const groups = useAppSelector((state) => state.groups.groups)
     const data = [...chats, ...groups]
+
+    // Establish WebSocket connection
+    useWebSocketConnection()
 
     useEffect(() => {
         const fetchChats = async () => {

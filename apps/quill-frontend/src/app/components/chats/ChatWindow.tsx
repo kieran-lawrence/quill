@@ -10,7 +10,7 @@ import { ChatBox } from './ChatBox'
 import { getChatRecipient, getGroupChatMembers } from '../../utils/helpers'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { NoMessagesYet } from './NoMessagesYet'
-import { useWebSocket } from '../../utils/hooks'
+import { useWebSocketEvents } from '../../utils/hooks'
 import { useEffect } from 'react'
 import { useAuth } from '../../contexts/auth'
 import { useDispatch } from 'react-redux'
@@ -46,29 +46,25 @@ export const ChatWindow = ({
         : `${getChatRecipient(chat, user).firstName} ${
               getChatRecipient(chat, user).lastName
           }`
-    const { connected, sendMessage, listenForMessage } = useWebSocket()
+    const { sendMessage, listenForMessage } = useWebSocketEvents()
 
     useEffect(() => {
-        listenForMessage(
+        const cleanup = listenForMessage<MessageReceivedEventParams>(
             'messageReceived',
-            (data: MessageReceivedEventParams) => {
-                data &&
-                    dispatch(
-                        addMessageState({
-                            chatId: data.chat.id,
-                            message: data.message,
-                        }),
-                    )
+            (data) => {
+                dispatch(
+                    addMessageState({
+                        chatId: data.chat.id,
+                        message: data.message,
+                    }),
+                )
             },
         )
-    }, [listenForMessage, connected, dispatch, chat.id])
+        return cleanup
+    }, [dispatch, listenForMessage])
 
     /** Provides a single method in which to dispatch websocket events related to Chats */
     const sendMessageToSocket = <T extends object>(event: string, data: T) => {
-        if (!connected) {
-            console.error('Unable to establish WebSocket connection')
-            return
-        }
         sendMessage(event, data)
     }
 

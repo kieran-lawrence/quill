@@ -7,6 +7,7 @@ export type User = {
     avatar?: string
     messages?: PrivateMessage[]
     groupChats?: GroupChat[]
+    onlineStatus: OnlineStatus
 }
 export type PrivateMessage = {
     id: number

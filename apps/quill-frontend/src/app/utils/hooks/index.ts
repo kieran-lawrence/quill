@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { User } from '@quill/data'
 import toast from 'react-hot-toast'
-import { io, Socket } from 'socket.io-client'
 import { useAuth } from '../../contexts/auth'
 import { getFriends } from '../api'
+import { socketService } from '../services/SocketService'
 
 /** A hook that returns all of a users friends, and allows for searching of friends */
 export const useFriends = () => {
@@ -67,74 +67,94 @@ export const useFriends = () => {
     }
 }
 
-export const useWebSocket = () => {
-    const { user } = useAuth()
-    const [error, setError] = useState<string | null>()
+/**
+ * A custom hook that manages WebSocket connections.
+ * Provides functionality to connect to a WebSocket.
+ *
+ * @returns {Object} An object containing:
+ *   - connected: boolean indicating if the WebSocket is currently connected
+ *   - error: string | null containing any connection error message
+ *
+ * @example
+ * ```typescript
+ *
+ * // Establish WebSocket Connection
+ * useWebSocketConnection();
+ *
+ * // Check WebSocket Connection Status
+ * const { connected, error } = useWebSocketConnection();
+ *  connected ? console.log('Connected') : console.log('Disconnected');
+ *  error ? console.error('Error:', error) : null;
+ * ```
+ */
+export const useWebSocketConnection = () => {
     const [connected, setConnected] = useState(false)
-
-    // Reference to avoid recreating the socket instance on each render
-    const socketRef = useRef<Socket | null>(null)
+    const [error, setError] = useState<string | null>()
+    const { user } = useAuth()
 
     useEffect(() => {
-        // Initialize WebSocket connection
-        if (!socketRef.current) {
-            socketRef.current = io('http://localhost:3001', {
-                withCredentials: true,
-            })
-        }
-        socketRef.current.connect()
-        socketRef.current.auth = { user }
-        socketRef.current.on('connect', () => {
+        const socket = socketService.connect(user)
+        socket.on('connect', () => {
             setConnected(true)
             setError(null)
         })
 
-        socketRef.current.on('disconnect', () => {
+        socket.on('disconnect', () => {
             setConnected(false)
         })
 
-        socketRef.current.on('error', (err: string) => {
+        socket.on('error', (err: string) => {
             setError(err)
         })
-
-        // Clean up WebSocket connection on component unmount
-        return () => {
-            if (socketRef.current) {
-                socketRef.current.disconnect()
-            }
-        }
     }, [user])
 
-    // Sends messages to the WebSocket server
+    return { connected, error }
+}
+
+/**
+ * A custom hook that manages WebSocket communication.
+ * Provides functionality to send and listen for WebSocket events.
+ *
+ * @returns {Object} An object containing:
+ *   - sendMessage: function to emit events through the WebSocket
+ *   - listenForMessage: function to subscribe to WebSocket events
+ *
+ * @example
+ * ```typescript
+ * const {sendMessage, listenForMessage } = useWebSocketEvents();
+ *
+ * // Send a message
+ * sendMessage('eventName', { data: 'value' });
+ *
+ * // Listen for messages
+ * useEffect(() => {
+ *   const cleanup = listenForMessage<MessageType>('eventName', (data) => {
+ *     // Handle received data
+ *   });
+ *   return cleanup;
+ * }, []);
+ * ```
+ */
+export const useWebSocketEvents = () => {
     const sendMessage = useCallback(
         <T extends object>(event: string, data: T) => {
-            if (socketRef.current) {
-                socketRef.current.emit(event, data)
-            }
+            socketService.emit(event, data)
         },
         [],
     )
-    // Listens for messages from the WebSocket server
-    const listenForMessage = useCallback(
-        <T>(event: string, cb: (data: T) => void) => {
-            if (socketRef.current) {
-                socketRef.current.on(event, cb)
 
-                // Clean up the event listener on unmount
+    const listenForMessage = useCallback(
+        <T>(event: string, callback: (data: T) => void) => {
+            const socket = socketService.getSocket()
+            if (socket) {
+                socket.on(event, callback)
                 return () => {
-                    if (socketRef.current) {
-                        socketRef.current.off(event, cb)
-                    }
+                    socket.off(event, callback)
                 }
             }
         },
         [],
     )
 
-    return {
-        connected,
-        error,
-        sendMessage,
-        listenForMessage,
-    }
+    return { sendMessage, listenForMessage }
 }
