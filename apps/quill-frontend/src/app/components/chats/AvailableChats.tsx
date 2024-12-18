@@ -6,18 +6,22 @@ import { useEffect, useState } from 'react'
 import { CreateChatModal } from './CreateChatModal'
 import { IoAdd, IoSearch } from 'react-icons/io5'
 import { ChatPreview } from './ChatPreview'
-import { Chat, GroupChat } from '@quill/data'
-import { getChats, getGroups } from '../../utils/api'
+import { Chat, GroupChat, User } from '@quill/data'
+import { getChats, getFriends, getGroups } from '../../utils/api'
 import { AppDispatch, useAppSelector } from '../../utils/store'
 import { setChatState } from '../../utils/store/chats'
 import { useDispatch } from 'react-redux'
 import toast, { Toaster } from 'react-hot-toast'
 import { setGroupsState } from '../../utils/store/groups'
-import { useWebSocketConnection } from '../../utils/hooks'
 import { useRouter } from 'next/navigation'
 import { PiHandWavingBold } from 'react-icons/pi'
+import { useWebSocketConnection, useWebSocketEvents } from '../../utils/hooks'
+import { setFriendState, updateFriendState } from '../../utils/store/friends'
 
 export const AvailableChats = () => {
+    // Establish WebSocket connection
+    useWebSocketConnection()
+
     const [showCreateChatModal, setShowCreateChatModal] = useState(false)
     const { user } = useAuth()
     const dispatch = useDispatch<AppDispatch>()
@@ -26,37 +30,64 @@ export const AvailableChats = () => {
     const data = [...chats, ...groups]
     const router = useRouter()
 
-    // Establish WebSocket connection
-    useWebSocketConnection()
+    const { listenForMessage } = useWebSocketEvents()
+
+    useEffect(() => {
+        const userStatusListener = listenForMessage<User>(
+            'userStatusChange',
+            (user) => {
+                dispatch(updateFriendState(user))
+            },
+        )
+        return userStatusListener
+    }, [listenForMessage, dispatch])
 
     useEffect(() => {
         const fetchChats = async () => {
-            Promise.all([getChats(), getGroups()]).then((responses) => {
-                const [chatsResp, groupsResp] = responses
+            Promise.all([getChats(), getGroups(), getFriends()]).then(
+                (responses) => {
+                    const [chatsResp, groupsResp, friendResp] = responses
 
-                if ('status' in chatsResp) {
-                    const errorMessage = chatsResp?.message
-                    toast.error(
-                        errorMessage ||
-                            'An error occurred fetching your chats.',
-                    )
-                } else {
-                    dispatch(setChatState(chatsResp))
-                }
+                    if ('status' in chatsResp) {
+                        const errorMessage = chatsResp?.message
+                        toast.error(
+                            errorMessage ||
+                                'An error occurred fetching your chats.',
+                        )
+                    } else {
+                        dispatch(setChatState(chatsResp))
+                    }
 
-                if ('status' in groupsResp) {
-                    const errorMessage = groupsResp?.message
-                    toast.error(
-                        errorMessage ||
-                            'An error occurred fetching your groups.',
-                    )
-                } else {
-                    dispatch(setGroupsState(groupsResp))
-                }
-            })
+                    if ('status' in groupsResp) {
+                        const errorMessage = groupsResp?.message
+                        toast.error(
+                            errorMessage ||
+                                'An error occurred fetching your groups.',
+                        )
+                    } else {
+                        dispatch(setGroupsState(groupsResp))
+                    }
+
+                    if ('status' in friendResp) {
+                        const errorMessage = friendResp?.message
+                        toast.error(
+                            errorMessage ||
+                                'An error occurred fetching your groups.',
+                        )
+                    } else {
+                        const friendsResponse = friendResp.friends.map(
+                            (friend) =>
+                                friend?.userOne.id === user?.id
+                                    ? friend?.userTwo
+                                    : friend?.userOne,
+                        )
+                        dispatch(setFriendState(friendsResponse))
+                    }
+                },
+            )
         }
         fetchChats()
-    }, [dispatch])
+    }, [dispatch, user])
 
     return (
         data && (

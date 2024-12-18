@@ -1,43 +1,15 @@
 import { useState, useEffect, useCallback } from 'react'
-import toast from 'react-hot-toast'
 import { useAuth } from '../../contexts/auth'
-import { getFriends } from '../api'
 import { socketService } from '../services/SocketService'
-import { AppDispatch, useAppSelector } from '../store'
-import { useDispatch } from 'react-redux'
-import { setFriendState, filterFriends } from '../store/friends'
+import { useAppSelector } from '../store'
+import { filterFriends } from '../store/friends'
 
 /** A hook that returns all of a users friends, and allows for searching of friends */
 export const useFriends = () => {
     const [searchTerm, setSearchTerm] = useState('')
-    const dispatch = useDispatch<AppDispatch>()
     const friends = useAppSelector((state) =>
         filterFriends(state.friends, searchTerm),
     )
-
-    useEffect(() => {
-        const fetchFriends = async () => {
-            getFriends().then((res) => {
-                if ('status' in res) {
-                    toast.error('Failed to fetch friends')
-                    return
-                }
-                /**
-                 * Transforms the server response into a list of users
-                 * This is required because the schema for a Friend is {userOne:User,userTwo:User}
-                 * so we need to figure out which is not the current user in the Friend object
-                 */
-                const friendsResponse = res.friends.map((friend) =>
-                    friend?.userOne.id === res.userId
-                        ? friend?.userTwo
-                        : friend?.userOne,
-                )
-                dispatch(setFriendState(friendsResponse))
-            })
-        }
-        fetchFriends()
-    }, [dispatch])
-
     return {
         friends,
         searchTerm,

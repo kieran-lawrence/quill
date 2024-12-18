@@ -111,7 +111,7 @@ export const ChatInfo = ({ isVisible, chat }: Props) => {
                             )}
 
                             {`${member.firstName} ${member.lastName}`}
-                            <OnlineStatus status={member.onlineStatus} />
+                            <OnlineStatus userId={member.id} />
                             <p>{member.id === chat.creator.id && 'admin'}</p>
                         </SMemberWrapper>
                     ))}

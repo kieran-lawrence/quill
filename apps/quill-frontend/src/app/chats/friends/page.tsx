@@ -66,7 +66,7 @@ export default function FriendsPage() {
                             )}
 
                             {`${friend.firstName} ${friend.lastName}`}
-                            <OnlineStatus status={friend.onlineStatus} />
+                            <OnlineStatus userId={friend.id} />
                         </SFriendWrapper>
                     ))}
             </SFriendsWrapper>

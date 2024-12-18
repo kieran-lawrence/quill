@@ -1,11 +1,16 @@
-import { OnlineStatus as Status } from '@quill/data'
 import styled from 'styled-components'
+import { useAppSelector } from '../utils/store'
+import { findFriendById } from '../utils/store/friends'
 
 type StatusColour = {
     backgroundColour: string
     borderColour: string
 }
-export const OnlineStatus = ({ status }: { status: Status }) => {
+export const OnlineStatus = ({ userId }: { userId: number }) => {
+    const status = useAppSelector((state) =>
+        findFriendById(state.friends, userId),
+    )?.onlineStatus
+
     const colour: StatusColour =
         status === 'online'
             ? { backgroundColour: '#28c469', borderColour: '2px solid #28c469' }

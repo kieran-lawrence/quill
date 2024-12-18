@@ -33,9 +33,7 @@ export const ChatPreview = ({ user, chat }: ChatPreviewProps) => {
             <SContent>
                 <SNameContainer>
                     <SName>{displayName}</SName>
-                    {chatUser && (
-                        <OnlineStatus status={chatUser.onlineStatus} />
-                    )}
+                    {chatUser && <OnlineStatus userId={chatUser.id} />}
                 </SNameContainer>
                 <SMessage>
                     {chat.lastMessageSent

@@ -45,6 +45,10 @@ export const filterFriends = (state: FriendState, searchTerm: string) => {
     }, [])
 }
 
+export const findFriendById = (state: FriendState, id: number) => {
+    return state.friends.find((friend) => friend.id === id)
+}
+
 export const { setFriendState, addFriendToState, updateFriendState } =
     friendSlice.actions
 

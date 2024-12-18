@@ -11,14 +11,17 @@ import { Inject } from '@nestjs/common'
 import { Server } from 'socket.io'
 import { AuthenticatedSocket, ISessionStore } from '../../utils/interfaces'
 import { Services } from '../../utils/constants'
-import { CreateGroupMessageResponse } from '@quill/data'
+import { CreateGroupMessageResponse, OnlineStatus } from '@quill/data'
 import { NewPrivateMessageEventParams } from '@quill/socket'
 import { UserService } from '../user/user.service'
+import { User } from '../../utils/typeorm'
 
 @WebSocketGateway({
     cors: { origin: ['http://localhost:3000'], credentials: true },
 })
 export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
+    private statusChangeTimeouts: Map<number, NodeJS.Timeout> = new Map()
+
     constructor(
         @Inject(Services.SESSION_STORE)
         private readonly sessions: ISessionStore,
@@ -26,6 +29,34 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ) {}
 
     @WebSocketServer() server: Server = new Server()
+
+    private emitStatusChange(user: User, status: OnlineStatus) {
+        // Clear any existing timeout for this user
+        const existingTimeout = this.statusChangeTimeouts.get(user.id)
+        if (existingTimeout) {
+            clearTimeout(existingTimeout)
+        }
+
+        // Set new timeout
+        const timeout = setTimeout(() => {
+            // Emit to all active sessions
+            this.sessions.findAllSessions().map((s) => {
+                const sessionUser = s.handshake.auth.user
+                // Broadcast to all users except current user
+                if (sessionUser.id !== user.id) {
+                    this.server
+                        .to(`private-chat-${sessionUser.id}`)
+                        .emit('userStatusChange', {
+                            ...user,
+                            onlineStatus: status,
+                        })
+                }
+            })
+            this.statusChangeTimeouts.delete(user.id)
+        }, 2000) // 30 seconds
+
+        this.statusChangeTimeouts.set(user.id, timeout)
+    }
 
     async handleConnection(client: AuthenticatedSocket) {
         this.server.use((socket: AuthenticatedSocket, next) => {
@@ -38,15 +69,13 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
         })
 
         if (client.user) {
-            console.log(
-                `User: ${client.user.firstName} connected to room: private-chat-${client.user.id}`,
-            )
             client.join(`private-chat-${client.user.id}`)
             this.sessions.saveSession(client.user.id, client)
             await this.userService.updateUser({
                 user: client.user,
                 onlineStatus: 'online',
             })
+            this.emitStatusChange(client.user, 'online')
         }
     }
 
@@ -57,6 +86,20 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
             user: client.user,
             onlineStatus: 'offline',
         })
+        this.emitStatusChange(client.user, 'offline')
+    }
+
+    @SubscribeMessage('onUserStatusChange')
+    async userStatusChange(
+        @ConnectedSocket() client: AuthenticatedSocket,
+        @MessageBody() { status }: { status: OnlineStatus },
+    ) {
+        if (!client.user) return
+        await this.userService.updateUser({
+            user: client.user,
+            onlineStatus: status,
+        })
+        this.emitStatusChange(client.user, status)
     }
 
     @SubscribeMessage('onGroupChatJoin')
@@ -73,7 +116,6 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @MessageBody()
         { message, chat, recipientId }: NewPrivateMessageEventParams,
     ) {
-        console.log(`Sending message to room: private-chat-${recipientId}`)
         this.server
             .to(`private-chat-${recipientId}`)
             .emit('messageReceived', { message, chat })
