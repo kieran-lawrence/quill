@@ -120,7 +120,21 @@ export const ChatWindow = ({
         <SChatWindow>
             <Toaster />
             <SChatHeader>
-                <h1>{chatName}</h1>
+                <div className="chatInfo">
+                    <h1>{chatName}</h1>
+                    {isGroupChat ? (
+                        <p>
+                            {chat.members.length} members,{' '}
+                            {
+                                chat.members.filter(
+                                    (member) =>
+                                        member.onlineStatus === 'online',
+                                ).length
+                            }{' '}
+                            online
+                        </p>
+                    ) : null}
+                </div>
                 <div className="chatIcons">
                     <IconContext.Provider
                         value={{
@@ -190,6 +204,15 @@ const SChatHeader = styled.div`
     align-items: center;
     h1 {
         font-size: 2rem;
+    }
+    .chatInfo {
+        display: flex;
+        flex-direction: column;
+
+        p {
+            font-size: 0.9rem;
+            color: #1c1c1c8d;
+        }
     }
     .chatIcons {
         display: flex;

@@ -10,6 +10,7 @@ import { useState } from 'react'
 import { RenameGroupMenu } from '../menu/group/RenameGroupMenu'
 import { DeleteGroupMenu } from '../menu/group/DeleteGroupMenu'
 import { ChangeGroupPhotoMenu } from '../menu/group/ChangeGroupPhotoMenu'
+import { OnlineStatus } from '../OnlineStatus'
 
 type Props = {
     isVisible: boolean
@@ -110,6 +111,7 @@ export const ChatInfo = ({ isVisible, chat }: Props) => {
                             )}
 
                             {`${member.firstName} ${member.lastName}`}
+                            <OnlineStatus status={member.onlineStatus} />
                             <p>{member.id === chat.creator.id && 'admin'}</p>
                         </SMemberWrapper>
                     ))}
