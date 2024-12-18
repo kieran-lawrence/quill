@@ -1,7 +1,7 @@
 # 🪶 Quill 🪶
 
-Quill is a full stack **work-in-progress** ~~real-time~~ chat application I am building.\
-The backend is running NestJS with TypeORM for the database. It's mostly done, except I need to eventually get to the **real-time** part and add web sockets 😜\
+Quill is a full stack real-time chat application I am building.\
+The backend is running NestJS with TypeORM for the database. It has all the basic stuff working like real time messages, personalisation, group and private messaging\
 I've still got to finish off the front end, add all the cool functionality you would expect from a chat app like Slack or Discord before this is done.
 
 <figure>
@@ -9,7 +9,7 @@ I've still got to finish off the front end, add all the cool functionality you w
   <figcaption>> me thinking about all the things I want to do in this project </figcaption>
 </figure>
 
-## If for some reason you want to have a play in its current state, read on for instructions
+## If you want to have a play in its current state, read on for instructions
 
 There are a few pre-requisites you will need before starting in order for the project to build successfully:
 
@@ -27,11 +27,14 @@ DB_PORT=value_goes_here # Port for your database provider, mine is running in a 
 DB_USERNAME=username # Your postgres user creds
 DB_PASSWORD=password # Your postgres user creds
 DB_NAME=quill # Change if desired
-FILE_UPLOAD_DESTINATION= # Untested, but the path where you want uploaded files to go
+FILE_UPLOAD_DESTINATION= # The path where you want uploaded files to go, eg ~/User/{path_to_repo}/quill/assets/images
 ```
-
-4. Create a database with the name you specified in `DB_NAME`
-5. Run `yarn` to install all dependencies
+4. Create a `.env.local` file in `/apps/quill-frontend` and populate it with the following:
+```sh
+NEXT_PUBLIC_SOCKET_URI= Url the backend is running on, probably http://localhost:3001
+```
+5. Create a database with the name you specified in `DB_NAME`
+6. Run `yarn` to install all dependencies
 
 ## Run tasks
 
