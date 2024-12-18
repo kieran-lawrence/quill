@@ -1,14 +1,20 @@
 import { useState, useEffect, useCallback } from 'react'
-import { User } from '@quill/data'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../contexts/auth'
 import { getFriends } from '../api'
 import { socketService } from '../services/SocketService'
+import { AppDispatch, useAppSelector } from '../store'
+import { useDispatch } from 'react-redux'
+import { setFriendState, filterFriends } from '../store/friends'
 
 /** A hook that returns all of a users friends, and allows for searching of friends */
 export const useFriends = () => {
     const [searchTerm, setSearchTerm] = useState('')
-    const [friends, setFriends] = useState<User[] | null>(null)
+    const dispatch = useDispatch<AppDispatch>()
+    const friends = useAppSelector((state) =>
+        filterFriends(state.friends, searchTerm),
+    )
+
     useEffect(() => {
         const fetchFriends = async () => {
             getFriends().then((res) => {
@@ -26,45 +32,16 @@ export const useFriends = () => {
                         ? friend?.userTwo
                         : friend?.userOne,
                 )
-                setFriends(friendsResponse)
+                dispatch(setFriendState(friendsResponse))
             })
         }
         fetchFriends()
-    }, [])
+    }, [dispatch])
 
-    /** If there is no `searchTerm`, returns all users friends, else returns friends filtered by `searchTerm` */
-    const filteredFriends = friends
-        ? friends.reduce<User[]>((filtered, friend) => {
-              if (
-                  friend.username
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                  friend.email
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                  friend.firstName
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                  friend.lastName
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                  friend.onlineStatus.includes(searchTerm.toLowerCase())
-              ) {
-                  filtered.push(friend)
-              }
-              return filtered
-          }, [])
-        : []
-
-    /** Searches users friends based on search query */
-    const filterFriends = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value)
-    }
     return {
-        friends: filteredFriends,
+        friends,
         searchTerm,
         setSearchTerm,
-        filterFriends,
     }
 }
 

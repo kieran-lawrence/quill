@@ -19,7 +19,7 @@ type Props = {
 export const CreateChatModal = ({ onClose }: Props) => {
     const dispatch = useDispatch<AppDispatch>()
     const [selectedUsers, setSelectedUsers] = useState<User[]>([])
-    const { friends, filterFriends, searchTerm, setSearchTerm } = useFriends()
+    const { friends, searchTerm, setSearchTerm } = useFriends()
 
     const updateSelectedUsers = (user: User) => {
         const exists = selectedUsers.find((u) => u.id === user.id)
@@ -86,7 +86,7 @@ export const CreateChatModal = ({ onClose }: Props) => {
                         ))}
                         <input
                             placeholder="Search friends"
-                            onChange={filterFriends}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                             value={searchTerm}
                         />
                     </SSearchInputWrapper>

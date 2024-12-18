@@ -1,6 +1,5 @@
 import { GroupChat, GroupMessage } from '@quill/data'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { updateGroupMessage } from '../../api'
 
 interface GroupState {
     groups: GroupChat[]
