@@ -15,7 +15,7 @@ class SocketService {
         return SocketService.instance
     }
 
-    connect(user: Partial<User> | undefined) {
+    connect(user: User | undefined) {
         if (!this.socket) {
             this.socket = io(process.env.NEXT_PUBLIC_SOCKET_URI, {
                 withCredentials: true,

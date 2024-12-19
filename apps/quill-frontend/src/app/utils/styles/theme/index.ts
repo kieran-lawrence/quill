@@ -14,6 +14,15 @@ export const theme = {
             weak: '#1C1C1C8D',
         },
         shadow: '#00000020',
+        userStatus: {
+            online: '#28C469',
+            away: '#EBA604',
+            busy: '#E74C3C',
+            offline: {
+                background: 'transparent',
+                border: '#859293',
+            },
+        },
     },
 } as const
 

@@ -8,10 +8,9 @@ import {
 import { User } from '@quill/data'
 import { authStatus } from '../utils/api'
 
-type AuthUser = Partial<User>
 type AuthContextType = {
-    user?: AuthUser
-    updateAuthUser: (user: AuthUser) => void
+    user?: User
+    updateAuthUser: (user: User) => void
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -21,7 +20,7 @@ export const AuthContext = createContext<AuthContextType>({
 
 type Props = { children: ReactNode }
 export default function AuthContextProvider({ children }: Props) {
-    const [user, setUser] = useState<AuthUser>()
+    const [user, setUser] = useState<User>()
     return (
         <AuthContext.Provider value={{ user, updateAuthUser: setUser }}>
             {children}

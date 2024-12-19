@@ -8,15 +8,12 @@ export const getGroupChatMembers = (chat: GroupChat) => {
     return members.replace(/,\s*$/, '')
 }
 
-export const isGroupChatCreator = (chat: GroupChat, user?: Partial<User>) => {
+export const isGroupChatCreator = (chat: GroupChat, user?: User) => {
     return chat.creator.id === user?.id
 }
 
 /** Returns the display name of the chat */
-export const getChatDisplayName = (
-    chat: GroupChat | Chat,
-    user?: Partial<User>,
-) => {
+export const getChatDisplayName = (chat: GroupChat | Chat, user?: User) => {
     return 'members' in chat
         ? chat.name || getGroupChatMembers(chat)
         : user?.id === chat.creator.id
@@ -30,6 +27,6 @@ export const copyToClipboard = (text: string) => {
 }
 
 /** Returns the recipient of the chat */
-export const getChatRecipient = (chat: Chat, user?: Partial<User>) => {
+export const getChatRecipient = (chat: Chat, user?: User) => {
     return user?.id === chat?.creator.id ? chat?.recipient : chat?.creator
 }

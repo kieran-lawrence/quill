@@ -11,7 +11,7 @@ import {
 import { OnlineStatus } from '../OnlineStatus'
 
 type ChatPreviewProps = {
-    user?: Partial<User>
+    user?: User
     chat: Chat | GroupChat
 }
 export const ChatPreview = ({ user, chat }: ChatPreviewProps) => {
@@ -50,7 +50,7 @@ export const ChatPreview = ({ user, chat }: ChatPreviewProps) => {
     )
 }
 
-const getImageOrInitials = (chat: Chat | GroupChat, user?: Partial<User>) => {
+const getImageOrInitials = (chat: Chat | GroupChat, user?: User) => {
     if (!user) return
     if ('members' in chat) {
         return chat.coverImage ? (
