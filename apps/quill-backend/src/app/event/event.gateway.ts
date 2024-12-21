@@ -13,6 +13,8 @@ import { AuthenticatedSocket, ISessionStore } from '../../utils/interfaces'
 import { Services } from '../../utils/constants'
 import { CreateGroupMessageResponse, OnlineStatus } from '@quill/data'
 import {
+    DeleteGroupMessageEventParams,
+    DeletePrivateMessageEventParams,
     EditGroupMessageEventParams,
     EditPrivateMessageEventParams,
     NewPrivateMessageEventParams,
@@ -173,5 +175,33 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server
             .to(`private-chat-${recipientId}`)
             .emit('messageUpdated', { chatId, message })
+    }
+
+    @SubscribeMessage('onGroupMessageDeletion')
+    groupMessageDeleted(
+        @ConnectedSocket() client: AuthenticatedSocket,
+        @MessageBody() { groupId, messageId }: DeleteGroupMessageEventParams,
+    ) {
+        if (!client.user) return
+        this.server
+            .to(`group-chat-${groupId}`)
+            .emit('groupMessageDeleted', { groupId, messageId })
+    }
+
+    @SubscribeMessage('onPrivateMessageDeletion')
+    async privateMessageDeleted(
+        @ConnectedSocket() client: AuthenticatedSocket,
+        @MessageBody()
+        { chatId, messageId }: DeletePrivateMessageEventParams,
+    ) {
+        if (!client.user) return
+        const { creator, recipient } = await this.chatService.getChatById(
+            chatId,
+        )
+        const recipientId =
+            client.user.id === creator.id ? recipient.id : creator.id
+        this.server
+            .to(`private-chat-${recipientId}`)
+            .emit('messageDeleted', { chatId, messageId })
     }
 }

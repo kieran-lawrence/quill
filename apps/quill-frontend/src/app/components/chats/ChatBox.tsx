@@ -25,6 +25,8 @@ import {
 } from '../../utils/store/chats'
 import { useWebSocketEvents } from '../../utils/hooks'
 import {
+    DeleteGroupMessageEventParams,
+    DeletePrivateMessageEventParams,
     EditGroupMessageEventParams,
     EditPrivateMessageEventParams,
 } from '@quill/socket'
@@ -81,9 +83,35 @@ export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
                     )
                 },
             )
+        const privateMessageDeletedEvent =
+            listenForMessage<DeletePrivateMessageEventParams>(
+                'messageDeleted',
+                ({ chatId, messageId }) => {
+                    dispatch(
+                        deletePrivateMessageState({
+                            chatId,
+                            messageId,
+                        }),
+                    )
+                },
+            )
+        const groupMessageDeletedEvent =
+            listenForMessage<DeleteGroupMessageEventParams>(
+                'groupMessageDeleted',
+                ({ groupId, messageId }) => {
+                    dispatch(
+                        deleteGroupMessageState({
+                            groupId,
+                            messageId,
+                        }),
+                    )
+                },
+            )
         return () => {
             privateMessageUpdatedEvent?.()
             groupMessageUpdatedEvent?.()
+            privateMessageDeletedEvent?.()
+            groupMessageDeletedEvent?.()
         }
     }, [dispatch, listenForMessage])
 
@@ -163,6 +191,10 @@ export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
                               messageId: message.id,
                           }),
                       )
+                      sendMessage('onGroupMessageDeletion', {
+                          groupId: chatId,
+                          messageId: message.id,
+                      })
                   }
               })
             : deletePrivateMessage({ chatId, messageId: message.id }).then(
@@ -181,6 +213,10 @@ export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
                                   messageId: message.id,
                               }),
                           )
+                          sendMessage('onPrivateMessageDeletion', {
+                              chatId,
+                              messageId: message.id,
+                          })
                       }
                   },
               )

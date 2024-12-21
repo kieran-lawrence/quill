@@ -45,3 +45,11 @@ export type EditPrivateMessageEventParams = {
     chatId: number
     message: PrivateMessage
 }
+export type DeleteGroupMessageEventParams = {
+    groupId: number
+    messageId: number
+}
+export type DeletePrivateMessageEventParams = {
+    chatId: number
+    messageId: number
+}
