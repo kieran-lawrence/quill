@@ -7,6 +7,11 @@ import {
     GroupChat,
 } from '@quill/data'
 
+export type SocketEvent<TParams> = {
+    event: string
+    stateAction: (params: TParams) => void
+    paramMap: (params: TParams) => void
+}
 export type NewPrivateMessageEventParams = {
     recipientId: number
 } & MessageReceivedEventParams

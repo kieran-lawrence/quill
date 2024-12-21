@@ -29,6 +29,7 @@ import {
     DeletePrivateMessageEventParams,
     EditGroupMessageEventParams,
     EditPrivateMessageEventParams,
+    SocketEvent,
 } from '@quill/socket'
 
 type ChatBoxProps = {
@@ -36,6 +37,19 @@ type ChatBoxProps = {
     isGroupChat: boolean
     chatId: number
 }
+
+/** This type represents the different socket events that can be produced by this component */
+type ChatSocketEvents = {
+    messageUpdated: {
+        private: SocketEvent<EditPrivateMessageEventParams>
+        group: SocketEvent<EditGroupMessageEventParams>
+    }
+    messageDeleted: {
+        private: SocketEvent<DeletePrivateMessageEventParams>
+        group: SocketEvent<DeleteGroupMessageEventParams>
+    }
+}
+
 export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
     const { user } = useAuth()
     const isAuthor = user?.id === message.author.id
@@ -59,59 +73,55 @@ export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
     }
 
     useEffect(() => {
-        const privateMessageUpdatedEvent =
-            listenForMessage<EditPrivateMessageEventParams>(
-                'messageUpdated',
-                ({ chatId, message }) => {
-                    dispatch(
-                        updatePrivateMessageState({
-                            chatId,
-                            message,
-                        }),
-                    )
+        const events: ChatSocketEvents = {
+            messageUpdated: {
+                private: {
+                    event: 'messageUpdated',
+                    stateAction: updatePrivateMessageState,
+                    paramMap: (params: EditPrivateMessageEventParams) => ({
+                        chatId: params.chatId,
+                        message: params.message,
+                    }),
                 },
-            )
-        const groupMessageUpdatedEvent =
-            listenForMessage<EditGroupMessageEventParams>(
-                'groupMessageUpdated',
-                ({ groupId, message }) => {
-                    dispatch(
-                        updateGroupMessageState({
-                            groupId,
-                            message,
-                        }),
-                    )
+                group: {
+                    event: 'groupMessageUpdated',
+                    stateAction: updateGroupMessageState,
+                    paramMap: (params: EditGroupMessageEventParams) => ({
+                        groupId: params.groupId,
+                        message: params.message,
+                    }),
                 },
-            )
-        const privateMessageDeletedEvent =
-            listenForMessage<DeletePrivateMessageEventParams>(
-                'messageDeleted',
-                ({ chatId, messageId }) => {
-                    dispatch(
-                        deletePrivateMessageState({
-                            chatId,
-                            messageId,
-                        }),
-                    )
+            },
+            messageDeleted: {
+                private: {
+                    event: 'messageDeleted',
+                    stateAction: deletePrivateMessageState,
+                    paramMap: (params: DeletePrivateMessageEventParams) => ({
+                        chatId: params.chatId,
+                        messageId: params.messageId,
+                    }),
                 },
-            )
-        const groupMessageDeletedEvent =
-            listenForMessage<DeleteGroupMessageEventParams>(
-                'groupMessageDeleted',
-                ({ groupId, messageId }) => {
-                    dispatch(
-                        deleteGroupMessageState({
-                            groupId,
-                            messageId,
-                        }),
-                    )
+                group: {
+                    event: 'groupMessageDeleted',
+                    stateAction: deleteGroupMessageState,
+                    paramMap: (params: DeleteGroupMessageEventParams) => ({
+                        groupId: params.groupId,
+                        messageId: params.messageId,
+                    }),
                 },
-            )
+            },
+        }
+
+        const cleanupFunctions = Object.values(events).flatMap((category) =>
+            Object.values(category).map((eventType) =>
+                listenForMessage(eventType.event, (params) => {
+                    dispatch(eventType.action(eventType.paramMap(params)))
+                }),
+            ),
+        )
+
         return () => {
-            privateMessageUpdatedEvent?.()
-            groupMessageUpdatedEvent?.()
-            privateMessageDeletedEvent?.()
-            groupMessageDeletedEvent?.()
+            cleanupFunctions.forEach((cleanup) => cleanup?.())
         }
     }, [dispatch, listenForMessage])
 
