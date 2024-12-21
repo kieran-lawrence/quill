@@ -12,7 +12,10 @@ import { Server } from 'socket.io'
 import { AuthenticatedSocket, ISessionStore } from '../../utils/interfaces'
 import { Services } from '../../utils/constants'
 import { CreateGroupMessageResponse, OnlineStatus } from '@quill/data'
-import { NewPrivateMessageEventParams } from '@quill/socket'
+import {
+    EditGroupMessageEventParams,
+    NewPrivateMessageEventParams,
+} from '@quill/socket'
 import { UserService } from '../user/user.service'
 import { User } from '../../utils/typeorm'
 
@@ -105,10 +108,19 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage('onGroupChatJoin')
     async groupChatJoin(
         @ConnectedSocket() client: AuthenticatedSocket,
-        @MessageBody() { chatId }: { chatId: number },
+        @MessageBody() { groupId }: { groupId: number },
     ) {
         if (!client.user) return
-        client.join(`group-chat-${chatId}`)
+        client.join(`group-chat-${groupId}`)
+    }
+
+    @SubscribeMessage('onGroupChatLeave')
+    async leaveGroupChat(
+        @ConnectedSocket() client: AuthenticatedSocket,
+        @MessageBody() { groupId }: { groupId: number },
+    ) {
+        if (!client.user) return
+        client.leave(`group-chat-${groupId}`)
     }
 
     @SubscribeMessage('onPrivateMessageCreation')
@@ -130,5 +142,16 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server
             .to(`group-chat-${chat.id}`)
             .emit('groupMessageReceived', { message, chat })
+    }
+
+    @SubscribeMessage('onGroupMessageUpdate')
+    groupMessageUpdate(
+        @ConnectedSocket() client: AuthenticatedSocket,
+        @MessageBody() { groupId, message }: EditGroupMessageEventParams,
+    ) {
+        if (!client.user) return
+        this.server
+            .to(`group-chat-${groupId}`)
+            .emit('groupMessageUpdated', { message })
     }
 }

@@ -1,6 +1,9 @@
 import styled from 'styled-components'
 import { GroupChat, Chat } from '@quill/data'
-import { MessageReceivedEventParams } from '@quill/socket'
+import {
+    GroupMessageReceivedEventParams,
+    MessageReceivedEventParams,
+} from '@quill/socket'
 import { IoSearch, IoCall, IoPaperPlaneOutline } from 'react-icons/io5'
 import { LuChevronLeftSquare, LuChevronRightSquare } from 'react-icons/lu'
 import toast, { Toaster } from 'react-hot-toast'
@@ -49,18 +52,34 @@ export const ChatWindow = ({
     const { sendMessage, listenForMessage } = useWebSocketEvents()
 
     useEffect(() => {
-        const cleanup = listenForMessage<MessageReceivedEventParams>(
-            'messageReceived',
-            (data) => {
-                dispatch(
-                    addMessageState({
-                        chatId: data.chat.id,
-                        message: data.message,
-                    }),
-                )
-            },
-        )
-        return cleanup
+        const privateMessageEvent =
+            listenForMessage<MessageReceivedEventParams>(
+                'messageReceived',
+                (data) => {
+                    dispatch(
+                        addMessageState({
+                            chatId: data.chat.id,
+                            message: data.message,
+                        }),
+                    )
+                },
+            )
+        const groupMessageEvent =
+            listenForMessage<GroupMessageReceivedEventParams>(
+                'groupMessageReceived',
+                (data) => {
+                    dispatch(
+                        addGroupMessageState({
+                            groupId: data.chat.id,
+                            message: data.message,
+                        }),
+                    )
+                },
+            )
+        return () => {
+            privateMessageEvent?.()
+            groupMessageEvent?.()
+        }
     }, [dispatch, listenForMessage])
 
     /** Provides a single method in which to dispatch websocket events related to Chats */
@@ -88,6 +107,10 @@ export const ChatWindow = ({
                           }),
                       )
                       clearForm()
+                      sendMessageToSocket('onGroupMessageCreation', {
+                          message: resp.message,
+                          chat,
+                      })
                   }
               })
             : createPrivateMessage({

@@ -1,4 +1,11 @@
-import { PrivateMessage, Chat, User, OnlineStatus } from '@quill/data'
+import {
+    PrivateMessage,
+    Chat,
+    User,
+    OnlineStatus,
+    GroupMessage,
+    GroupChat,
+} from '@quill/data'
 
 export type NewPrivateMessageEventParams = {
     recipientId: number
@@ -25,4 +32,12 @@ export type EditGroupChatMemberEventParams = {
 export type UserStatusUpdatedEventParams = {
     user: User
     status: OnlineStatus
+}
+export type GroupMessageReceivedEventParams = {
+    message: GroupMessage
+    chat: GroupChat
+}
+export type EditGroupMessageEventParams = {
+    groupId: number
+    message: GroupMessage
 }
