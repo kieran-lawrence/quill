@@ -41,3 +41,7 @@ export type EditGroupMessageEventParams = {
     groupId: number
     message: GroupMessage
 }
+export type EditPrivateMessageEventParams = {
+    chatId: number
+    message: PrivateMessage
+}

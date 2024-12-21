@@ -3,7 +3,7 @@ import { GroupMessage, PrivateMessage } from '@quill/data'
 import { useAuth } from '../../contexts/auth'
 import { Avatar } from '../Avatar'
 import { GroupUserInitials } from '../GroupUserInitials'
-import { useState, KeyboardEvent } from 'react'
+import { useState, KeyboardEvent, useEffect } from 'react'
 import { ContextMenu } from '../menu/ContextMenu'
 import { copyToClipboard } from '../../utils/helpers'
 import {
@@ -23,6 +23,11 @@ import {
     deletePrivateMessageState,
     updatePrivateMessageState,
 } from '../../utils/store/chats'
+import { useWebSocketEvents } from '../../utils/hooks'
+import {
+    EditGroupMessageEventParams,
+    EditPrivateMessageEventParams,
+} from '@quill/socket'
 
 type ChatBoxProps = {
     message: PrivateMessage | GroupMessage
@@ -32,6 +37,7 @@ type ChatBoxProps = {
 export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
     const { user } = useAuth()
     const isAuthor = user?.id === message.author.id
+    const { sendMessage, listenForMessage } = useWebSocketEvents()
 
     const [showContextMenu, setShowContextMenu] = useState(false)
     const [points, setPoints] = useState({ x: 0, y: 0 })
@@ -49,6 +55,38 @@ export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
             setShowContextMenu(false),
         )
     }
+
+    useEffect(() => {
+        const privateMessageUpdatedEvent =
+            listenForMessage<EditPrivateMessageEventParams>(
+                'messageUpdated',
+                ({ chatId, message }) => {
+                    dispatch(
+                        updatePrivateMessageState({
+                            chatId,
+                            message,
+                        }),
+                    )
+                },
+            )
+        const groupMessageUpdatedEvent =
+            listenForMessage<EditGroupMessageEventParams>(
+                'groupMessageUpdated',
+                ({ groupId, message }) => {
+                    dispatch(
+                        updateGroupMessageState({
+                            groupId,
+                            message,
+                        }),
+                    )
+                },
+            )
+        return () => {
+            privateMessageUpdatedEvent?.()
+            groupMessageUpdatedEvent?.()
+        }
+    }, [dispatch, listenForMessage])
+
     const editMessage = () => {
         if (isGroupChat) {
             updateGroupMessage({
@@ -70,6 +108,10 @@ export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
                             message: resp.message,
                         }),
                     )
+                    sendMessage('onGroupMessageUpdate', {
+                        groupId: chatId,
+                        message: resp.message,
+                    })
                 }
             })
         } else {
@@ -92,6 +134,10 @@ export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
                             message: resp.message,
                         }),
                     )
+                    sendMessage('onPrivateMessageUpdate', {
+                        chatId,
+                        message: resp.message,
+                    })
                 }
             })
         }

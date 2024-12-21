@@ -14,10 +14,12 @@ import { Services } from '../../utils/constants'
 import { CreateGroupMessageResponse, OnlineStatus } from '@quill/data'
 import {
     EditGroupMessageEventParams,
+    EditPrivateMessageEventParams,
     NewPrivateMessageEventParams,
 } from '@quill/socket'
 import { UserService } from '../user/user.service'
 import { User } from '../../utils/typeorm'
+import { ChatService } from '../chat/chat.service'
 
 @WebSocketGateway({
     cors: { origin: ['http://localhost:3000'], credentials: true },
@@ -29,6 +31,7 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @Inject(Services.SESSION_STORE)
         private readonly sessions: ISessionStore,
         @Inject(Services.USER) private userService: UserService,
+        @Inject(Services.CHAT) private chatService: ChatService,
     ) {}
 
     @WebSocketServer() server: Server = new Server()
@@ -152,6 +155,23 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (!client.user) return
         this.server
             .to(`group-chat-${groupId}`)
-            .emit('groupMessageUpdated', { message })
+            .emit('groupMessageUpdated', { groupId, message })
+    }
+
+    @SubscribeMessage('onPrivateMessageUpdate')
+    async privateMessageUpdate(
+        @ConnectedSocket() client: AuthenticatedSocket,
+        @MessageBody()
+        { message, chatId }: EditPrivateMessageEventParams,
+    ) {
+        if (!client.user) return
+        const { creator, recipient } = await this.chatService.getChatById(
+            chatId,
+        )
+        const recipientId =
+            client.user.id === creator.id ? recipient.id : creator.id
+        this.server
+            .to(`private-chat-${recipientId}`)
+            .emit('messageUpdated', { chatId, message })
     }
 }
