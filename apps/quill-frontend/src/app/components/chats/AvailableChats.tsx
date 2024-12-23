@@ -6,10 +6,10 @@ import { useEffect, useState } from 'react'
 import { CreateChatModal } from './CreateChatModal'
 import { IoAdd, IoSearch } from 'react-icons/io5'
 import { ChatPreview } from './ChatPreview'
-import { Chat, GroupChat, User } from '@quill/data'
+import { Chat, GroupChat } from '@quill/data'
 import { getChats, getFriends, getGroups } from '../../utils/api'
 import { AppDispatch, useAppSelector } from '../../utils/store'
-import { setChatState } from '../../utils/store/chats'
+import { setChatState, updateChatUserState } from '../../utils/store/chats'
 import { useDispatch } from 'react-redux'
 import toast, { Toaster } from 'react-hot-toast'
 import { setGroupsState } from '../../utils/store/groups'
@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation'
 import { PiHandWavingBold } from 'react-icons/pi'
 import { useWebSocketConnection, useWebSocketEvents } from '../../utils/hooks'
 import { setFriendState, updateFriendState } from '../../utils/store/friends'
+import { UserUpdatedEventParams } from '@quill/socket'
 
 export const AvailableChats = () => {
     // Establish WebSocket connection
@@ -33,10 +34,12 @@ export const AvailableChats = () => {
     const { listenForMessage } = useWebSocketEvents()
 
     useEffect(() => {
-        const userStatusListener = listenForMessage<User>(
+        const userStatusListener = listenForMessage<UserUpdatedEventParams>(
             'userUpdated',
-            (user) => {
-                dispatch(updateFriendState(user))
+            ({ updatedUser }) => {
+                if (!updatedUser) return
+                dispatch(updateFriendState(updatedUser))
+                dispatch(updateChatUserState(updatedUser))
             },
         )
         return userStatusListener

@@ -1,4 +1,4 @@
-import { Chat, PrivateMessage } from '@quill/data'
+import { Chat, PrivateMessage, User } from '@quill/data'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface ChatState {
@@ -69,6 +69,14 @@ const chatSlice = createSlice({
                 )
             }
         },
+        updateChatUserState: (state, action: PayloadAction<User>) => {
+            state.chats.map((chat) => {
+                const user = action.payload
+                chat.creator.id === user.id
+                    ? (chat.creator = user)
+                    : (chat.recipient = user)
+            })
+        },
     },
 })
 
@@ -83,6 +91,7 @@ export const {
     addMessageState,
     updatePrivateMessageState,
     deletePrivateMessageState,
+    updateChatUserState,
 } = chatSlice.actions
 
 export default chatSlice.reducer

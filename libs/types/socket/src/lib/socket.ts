@@ -58,7 +58,6 @@ export type DeletePrivateMessageEventParams = {
     chatId: number
     messageId: number
 }
-export type UserAvatarUpdatedEventParams = {
-    userId: number
-    avatar: string
+export type UserUpdatedEventParams = {
+    updatedUser: User
 }
