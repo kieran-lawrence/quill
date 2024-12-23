@@ -11,6 +11,7 @@ import { SubmitHandler, useForm, UseFormRegister } from 'react-hook-form'
 import { updateUser } from '../utils/api'
 import toast, { Toaster } from 'react-hot-toast'
 import { PiPencilSimpleBold } from 'react-icons/pi'
+import { useWebSocketEvents } from '../utils/hooks'
 
 type ProfileFormProps = {
     firstName?: string
@@ -20,7 +21,7 @@ type ProfileFormProps = {
 }
 export default function ProfilePage() {
     const { register, handleSubmit, reset, watch } = useForm<ProfileFormProps>()
-
+    const { sendMessage } = useWebSocketEvents()
     const [file, setFile] = useState<File>()
     const [imgPath, setImgPath] = useState('')
     const router = useRouter()
@@ -54,13 +55,16 @@ export default function ProfilePage() {
         if (lastName) formData.append('lastName', lastName)
         if (username) formData.append('username', username)
 
-        return updateUser(formData).then((resp) => {
+        updateUser(formData).then((resp) => {
             if ('status' in resp) {
                 const errorMessage = resp?.message
                 toast.error(
-                    errorMessage || 'An error occurred fetching your chats.',
+                    errorMessage || 'An error occurred updating your profile.',
                 )
             } else {
+                sendMessage('onUserUpdated', {
+                    updatedUser: resp,
+                })
                 router.push('/chats')
             }
         })

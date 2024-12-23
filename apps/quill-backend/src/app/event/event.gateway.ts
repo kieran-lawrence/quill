@@ -205,10 +205,10 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
             .emit('messageDeleted', { chatId, messageId })
     }
 
-    @SubscribeMessage('onUserAvatarUpdated')
+    @SubscribeMessage('onUserUpdated')
     userAvatarUpdated(
         @ConnectedSocket() { user }: AuthenticatedSocket,
-        @MessageBody() { avatar }: { avatar: string },
+        @MessageBody() updatedUser: Partial<User>,
     ) {
         if (!user) return
 
@@ -219,7 +219,7 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (sessionUser.id !== user.id) {
                 this.server
                     .to(`private-chat-${sessionUser.id}`)
-                    .emit('userUpdated', { ...user, avatar })
+                    .emit('userUpdated', updatedUser)
             }
         })
     }
