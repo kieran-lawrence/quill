@@ -30,7 +30,7 @@ export const Header = () => {
                 </ul>
                 <QuillButton
                     onClick={handleClick}
-                    type="filled"
+                    style="filled"
                     text={user ? 'Open Quill' : 'Get Started'}
                 />
             </SNav>

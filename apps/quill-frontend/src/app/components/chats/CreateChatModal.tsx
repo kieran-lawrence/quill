@@ -105,7 +105,7 @@ export const CreateChatModal = ({ onClose }: Props) => {
                         ))}
                     </SFriendsContainer>
                 </SFriendWrapper>
-                <QuillButton type="filled" text="Create Chat" />
+                <QuillButton style="filled" text="Create Chat" />
             </SCreateChatForm>
         </Modal>
     )

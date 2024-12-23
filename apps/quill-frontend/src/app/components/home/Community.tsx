@@ -12,7 +12,7 @@ export const Community = () => {
                     colleagues. Don’t miss out—your next great conversation is
                     just a click away!
                 </p>
-                <QuillButton text="Sign Up" type="filled" />
+                <QuillButton text="Sign Up" style="filled" />
             </div>
             <div className="innerRight">Chats Go Here</div>
         </SCommunity>

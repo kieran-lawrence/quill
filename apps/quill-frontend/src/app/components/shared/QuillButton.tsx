@@ -1,32 +1,35 @@
 import styled from 'styled-components'
 
+type ButtonStyles = 'filled' | 'outlined'
 type QuillButtonProps = {
     text: string
-    type: 'filled' | 'outlined'
+    style: ButtonStyles
+    type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type']
     isDisabled?: boolean
     onClick?: () => void
 }
 export const QuillButton = ({
     text,
     isDisabled,
-    ...rest
+    style,
+    type = 'submit',
 }: QuillButtonProps) => {
     return (
-        <SButton {...rest} disabled={isDisabled}>
+        <SButton $style={style} disabled={isDisabled} type={type}>
             {text}
         </SButton>
     )
 }
-const SButton = styled.button<Omit<QuillButtonProps, 'text'>>`
+const SButton = styled.button<{ $style: ButtonStyles }>`
     border: none;
-    background: ${({ type, theme }) =>
-        type === 'filled' ? theme.colors.blueStrong : 'transparent'};
+    background: ${({ $style, theme }) =>
+        $style === 'filled' ? theme.colors.blueStrong : 'transparent'};
     padding: 12px 20px;
     font-size: 18px;
     font-weight: 500;
     border-radius: 8px;
-    color: ${({ type, theme }) =>
-        type === 'filled'
+    color: ${({ $style, theme }) =>
+        $style === 'filled'
             ? theme.colors.text.light
             : theme.colors.text.primary};
     outline: none;

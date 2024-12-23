@@ -50,7 +50,7 @@ export default function LoginPage() {
                     <Link href="/forgot-password">Forgot your password?</Link>
                     <QuillButton
                         text={'Log In'}
-                        type="filled"
+                        style="filled"
                         isDisabled={false}
                     />
                 </SLoginForm>

@@ -52,7 +52,7 @@ export default function AddFriendModal({ onClose }: Props) {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
-                    <QuillButton type="filled" text="Send Friend Request" />
+                    <QuillButton style="filled" text="Send Friend Request" />
                 </SSearchInputWrapper>
             </SAddFriendForm>
         </Modal>

@@ -10,7 +10,7 @@ export const Hero = () => {
                     Join a vibrant community where every message nurtures
                     understanding and sparks collaboration
                 </p>
-                <QuillButton text="Get Started" type="filled" />
+                <QuillButton text="Get Started" style="filled" />
             </SHeroText>
 
             <SPromoImage
