@@ -11,7 +11,11 @@ import { Inject } from '@nestjs/common'
 import { Server } from 'socket.io'
 import { AuthenticatedSocket, ISessionStore } from '../../utils/interfaces'
 import { Services } from '../../utils/constants'
-import { CreateGroupMessageResponse, OnlineStatus } from '@quill/data'
+import {
+    CreateGroupMessageResponse,
+    GroupChat,
+    OnlineStatus,
+} from '@quill/data'
 import {
     DeleteGroupMessageEventParams,
     DeletePrivateMessageEventParams,
@@ -222,5 +226,25 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
                     .emit('userUpdated', updatedUser)
             }
         })
+    }
+
+    @SubscribeMessage('onGroupChatUpdate')
+    groupChatUpdated(
+        @ConnectedSocket() client: AuthenticatedSocket,
+        @MessageBody() { group }: { group: GroupChat },
+    ) {
+        if (!client.user) return
+        this.server.to(`group-chat-${group.id}`).emit('groupChatUpdated', group)
+    }
+
+    @SubscribeMessage('onGroupChatDelete')
+    groupChatDeleted(
+        @ConnectedSocket() client: AuthenticatedSocket,
+        @MessageBody() { groupId }: { groupId: number },
+    ) {
+        if (!client.user) return
+        this.server
+            .to(`group-chat-${groupId}`)
+            .emit('groupChatDeleted', groupId)
     }
 }

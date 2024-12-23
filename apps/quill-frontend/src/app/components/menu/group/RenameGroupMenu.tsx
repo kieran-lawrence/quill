@@ -6,6 +6,7 @@ import { updateGroup } from '../../../utils/api'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../../../utils/store'
 import { updateGroupState } from '../../../utils/store/groups'
+import { useWebSocketEvents } from '../../../utils/hooks'
 
 type RenameGroupMenuprops = {
     groupId: number
@@ -17,6 +18,7 @@ export const RenameGroupMenu = ({
 }: RenameGroupMenuprops) => {
     const [name, setName] = useState('')
     const dispatch = useDispatch<AppDispatch>()
+    const { sendMessage } = useWebSocketEvents()
 
     const onRenameGroup = () => {
         if (!name) return
@@ -33,6 +35,7 @@ export const RenameGroupMenu = ({
                 toast.success('Group renamed successfully')
                 onCancel()
                 dispatch(updateGroupState(res))
+                sendMessage('onGroupChatUpdate', { group: res })
             }
         })
     }

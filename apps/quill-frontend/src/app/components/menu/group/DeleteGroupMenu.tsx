@@ -4,6 +4,7 @@ import { ActionMenu } from '../ActionMenu'
 import toast, { Toaster } from 'react-hot-toast'
 import { AppDispatch } from '../../../utils/store'
 import { deleteGroupState } from '../../../utils/store/groups'
+import { useWebSocketEvents } from '../../../utils/hooks'
 
 type DeleteGroupMenuprops = {
     groupId: number
@@ -14,6 +15,7 @@ export const DeleteGroupMenu = ({
     onCancel,
 }: DeleteGroupMenuprops) => {
     const dispatch = useDispatch<AppDispatch>()
+    const { sendMessage } = useWebSocketEvents()
 
     const onDeleteGroup = () => {
         deleteGroup(groupId).then((resp) => {
@@ -24,6 +26,7 @@ export const DeleteGroupMenu = ({
                 )
             } else {
                 toast.success('Group deleted successfully')
+                sendMessage('onGroupChatDelete', { groupId })
                 dispatch(deleteGroupState(groupId))
                 onCancel()
             }

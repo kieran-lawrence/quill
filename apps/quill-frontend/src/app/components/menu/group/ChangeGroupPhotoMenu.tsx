@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { NestJSError } from '../../../utils/types'
 import { GroupChat } from '@quill/data'
 import { ActionMenu } from '../ActionMenu'
 import toast, { Toaster } from 'react-hot-toast'
@@ -12,6 +11,7 @@ import { updateGroupCoverImage } from '../../../utils/api'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../../../utils/store'
 import { updateGroupState } from '../../../utils/store/groups'
+import { useWebSocketEvents } from '../../../utils/hooks'
 
 type ChangeGroupPhotoMenuprops = {
     group: GroupChat
@@ -27,6 +27,7 @@ export const ChangeGroupPhotoMenu = ({
         group.coverImage ? `/images/${group.coverImage}` : '',
     )
     const [file, setFile] = useState<File>()
+    const { sendMessage } = useWebSocketEvents()
 
     const onChangeGroupPhoto = () => {
         const formData = new FormData()
@@ -46,6 +47,7 @@ export const ChangeGroupPhotoMenu = ({
                 toast.success('Group photo updated successfully')
                 onCancel()
                 dispatch(updateGroupState(res))
+                sendMessage('onGroupChatUpdate', { group: res })
             }
         })
     }

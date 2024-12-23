@@ -11,6 +11,7 @@ import { RenameGroupMenu } from '../menu/group/RenameGroupMenu'
 import { DeleteGroupMenu } from '../menu/group/DeleteGroupMenu'
 import { ChangeGroupPhotoMenu } from '../menu/group/ChangeGroupPhotoMenu'
 import { OnlineStatus } from '../OnlineStatus'
+import { useRouter } from 'next/navigation'
 
 type Props = {
     isVisible: boolean
@@ -25,6 +26,7 @@ type ActionProps = {
 export const ChatInfo = ({ isVisible, chat }: Props) => {
     const { user } = useAuth()
     const isCreator = isGroupChatCreator(chat, user)
+    const router = useRouter()
     const [editing, setEditing] = useState<ActionProps>({
         isRenaming: false,
         isDeleting: false,
@@ -44,9 +46,10 @@ export const ChatInfo = ({ isVisible, chat }: Props) => {
             {editing.isDeleting && (
                 <DeleteGroupMenu
                     groupId={chat.id}
-                    onCancel={() =>
+                    onCancel={() => {
                         setEditing({ ...editing, isDeleting: false })
-                    }
+                        router.replace('/chats')
+                    }}
                 />
             )}
             {editing.isChangingPhoto && (
