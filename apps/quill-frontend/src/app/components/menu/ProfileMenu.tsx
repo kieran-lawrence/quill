@@ -4,6 +4,7 @@ import { Avatar } from '../Avatar'
 import { GroupUserInitials } from '../GroupUserInitials'
 import { OnlineStatus } from '../OnlineStatus'
 import { useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 
 type Props = {
     user: User
@@ -11,7 +12,7 @@ type Props = {
 }
 export const ProfileMenu = ({ user, handleClose }: Props) => {
     const menuRef = useRef<HTMLDivElement>(null)
-
+    const router = useRouter()
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (
@@ -63,7 +64,7 @@ export const ProfileMenu = ({ user, handleClose }: Props) => {
                     </strong>
                 </li>
                 <li></li>
-                <li>Profile</li>
+                <li onClick={() => router.push('/profile')}>Profile</li>
                 <li>Sign Out</li>
             </SProfileOptions>
         </SProfileMenu>

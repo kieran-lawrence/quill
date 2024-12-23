@@ -24,7 +24,7 @@ export default function Register() {
 
     const onSubmit: SubmitHandler<RegisterFormProps> = (data) => {
         register(data).then(() => {
-            router.push('/register/success')
+            router.push('/chats')
         })
     }
 
@@ -77,7 +77,7 @@ export default function Register() {
                         required
                         {...formReg('password')}
                     />
-                    <QuillButton type="filled" text={'Register'}></QuillButton>
+                    <QuillButton style="filled" text={'Register'}></QuillButton>
                 </SRegisterForm>
                 <small>
                     By continuing you agree to our{' '}

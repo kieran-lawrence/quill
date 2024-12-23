@@ -73,3 +73,10 @@ export type DeleteResult = {
     affected?: number | null
 }
 export type OnlineStatus = 'online' | 'offline' | 'away' | 'busy'
+
+export type UpdateUserParams = {
+    firstName?: string
+    lastName?: string
+    username?: string
+    formData?: FormData
+}
