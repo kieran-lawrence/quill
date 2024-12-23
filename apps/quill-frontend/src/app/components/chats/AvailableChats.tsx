@@ -34,7 +34,7 @@ export const AvailableChats = () => {
 
     useEffect(() => {
         const userStatusListener = listenForMessage<User>(
-            'userStatusChange',
+            'userUpdated',
             (user) => {
                 dispatch(updateFriendState(user))
             },

@@ -54,7 +54,7 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 if (sessionUser.id !== user.id) {
                     this.server
                         .to(`private-chat-${sessionUser.id}`)
-                        .emit('userStatusChange', {
+                        .emit('userUpdated', {
                             ...user,
                             onlineStatus: status,
                         })
@@ -203,5 +203,24 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server
             .to(`private-chat-${recipientId}`)
             .emit('messageDeleted', { chatId, messageId })
+    }
+
+    @SubscribeMessage('onUserAvatarUpdated')
+    userAvatarUpdated(
+        @ConnectedSocket() { user }: AuthenticatedSocket,
+        @MessageBody() { avatar }: { avatar: string },
+    ) {
+        if (!user) return
+
+        // Emit to all active sessions
+        this.sessions.findAllSessions().map((s) => {
+            const sessionUser = s.handshake.auth.user
+            // Broadcast to all users except current user
+            if (sessionUser.id !== user.id) {
+                this.server
+                    .to(`private-chat-${sessionUser.id}`)
+                    .emit('userUpdated', { ...user, avatar })
+            }
+        })
     }
 }
