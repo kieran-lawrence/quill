@@ -222,9 +222,17 @@ export const ChatInfo = ({ isVisible, chat }: Props) => {
                                 />
                             )}
 
-                            {`${member.firstName} ${member.lastName}`}
-                            <OnlineStatus userId={member.id} />
-                            <p>{member.id === chat.creator.id && 'admin'}</p>
+                            <div className="memberInfo">
+                                {`${member.firstName} ${member.lastName}`}
+                                <OnlineStatus
+                                    userId={member.id}
+                                    overrideStatus={member.onlineStatus}
+                                />
+                                <p>
+                                    {member.id === chat.creator.id && 'admin'}
+                                </p>
+                                <p>{member.id === user?.id && '(you)'}</p>
+                            </div>
                         </SMemberWrapper>
                     ))}
                 </SChatMembers>
@@ -301,9 +309,10 @@ const SChatMemberActions = styled.div`
     .addMemberIcon {
         cursor: pointer;
         transition: all 0.2s;
+        color: ${({ theme }) => theme.colors.blueStrong};
 
         &:hover {
-            color: ${({ theme }) => theme.colors.blueStrong};
+            color: ${({ theme }) => theme.colors.orangeStrong};
         }
     }
 `
@@ -317,6 +326,13 @@ const SMemberWrapper = styled.address`
     border-radius: 0.5rem;
     box-sizing: border-box;
     user-select: none;
+
+    .memberInfo {
+        display: flex;
+        align-items: center;
+        column-gap: 0.5rem;
+        flex-wrap: wrap;
+    }
 
     p {
         font-size: 0.9rem;
