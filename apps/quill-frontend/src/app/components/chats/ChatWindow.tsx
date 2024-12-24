@@ -28,7 +28,8 @@ type ChatWindowProps = {
     optionsVisible?: boolean
 }
 type CreateMessageParams = {
-    message: string
+    message?: string
+    image?: FileList
 }
 
 export const ChatWindow = ({
@@ -87,11 +88,27 @@ export const ChatWindow = ({
         sendMessage(event, data)
     }
 
-    const onSubmit: SubmitHandler<CreateMessageParams> = (data) => {
+    const onSubmit: SubmitHandler<CreateMessageParams> = ({
+        image,
+        message,
+    }) => {
+        if (!image && !message) {
+            toast.error('Please enter a message or attach an image')
+            return
+        }
+
+        const formData = new FormData()
+
+        if (image && image.length) {
+            const uploadedFile = image.item(0)
+            uploadedFile && formData.append('image', uploadedFile)
+        }
+        if (message) formData.append('messageContent', message)
+
         isGroupChat
             ? createGroupMessage({
                   groupId: chat.id,
-                  messageContent: data.message,
+                  formData,
               }).then((resp) => {
                   if ('status' in resp) {
                       const errorMessage = resp?.message
@@ -115,7 +132,7 @@ export const ChatWindow = ({
               })
             : createPrivateMessage({
                   chatId: chat.id,
-                  messageContent: data.message,
+                  formData,
               }).then((resp) => {
                   if ('status' in resp) {
                       const errorMessage = resp?.message
@@ -198,7 +215,17 @@ export const ChatWindow = ({
                 <IconContext.Provider
                     value={{ className: 'messageIcons', size: '1.6rem' }}
                 >
-                    <FiPaperclip />
+                    <FiPaperclip
+                        onClick={() =>
+                            document.getElementById('fileInput')?.click()
+                        }
+                    />
+                    <input
+                        id="fileInput"
+                        type="file"
+                        {...register('image')}
+                        accept=".jpg, .jpeg, .png"
+                    />
                     <input
                         className="messageInput"
                         placeholder={`Message ${chatName}`}
@@ -285,6 +312,9 @@ const SMessageInputWrapper = styled.form`
         border: none;
         outline: none;
         background: none;
+    }
+    #fileInput {
+        display: none;
     }
 
     &:is(:hover, :active, :focus-within) {

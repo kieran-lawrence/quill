@@ -7,7 +7,9 @@ import {
     Param,
     ParseIntPipe,
     Post,
+    UploadedFile,
     UseGuards,
+    UseInterceptors,
     UsePipes,
     ValidationPipe,
 } from '@nestjs/common'
@@ -18,6 +20,8 @@ import { CreatePrivateMessageDto } from '../dtos/CreatePrivateMessage.dto'
 import { EditPrivateMessageDto } from '../dtos/EditPrivateMessage.dto'
 import { AuthenticatedUser } from '../../../utils/decorators'
 import { AuthenticatedGuard } from '../../auth/local-auth.guard'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { multerOptions } from '../../../utils/helpers'
 
 @Controller(Routes.PRIVATE_MESSAGE)
 @UseGuards(AuthenticatedGuard)
@@ -42,15 +46,19 @@ export class PrivateMessageController {
 
     @Post()
     @UsePipes(ValidationPipe)
+    @UseInterceptors(FileInterceptor('image', multerOptions))
     async createPrivateMessage(
         @AuthenticatedUser() user: User,
         @Param('id', ParseIntPipe) id: number,
         @Body() { messageContent }: CreatePrivateMessageDto,
+        @UploadedFile()
+        image: Express.Multer.File,
     ) {
         return this.messageService.createPrivateMessage({
             messageContent,
             chatId: id,
             user,
+            image,
         })
     }
 

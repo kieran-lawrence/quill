@@ -61,9 +61,10 @@ export type DeleteFriendParams = {
     friendId: number
 }
 export type CreateGroupMessageParams = {
-    messageContent: string
+    messageContent?: string
     groupId: number
     user: User
+    image?: Express.Multer.File
 }
 export type EditGroupMessageParams = {
     user: User
@@ -75,9 +76,10 @@ export type DeleteGroupMessageParams = {
     id: number
 }
 export type CreatePrivateMessageParams = {
-    messageContent: string
+    messageContent?: string
     chatId: number
     user: User
+    image?: Express.Multer.File
 }
 export type EditPrivateMessageParams = {
     user: User

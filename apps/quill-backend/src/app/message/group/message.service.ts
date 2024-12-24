@@ -27,7 +27,12 @@ export class GroupMessageService {
         messageContent,
         groupId,
         user: author,
+        image,
     }: CreateGroupMessageParams): Promise<CreateGroupMessageResponse> {
+        if (!messageContent && !image)
+            throw new BadRequestException(
+                'Message content or image is required',
+            )
         const groupChat = await this.groupService.getGroupChatById(groupId)
         if (!groupChat) throw new BadRequestException('Group chat not found')
         if (!groupChat.members.find((member) => member.id === author.id))
@@ -35,7 +40,7 @@ export class GroupMessageService {
                 'You are not a part of this group chat',
             )
         const groupMessage = this.groupMessageRepository.create({
-            messageContent,
+            messageContent: image.filename ?? messageContent,
             groupChat,
             author,
         })

@@ -26,18 +26,15 @@ export const createChat = async (chat: CreateChatParams) =>
     }).then((res) => res.json())
 
 export const createPrivateMessage = async ({
-    messageContent,
+    formData,
     chatId,
 }: CreatePrivateMessageParams) =>
     <Promise<CreatePrivateMessageResponse | NestJSError>>await fetch(
         `${BASE_URL}/${chatId}/message`,
         {
             method: 'POST',
-            body: JSON.stringify({ messageContent }),
+            body: formData,
             credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
         },
     ).then((res) => res.json())
 
@@ -76,7 +73,7 @@ type CreateChatParams = {
 
 type CreatePrivateMessageParams = {
     chatId: number
-    messageContent: string
+    formData: FormData
 }
 
 type UpdatePrivateMessageParams = {

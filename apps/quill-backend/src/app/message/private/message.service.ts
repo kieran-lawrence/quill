@@ -31,14 +31,19 @@ export class PrivateMessageService {
         messageContent,
         chatId,
         user: author,
+        image,
     }: CreatePrivateMessageParams): Promise<CreatePrivateMessageResponse> {
+        if (!messageContent && !image)
+            throw new BadRequestException(
+                'Message content or image is required',
+            )
         const chat = await this.chatService.getChatOnly(chatId)
         if (!chat) throw new BadRequestException('Chat not found')
         const { creator, recipient } = chat
         if (creator.id !== author.id && recipient.id !== author.id)
             throw new UnauthorizedException('You are not a part of this chat!')
         const privateMessage = this.messageRepository.create({
-            messageContent,
+            messageContent: image.filename ?? messageContent,
             chat,
             author,
         })

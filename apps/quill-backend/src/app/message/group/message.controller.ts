@@ -7,7 +7,9 @@ import {
     Param,
     ParseIntPipe,
     Post,
+    UploadedFile,
     UseGuards,
+    UseInterceptors,
     UsePipes,
     ValidationPipe,
 } from '@nestjs/common'
@@ -18,6 +20,8 @@ import { User } from '../../../utils/typeorm'
 import { EditGroupMessageDto } from '../dtos/EditGroupMessage.dto'
 import { CreateGroupMessageDto } from '../dtos/CreateGroupMessage.dto'
 import { AuthenticatedGuard } from '../../auth/local-auth.guard'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { multerOptions } from '../../../utils/helpers'
 
 @Controller(Routes.GROUP_MESSAGE)
 @UseGuards(AuthenticatedGuard)
@@ -42,15 +46,19 @@ export class GroupMessageController {
 
     @Post()
     @UsePipes(ValidationPipe)
+    @UseInterceptors(FileInterceptor('image', multerOptions))
     createGroupMessage(
         @AuthenticatedUser() user: User,
         @Param('id', ParseIntPipe) id: number,
         @Body() { messageContent }: CreateGroupMessageDto,
+        @UploadedFile()
+        image: Express.Multer.File,
     ) {
         return this.groupMessageService.createGroupMessage({
             messageContent,
             groupId: id,
             user,
+            image,
         })
     }
 
