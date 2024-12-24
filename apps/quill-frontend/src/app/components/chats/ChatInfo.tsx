@@ -5,13 +5,20 @@ import { GroupChat } from '@quill/data'
 import { useAuth } from '../../contexts/auth'
 import { GroupUserInitials } from '../GroupUserInitials'
 import { Avatar } from '../Avatar'
-import { isGroupChatCreator } from '../../utils/helpers'
+import { isChatCreator } from '../../utils/helpers'
 import { useState } from 'react'
 import { RenameGroupMenu } from '../menu/group/RenameGroupMenu'
 import { DeleteGroupMenu } from '../menu/group/DeleteGroupMenu'
 import { ChangeGroupPhotoMenu } from '../menu/group/ChangeGroupPhotoMenu'
 import { OnlineStatus } from '../OnlineStatus'
 import { useRouter } from 'next/navigation'
+import { ContextMenu } from '../menu/ContextMenu'
+import { leaveGroupChat, removeUserFromGroup } from '../../utils/api'
+import toast, { Toaster } from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '../../utils/store'
+import { updateGroupState } from '../../utils/store/groups'
+import { useWebSocketEvents } from '../../utils/hooks'
 
 type Props = {
     isVisible: boolean
@@ -25,13 +32,65 @@ type ActionProps = {
 
 export const ChatInfo = ({ isVisible, chat }: Props) => {
     const { user } = useAuth()
-    const isCreator = isGroupChatCreator(chat, user)
+    const isCreator = isChatCreator(chat, user)
     const router = useRouter()
+    const [showContextMenu, setShowContextMenu] = useState(false)
+    const [points, setPoints] = useState({ x: 0, y: 0 })
+    const [selectedUser, setSelectedUser] = useState<number | null>(null)
+    const dispatch = useDispatch<AppDispatch>()
+    const { sendMessage } = useWebSocketEvents()
     const [editing, setEditing] = useState<ActionProps>({
         isRenaming: false,
         isDeleting: false,
         isChangingPhoto: false,
     })
+
+    const onContextMenu = (e: React.MouseEvent) => {
+        e.preventDefault()
+        setShowContextMenu(true)
+        setPoints({ x: e.clientX, y: e.clientY })
+    }
+
+    const handleRemoveFromGroup = () => {
+        if (!selectedUser) return
+        removeUserFromGroup({ groupId: chat.id, userId: selectedUser }).then(
+            (res) => {
+                if ('error' in res) {
+                    const errorMessage = res?.message
+                    toast.error(
+                        errorMessage ||
+                            'An error occurred removing this user from the group.',
+                    )
+                } else {
+                    setShowContextMenu(false)
+                    setSelectedUser(null)
+                    dispatch(updateGroupState(res))
+                    sendMessage('onGroupChatUpdate', { group: res })
+                }
+            },
+        )
+    }
+
+    const handleGroupChatLeave = () => {
+        if (!user) return
+        leaveGroupChat({
+            groupId: chat.id,
+            userId: user.id,
+        }).then((res) => {
+            if ('error' in res) {
+                const errorMessage = res?.message
+                toast.error(
+                    errorMessage ||
+                        'Unable to leave group. Please try again later.',
+                )
+            } else {
+                setShowContextMenu(false)
+                dispatch(updateGroupState(res))
+                sendMessage('onGroupChatUpdate', { group: res })
+                router.push('/chats')
+            }
+        })
+    }
 
     return (
         <>
@@ -60,6 +119,7 @@ export const ChatInfo = ({ isVisible, chat }: Props) => {
                     }
                 />
             )}
+            <Toaster />
             <SChatInfo $isVisible={isVisible}>
                 <SChatActions $isVisible={isVisible}>
                     <h3>Chat Actions</h3>
@@ -94,13 +154,38 @@ export const ChatInfo = ({ isVisible, chat }: Props) => {
                                 Change Cover Photo
                             </li>
                         )}
-                        {!isCreator && <li>Leave</li>}
+                        {!isCreator && user && (
+                            <li onClick={handleGroupChatLeave}>Leave</li>
+                        )}
                     </ul>
                 </SChatActions>
                 <SChatMembers $isVisible={isVisible}>
                     <h3>{chat.members.length} members</h3>
+                    {showContextMenu && (
+                        <ContextMenu
+                            points={points}
+                            width={13}
+                            handleClose={() => setShowContextMenu(false)}
+                        >
+                            <ul>
+                                {isCreator && (
+                                    <li onClick={handleRemoveFromGroup}>
+                                        Remove from Group
+                                    </li>
+                                )}
+                            </ul>
+                        </ContextMenu>
+                    )}
                     {chat.members.map((member) => (
-                        <SMemberWrapper key={member.id}>
+                        <SMemberWrapper
+                            key={member.id}
+                            onContextMenu={(e) => {
+                                // Only show context menu if the user is not the creator
+                                if (member.id === chat.creator.id) return
+                                onContextMenu(e)
+                                setSelectedUser(member.id)
+                            }}
+                        >
                             {member.avatar ? (
                                 <Avatar
                                     imgSrc={`/images/${member.avatar}`}
@@ -190,10 +275,19 @@ const SMemberWrapper = styled.address`
     gap: 0.5rem;
     font-style: normal;
     font-weight: 500;
+    transition: all 0.2s;
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+    user-select: none;
 
     p {
         font-size: 0.9rem;
         color: ${({ theme }) => theme.colors.blueStrong};
         font-weight: 400;
+    }
+
+    &:hover {
+        cursor: pointer;
+        background: ${({ theme }) => theme.colors.blueWeak};
     }
 `

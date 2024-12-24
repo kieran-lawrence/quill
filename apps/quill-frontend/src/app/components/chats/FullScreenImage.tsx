@@ -38,5 +38,5 @@ const SOverlay = styled.div`
 const SImage = styled.img`
     max-width: 90%;
     max-height: 90%;
-    border-radius: 10px;
+    border-radius: 0.5rem;
 `

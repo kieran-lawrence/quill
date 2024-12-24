@@ -8,7 +8,7 @@ export const getGroupChatMembers = (chat: GroupChat) => {
     return members.replace(/,\s*$/, '')
 }
 
-export const isGroupChatCreator = (chat: GroupChat, user?: User) => {
+export const isChatCreator = (chat: GroupChat | Chat, user?: User) => {
     return chat.creator.id === user?.id
 }
 

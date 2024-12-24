@@ -7,7 +7,7 @@ import {
 import { Services } from '../../utils/constants'
 import { UserService } from '../user/user.service'
 import { Repository } from 'typeorm'
-import { GroupChat, GroupMessage } from '../../utils/typeorm'
+import { GroupChat, GroupMessage, User } from '../../utils/typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import {
     CreateGroupChatParams,
@@ -124,15 +124,28 @@ export class GroupService {
             throw new BadRequestException(
                 'Only the group owner can remove other members',
             )
-        if (groupChat.members.length <= 2)
+        return this.removeUserFromGroup({
+            group: groupChat,
+            user: userToRemove,
+        })
+    }
+    async leaveGroupChat({
+        groupId,
+        userId,
+        user,
+    }: ModifyGroupChatMemberParams): Promise<GroupChat> {
+        const groupChat = await this.getGroupChatById(groupId)
+        if (!groupChat) throw new BadRequestException('Group not found')
+        const userToRemove = await this.userService.findUser({ id: userId })
+        if (!userToRemove) throw new BadRequestException('User not found')
+        if (user.id !== userToRemove.id)
             throw new BadRequestException(
-                'Group minimum size has been reached.',
+                'Only the group owner can remove other members.',
             )
-        const updatedMembers = groupChat.members.filter(
-            (member) => member.id !== userToRemove.id,
-        )
-        groupChat.members = updatedMembers
-        return this.groupChatRepository.save(groupChat)
+        return this.removeUserFromGroup({
+            group: groupChat,
+            user: userToRemove,
+        })
     }
 
     async addGroupChatUsers({
@@ -170,5 +183,19 @@ export class GroupService {
         })
 
         return this.groupChatRepository.delete(groupId)
+    }
+
+    async removeUserFromGroup({
+        group,
+        user,
+    }: {
+        group: GroupChat
+        user: User
+    }) {
+        const updatedMembers = group.members.filter(
+            (member) => member.id !== user.id,
+        )
+        group.members = updatedMembers
+        return this.groupChatRepository.save(group)
     }
 }

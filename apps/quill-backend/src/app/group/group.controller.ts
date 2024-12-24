@@ -6,7 +6,6 @@ import {
     Inject,
     Param,
     Post,
-    Put,
     UploadedFile,
     UseGuards,
     UseInterceptors,
@@ -58,6 +57,16 @@ export class GroupController {
         return this.groupService.updateGroup({ id, user, name, file })
     }
 
+    @Post(':id/leave')
+    @UsePipes(ValidationPipe)
+    leaveGroup(
+        @Param('id') groupId: number,
+        @Body() { userId }: EditGroupChatDto,
+        @AuthenticatedUser() user: User,
+    ) {
+        return this.groupService.leaveGroupChat({ groupId, userId, user })
+    }
+
     @Post(':id/members/remove')
     @UsePipes(ValidationPipe)
     removeMember(
@@ -80,7 +89,7 @@ export class GroupController {
         })
     }
 
-    @Put(':id/members/add')
+    @Post(':id/members/add')
     @UsePipes(ValidationPipe)
     addMember(
         @Param('id') groupId: number,

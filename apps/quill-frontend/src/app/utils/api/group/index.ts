@@ -106,6 +106,36 @@ export const deleteGroupMessage = async ({
         },
     ).then((res) => res.json())
 
+export const removeUserFromGroup = async ({
+    groupId,
+    userId,
+}: LeaveGroupChatParams) => <Promise<GroupChat | NestJSError>>await fetch(
+        `${BASE_URL}/${groupId}/members/remove`,
+        {
+            method: 'POST',
+            credentials: 'include',
+            body: JSON.stringify({ userId }),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        },
+    ).then((res) => res.json())
+
+export const leaveGroupChat = async ({
+    groupId,
+    userId,
+}: LeaveGroupChatParams) => <Promise<GroupChat | NestJSError>>await fetch(
+        `${BASE_URL}/${groupId}/leave`,
+        {
+            method: 'POST',
+            credentials: 'include',
+            body: JSON.stringify({ userId }),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        },
+    ).then((res) => res.json())
+
 type CreateGroupChatParams = {
     members: string[]
     name?: string
@@ -124,4 +154,8 @@ type UpdateGroupMessageParams = {
     groupId: number
     messageId: number
     messageContent?: string
+}
+type LeaveGroupChatParams = {
+    groupId: number
+    userId: number
 }
