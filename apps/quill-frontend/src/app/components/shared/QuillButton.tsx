@@ -13,9 +13,15 @@ export const QuillButton = ({
     isDisabled,
     style,
     type = 'submit',
+    onClick,
 }: QuillButtonProps) => {
     return (
-        <SButton $style={style} disabled={isDisabled} type={type}>
+        <SButton
+            $style={style}
+            disabled={isDisabled}
+            type={type}
+            onClick={onClick}
+        >
             {text}
         </SButton>
     )
