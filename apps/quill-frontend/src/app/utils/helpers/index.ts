@@ -30,3 +30,7 @@ export const copyToClipboard = (text: string) => {
 export const getChatRecipient = (chat: Chat, user?: User) => {
     return user?.id === chat?.creator.id ? chat?.recipient : chat?.creator
 }
+
+export const isImage = (fileName: string) => {
+    return /\.(jpe?g|png|gif)$/i.test(fileName)
+}

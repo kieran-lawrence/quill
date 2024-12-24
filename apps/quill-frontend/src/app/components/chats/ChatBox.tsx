@@ -5,7 +5,7 @@ import { Avatar } from '../Avatar'
 import { GroupUserInitials } from '../GroupUserInitials'
 import { useState, KeyboardEvent, useEffect } from 'react'
 import { ContextMenu } from '../menu/ContextMenu'
-import { copyToClipboard } from '../../utils/helpers'
+import { copyToClipboard, isImage } from '../../utils/helpers'
 import {
     deleteGroupMessage,
     deletePrivateMessage,
@@ -260,13 +260,15 @@ export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
                         handleClose={() => setShowContextMenu(false)}
                     >
                         <ul>
-                            {isAuthor && (
+                            {isAuthor && !isImage(message.messageContent) && (
                                 <li onClick={() => setIsEditing(true)}>Edit</li>
                             )}
                             {isAuthor && (
                                 <li onClick={deleteMessage}>Delete</li>
                             )}
-                            <li onClick={copyText}>Copy Text</li>
+                            {!isImage(message.messageContent) && (
+                                <li onClick={copyText}>Copy Text</li>
+                            )}
                         </ul>
                     </ContextMenu>
                 )}
@@ -298,6 +300,11 @@ export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
                             </a>
                         </small>
                     </>
+                ) : isImage(message.messageContent) ? (
+                    <SChatImage
+                        src={`/images/${message.messageContent}`}
+                        alt={`Image from: ${message.author.firstName}`}
+                    />
                 ) : (
                     <div>{message.messageContent}</div>
                 )}
@@ -350,4 +357,11 @@ const SChat = styled.div<{ $isAuthor: boolean }>`
             cursor: pointer;
         }
     }
+`
+const SChatImage = styled.img`
+    border-radius: 0.5rem;
+    height: 15rem;
+    width: auto;
+    object-fit: cover;
+    cursor: pointer;
 `
