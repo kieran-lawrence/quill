@@ -4,7 +4,7 @@ import {
     GroupMessageReceivedEventParams,
     MessageReceivedEventParams,
 } from '@quill/socket'
-import { IoSearch, IoCall, IoPaperPlaneOutline } from 'react-icons/io5'
+import { IoSearch, IoCall, IoPaperPlaneOutline, IoClose } from 'react-icons/io5'
 import { LuChevronLeftSquare, LuChevronRightSquare } from 'react-icons/lu'
 import toast, { Toaster } from 'react-hot-toast'
 import { FiPaperclip } from 'react-icons/fi'
@@ -43,6 +43,7 @@ export const ChatWindow = ({
         register,
         handleSubmit,
         reset: clearForm,
+        watch,
     } = useForm<CreateMessageParams>()
     const isGroupChat = 'members' in chat
     const chatName = isGroupChat
@@ -51,6 +52,7 @@ export const ChatWindow = ({
               getChatRecipient(chat, user).lastName
           }`
     const { sendMessage, listenForMessage } = useWebSocketEvents()
+    const imageMessage = watch('image') ? watch('image')?.item(0) : null
 
     useEffect(() => {
         const privateMessageEvent =
@@ -226,6 +228,18 @@ export const ChatWindow = ({
                         {...register('image')}
                         accept=".jpg, .jpeg, .png"
                     />
+                    {imageMessage && (
+                        <SImageWrapper>
+                            <SImagePreview
+                                src={URL.createObjectURL(imageMessage)}
+                                alt="Image Preview"
+                            />
+                            <RemoveImageIcon
+                                className="removeImageIcon"
+                                onClick={() => clearForm()}
+                            />
+                        </SImageWrapper>
+                    )}
                     <input
                         className="messageInput"
                         placeholder={`Message ${chatName}`}
@@ -307,6 +321,11 @@ const SMessageInputWrapper = styled.form`
         size: 2rem;
         color: ${({ theme }) => theme.colors.blueStrong};
         cursor: pointer;
+
+        transition: all 0.2s;
+        &:hover {
+            color: ${({ theme }) => theme.colors.orangeStrong};
+        }
     }
     button {
         border: none;
@@ -320,5 +339,36 @@ const SMessageInputWrapper = styled.form`
     &:is(:hover, :active, :focus-within) {
         outline: ${({ theme }) => `1px solid ${theme.colors.blueStrong}`};
         cursor: text;
+    }
+`
+const RemoveImageIcon = styled(IoClose)`
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: ${({ theme }) => theme.colors.blueAccent};
+    border-radius: 50%;
+    opacity: 0;
+    transition: all 0.2s;
+`
+const SImageWrapper = styled.div`
+    position: relative;
+
+    &:hover ${RemoveImageIcon} {
+        font-size: 1.5rem;
+        opacity: 1;
+    }
+`
+
+const SImagePreview = styled.img`
+    width: auto;
+    height: 5rem;
+    margin: 0.2rem;
+    border: 1px solid ${({ theme }) => theme.colors.blueStrong};
+    border-radius: 0.5rem;
+    object-fit: cover;
+    transition: all 0.2s;
+
+    &:hover {
+        cursor: pointer;
     }
 `
