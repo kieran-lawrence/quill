@@ -31,6 +31,7 @@ import {
     EditPrivateMessageEventParams,
     SocketEvent,
 } from '@quill/socket'
+import { FullscreenImage } from './FullScreenImage'
 
 type ChatBoxProps = {
     message: PrivateMessage | GroupMessage
@@ -54,7 +55,7 @@ export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
     const { user } = useAuth()
     const isAuthor = user?.id === message.author.id
     const { sendMessage, listenForMessage } = useWebSocketEvents()
-
+    const [showImageModal, setShowImageModal] = useState(false)
     const [showContextMenu, setShowContextMenu] = useState(false)
     const [points, setPoints] = useState({ x: 0, y: 0 })
     const [isEditing, setIsEditing] = useState(false)
@@ -245,6 +246,12 @@ export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
     return (
         <SChatBox $isAuthor={isAuthor}>
             <Toaster />
+            {showImageModal && (
+                <FullscreenImage
+                    imagePath={message.messageContent}
+                    onClose={() => setShowImageModal(false)}
+                />
+            )}
             {message.author.avatar !== null ? (
                 <Avatar imgSrc={`/images/${message.author.avatar}`} />
             ) : (
@@ -304,6 +311,7 @@ export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
                     <SChatImage
                         src={`/images/${message.messageContent}`}
                         alt={`Image from: ${message.author.firstName}`}
+                        onClick={() => setShowImageModal(true)}
                     />
                 ) : (
                     <div>{message.messageContent}</div>
