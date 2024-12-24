@@ -91,7 +91,7 @@ export class GroupController {
 
     @Post(':id/members/add')
     @UsePipes(ValidationPipe)
-    addMember(
+    addMembers(
         @Param('id') groupId: number,
         @AuthenticatedUser() user: User,
         @Body() { users }: EditGroupChatDto,

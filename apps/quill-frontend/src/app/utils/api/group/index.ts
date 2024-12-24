@@ -136,6 +136,21 @@ export const leaveGroupChat = async ({
         },
     ).then((res) => res.json())
 
+export const addUsersToGroup = async ({
+    groupId,
+    users,
+}: AddGroupChatMemberParams) => <Promise<GroupChat | NestJSError>>await fetch(
+        `${BASE_URL}/${groupId}/members/add`,
+        {
+            method: 'POST',
+            credentials: 'include',
+            body: JSON.stringify({ users }),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        },
+    ).then((res) => res.json())
+
 type CreateGroupChatParams = {
     members: string[]
     name?: string
@@ -158,4 +173,8 @@ type UpdateGroupMessageParams = {
 type LeaveGroupChatParams = {
     groupId: number
     userId: number
+}
+type AddGroupChatMemberParams = {
+    groupId: number
+    users: number[]
 }

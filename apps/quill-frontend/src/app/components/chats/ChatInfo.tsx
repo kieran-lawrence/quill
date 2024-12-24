@@ -19,6 +19,8 @@ import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../../utils/store'
 import { updateGroupState } from '../../utils/store/groups'
 import { useWebSocketEvents } from '../../utils/hooks'
+import { IoAdd } from 'react-icons/io5'
+import { AddGroupMembersMenu } from '../menu/group/AddGroupMembersMenu'
 
 type Props = {
     isVisible: boolean
@@ -28,6 +30,7 @@ type ActionProps = {
     isRenaming: boolean
     isDeleting: boolean
     isChangingPhoto: boolean
+    isAddingMembers: boolean
 }
 
 export const ChatInfo = ({ isVisible, chat }: Props) => {
@@ -43,6 +46,7 @@ export const ChatInfo = ({ isVisible, chat }: Props) => {
         isRenaming: false,
         isDeleting: false,
         isChangingPhoto: false,
+        isAddingMembers: false,
     })
 
     const onContextMenu = (e: React.MouseEvent) => {
@@ -119,6 +123,14 @@ export const ChatInfo = ({ isVisible, chat }: Props) => {
                     }
                 />
             )}
+            {editing.isAddingMembers && (
+                <AddGroupMembersMenu
+                    group={chat}
+                    onCancel={() =>
+                        setEditing({ ...editing, isAddingMembers: false })
+                    }
+                />
+            )}
             <Toaster />
             <SChatInfo $isVisible={isVisible}>
                 <SChatActions $isVisible={isVisible}>
@@ -160,7 +172,19 @@ export const ChatInfo = ({ isVisible, chat }: Props) => {
                     </ul>
                 </SChatActions>
                 <SChatMembers $isVisible={isVisible}>
-                    <h3>{chat.members.length} members</h3>
+                    <SChatMemberActions>
+                        <h3>{chat.members.length} members</h3>
+                        <IoAdd
+                            size={24}
+                            className="addMemberIcon"
+                            onClick={() =>
+                                setEditing({
+                                    ...editing,
+                                    isAddingMembers: true,
+                                })
+                            }
+                        />
+                    </SChatMemberActions>
                     {showContextMenu && (
                         <ContextMenu
                             points={points}
@@ -267,6 +291,20 @@ const SChatMembers = styled.div<{ $isVisible: boolean }>`
 
     h3 {
         font-weight: 500;
+    }
+`
+const SChatMemberActions = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .addMemberIcon {
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            color: ${({ theme }) => theme.colors.blueStrong};
+        }
     }
 `
 const SMemberWrapper = styled.address`

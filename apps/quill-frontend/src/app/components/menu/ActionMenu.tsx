@@ -9,6 +9,7 @@ type Props = {
     onCancel: () => void
     confirmText: string
     cancelText: string
+    width?: number
 }
 export const ActionMenu = ({
     menuHeading,
@@ -18,10 +19,11 @@ export const ActionMenu = ({
     children,
     confirmText,
     cancelText,
+    width = 20,
 }: PropsWithChildren<Props>) => {
     return (
         <SFocusedContentContainer>
-            <SActionMenu>
+            <SActionMenu $width={width}>
                 <h2>{menuHeading}</h2>
                 <p>{menuText}</p>
                 {children}
@@ -37,8 +39,8 @@ export const ActionMenu = ({
         </SFocusedContentContainer>
     )
 }
-const SActionMenu = styled.div`
-    width: 20vw;
+const SActionMenu = styled.div<{ $width: number }>`
+    width: ${({ $width }) => $width}vw;
     height: fit-content;
     background: ${({ theme }) => theme.colors.backgroundSecondary};
     border-radius: 1rem;
