@@ -258,16 +258,18 @@ const SChatWindow = styled.div`
     flex-direction: column;
     flex: 1;
     height: 100%;
-    padding: 1rem 2rem;
     box-sizing: border-box;
-    gap: 1rem;
 `
 const SChatHeader = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 1rem 2rem;
+    box-shadow: ${({ theme }) => `0 2px 2px ${theme.colors.shadow}`};
+    margin-bottom: 2px;
     h1 {
-        font-size: 2rem;
+        font-size: 1.5rem;
+        font-weight: 500;
     }
     .chatInfo {
         display: flex;
@@ -298,6 +300,7 @@ const SChatBody = styled.div`
     gap: 1rem;
     overflow-y: scroll;
     transition: all 0.2s;
+    padding: 1rem 2rem;
 `
 const SMessageInputWrapper = styled.form`
     display: flex;
@@ -309,6 +312,8 @@ const SMessageInputWrapper = styled.form`
     color: ${({ theme }) => theme.colors.text.primary};
     padding: 0 1rem;
     transition: all 0.2s;
+    margin: 1rem 2rem;
+
     .messageInput {
         flex: 1;
         outline: none;
