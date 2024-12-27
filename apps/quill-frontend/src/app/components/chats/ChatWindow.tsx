@@ -21,10 +21,12 @@ import { AppDispatch } from '../../utils/store'
 import { addMessageState } from '../../utils/store/chats'
 import { createGroupMessage, createPrivateMessage } from '../../utils/api'
 import { addGroupMessageState } from '../../utils/store/groups'
+import { MenuActions } from '../../utils/types'
 
 type ChatWindowProps = {
     chat: Chat | GroupChat
-    onShowOptions?: () => void
+    /** Function that controls updating state on the chat menu actions (i.e. Search, Info panel) */
+    onChatAction?: (action: MenuActions) => void
     optionsVisible?: boolean
 }
 type CreateMessageParams = {
@@ -34,7 +36,7 @@ type CreateMessageParams = {
 
 export const ChatWindow = ({
     chat,
-    onShowOptions,
+    onChatAction,
     optionsVisible,
 }: ChatWindowProps) => {
     const { user } = useAuth()
@@ -178,22 +180,28 @@ export const ChatWindow = ({
                     ) : null}
                 </div>
                 <div className="chatIcons">
-                    <IconContext.Provider
-                        value={{
-                            className: 'optionIcons',
-                            size: '1.5rem',
-                        }}
-                    >
-                        <IoSearch />
-                        <IoCall />
-                        {isGroupChat ? (
-                            optionsVisible ? (
-                                <LuChevronRightSquare onClick={onShowOptions} />
-                            ) : (
-                                <LuChevronLeftSquare onClick={onShowOptions} />
-                            )
-                        ) : null}
-                    </IconContext.Provider>
+                    {onChatAction && (
+                        <IconContext.Provider
+                            value={{
+                                className: 'optionIcons',
+                                size: '1.5rem',
+                            }}
+                        >
+                            <IoSearch onClick={() => onChatAction('search')} />
+                            <IoCall />
+                            {isGroupChat ? (
+                                optionsVisible ? (
+                                    <LuChevronRightSquare
+                                        onClick={() => onChatAction('info')}
+                                    />
+                                ) : (
+                                    <LuChevronLeftSquare
+                                        onClick={() => onChatAction('info')}
+                                    />
+                                )
+                            ) : null}
+                        </IconContext.Provider>
+                    )}
                 </div>
             </SChatHeader>
             <SChatBody>

@@ -8,3 +8,5 @@ export type NestJSError = {
     error: string
     statusCode?: number
 }
+
+export type MenuActions = 'search' | 'info'

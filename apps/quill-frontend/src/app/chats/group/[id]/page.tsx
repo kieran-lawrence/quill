@@ -14,6 +14,8 @@ import {
 import { useWebSocketEvents } from '../../../utils/hooks'
 import { useDispatch } from 'react-redux'
 import { GroupChat } from '@quill/data'
+import { MenuActions } from '../../../utils/types'
+import { SearchChat } from '../../../components/chats/SearchChat'
 
 export default function GroupChatsPage() {
     const { id } = useParams()
@@ -23,9 +25,31 @@ export default function GroupChatsPage() {
         getGroupById(state.groups, parseInt(id as string)),
     )
     const [showInfo, setShowInfo] = useState(false)
+    const [showSearch, setShowSearch] = useState(false)
     const { sendMessage, listenForMessage } = useWebSocketEvents()
     const dispatch = useDispatch<AppDispatch>()
 
+    /** Search and Info panes use the same space, so we need to close one before opening the other */
+    const handleMenuActions = (action: MenuActions) => {
+        switch (action) {
+            case 'search':
+                if (showInfo) {
+                    setShowInfo(false)
+                    setShowSearch(true)
+                } else {
+                    setShowSearch(!showSearch)
+                }
+                break
+            case 'info':
+                if (showSearch) {
+                    setShowSearch(false)
+                    setShowInfo(true)
+                } else {
+                    setShowInfo(!showInfo)
+                }
+                break
+        }
+    }
     useEffect(() => {
         sendMessage('onGroupChatJoin', { groupId: id })
 
@@ -71,12 +95,13 @@ export default function GroupChatsPage() {
                 {group && (
                     <ChatWindow
                         chat={group}
-                        onShowOptions={() => setShowInfo(!showInfo)}
+                        onChatAction={handleMenuActions}
                         optionsVisible={showInfo}
                     />
                 )}
             </SChatContainer>
             {group && <ChatInfo isVisible={showInfo} chat={group} />}
+            {group && <SearchChat isVisible={showSearch} chat={group} />}
         </>
     )
 }
