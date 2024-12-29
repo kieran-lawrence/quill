@@ -1,8 +1,6 @@
 import styled from 'styled-components'
 import { GroupMessage, PrivateMessage } from '@quill/data'
 import { useAuth } from '../../contexts/auth'
-import { Avatar } from '../Avatar'
-import { GroupUserInitials } from '../GroupUserInitials'
 import { useState, KeyboardEvent, useEffect } from 'react'
 import { ContextMenu } from '../menu/ContextMenu'
 import { copyToClipboard, isImage } from '../../utils/helpers'
@@ -32,6 +30,7 @@ import {
     SocketEvent,
 } from '@quill/socket'
 import { FullscreenImage } from './FullScreenImage'
+import { ChatMessage } from './ChatMessage'
 
 type ChatBoxProps = {
     message: PrivateMessage | GroupMessage
@@ -252,14 +251,16 @@ export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
                     onClose={() => setShowImageModal(false)}
                 />
             )}
-            {message.author.avatar !== null ? (
-                <Avatar imgSrc={`/images/${message.author.avatar}`} />
-            ) : (
-                <GroupUserInitials
-                    text={`${message.author?.firstName} ${message.author?.lastName}`}
-                />
-            )}
-            <SChat $isAuthor={isAuthor} onContextMenu={onContextMenu}>
+            <ChatMessage
+                message={message}
+                isAuthor={isAuthor}
+                isEditing={isEditing}
+                setIsEditing={setIsEditing}
+                onKeyUp={handleKeyPress}
+                onEditMessage={editMessage}
+                onImageClick={setShowImageModal}
+                onContextMenu={onContextMenu}
+            >
                 {showContextMenu && (
                     <ContextMenu
                         points={points}
@@ -279,44 +280,7 @@ export const ChatBox = ({ message, isGroupChat, chatId }: ChatBoxProps) => {
                         </ul>
                     </ContextMenu>
                 )}
-                {!isAuthor && (
-                    <h3>{`${message.author.firstName} ${message.author.lastName}`}</h3>
-                )}
-                {isEditing ? (
-                    <>
-                        <div
-                            className="editBox"
-                            role="textbox"
-                            contentEditable={true}
-                            suppressContentEditableWarning={true}
-                            onKeyUp={(e) => handleKeyPress(e)}
-                        >
-                            {message.messageContent}
-                        </div>
-                        <small className="editActions">
-                            escape to{' '}
-                            <a
-                                role="button"
-                                onClick={() => setIsEditing(false)}
-                            >
-                                cancel
-                            </a>{' '}
-                            • enter to{' '}
-                            <a role="button" onClick={editMessage}>
-                                save
-                            </a>
-                        </small>
-                    </>
-                ) : isImage(message.messageContent) ? (
-                    <SChatImage
-                        src={`/images/${message.messageContent}`}
-                        alt={`Image from: ${message.author.firstName}`}
-                        onClick={() => setShowImageModal(true)}
-                    />
-                ) : (
-                    <div>{message.messageContent}</div>
-                )}
-            </SChat>
+            </ChatMessage>
         </SChatBox>
     )
 }
@@ -329,47 +293,4 @@ const SChatBox = styled.address<{ $isAuthor: boolean }>`
     width: fit-content;
     max-width: 55%;
     font-style: normal;
-`
-const SChat = styled.div<{ $isAuthor: boolean }>`
-    background: ${({ $isAuthor, theme }) =>
-        $isAuthor ? theme.colors.blueStrong : theme.colors.blueWeak};
-    color: ${({ $isAuthor, theme }) =>
-        $isAuthor ? theme.colors.text.light : theme.colors.text.primary};
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 1rem;
-    border-radius: 0.5rem;
-
-    h3 {
-        font-size: 1.1rem;
-        font-weight: 500;
-        color: ${({ theme }) => theme.colors.text.accent};
-    }
-    .editBox {
-        border: none;
-        outline: none;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        background: ${({ theme }) => theme.colors.text.accent};
-    }
-    .editActions {
-        padding-left: 0.5rem;
-        font-size: 0.8rem;
-
-        a {
-            color: ${({ theme }) => theme.colors.text.accent};
-            text-decoration: none;
-            cursor: pointer;
-        }
-    }
-`
-const SChatImage = styled.img`
-    border-radius: 0.5rem;
-    height: 15rem;
-    width: auto;
-    object-fit: cover;
-    cursor: pointer;
 `
