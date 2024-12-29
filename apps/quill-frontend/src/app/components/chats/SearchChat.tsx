@@ -7,6 +7,7 @@ import { GroupMessage, PrivateMessage } from '@quill/data'
 import { useAuth } from '../../contexts/auth'
 import { ChatMessage } from './ChatMessage'
 import { LoadingSpinner } from '../LoadingSpinner'
+import { Toaster, toast } from 'react-hot-toast'
 
 type Props = {
     isVisible: boolean
@@ -22,22 +23,24 @@ export const SearchChat = ({ isVisible, chatId, isGroupChat }: Props) => {
     const [loading, setLoading] = useState(false)
     const { user } = useAuth()
 
-    const onSearch = (query: string) => {
+    const onSearch = async (query: string) => {
         if (!query) return
-        isGroupChat
-            ? searchGroupMessages({ groupId: chatId, query }).then((res) => {
-                  if (res.length > 0) {
-                      setMessages(res)
-                  }
-                  setLoading(false)
-              })
-            : searchPrivateMessages({ chatId, query }).then((res) => {
-                  if (res.length > 0) {
-                      setMessages(res)
-                  }
-                  setLoading(false)
-              })
+        try {
+            const [results] = await Promise.all([
+                isGroupChat
+                    ? searchGroupMessages({ groupId: chatId, query })
+                    : searchPrivateMessages({ chatId, query }),
+            ])
+            if (results.length > 0) {
+                setMessages(results)
+            }
+        } catch {
+            toast('Something went wrong. Please try again later.')
+        } finally {
+            setLoading(false)
+        }
     }
+
     const debouncedSearch = useDebounce(onSearch, 500)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,6 +59,7 @@ export const SearchChat = ({ isVisible, chatId, isGroupChat }: Props) => {
     return (
         <SSearchChatWrapper $isVisible={isVisible}>
             <SSearchWindow $isVisible={isVisible}>
+                <Toaster />
                 <h3>Search this chat</h3>
                 <SSearchInput>
                     <IoSearch size={26} />
