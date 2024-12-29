@@ -108,3 +108,43 @@ export const useWebSocketEvents = () => {
 
     return { sendMessage, listenForMessage }
 }
+
+type DebouncedFunction = (value: string) => void
+
+/**
+ * A custom hook that debounces a function call.
+ * It delays the execution of the provided callback function until after a specified delay has elapsed
+ * since the last time the debounced function was invoked.
+ *
+ * @param {T} callback - The function to be debounced.
+ * @param {number} delay - The delay in milliseconds to wait before invoking the callback.
+ * @returns {Function} A function to set the debounced value.
+ *
+ * @example
+ * ```typescript
+ * // The function you want to debounce
+ * const myFunction = () => {
+ *     // Perform some action
+ * }
+ *
+ * // Call the hook with the function and delay
+ * const debouncedFunction = useDebounce(myFunction, 500)
+
+ * ```
+ */
+export const useDebounce = <T extends DebouncedFunction>(
+    callback: T,
+    delay: number,
+) => {
+    const [debouncedValue, setDebouncedValue] = useState<string>('')
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            callback(debouncedValue)
+        }, delay)
+
+        return () => clearTimeout(timeout)
+    }, [debouncedValue, callback, delay])
+
+    return setDebouncedValue
+}

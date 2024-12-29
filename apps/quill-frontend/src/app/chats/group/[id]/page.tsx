@@ -101,7 +101,13 @@ export default function GroupChatsPage() {
                 )}
             </SChatContainer>
             {group && <ChatInfo isVisible={showInfo} chat={group} />}
-            {group && <SearchChat isVisible={showSearch} chat={group} />}
+            {group && (
+                <SearchChat
+                    isVisible={showSearch}
+                    chatId={group.id}
+                    isGroupChat={true}
+                />
+            )}
         </>
     )
 }

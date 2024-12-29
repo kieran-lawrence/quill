@@ -25,7 +25,13 @@ export default function ChatsPage() {
                     />
                 )}
             </SChatContainer>
-            {chat && <SearchChat isVisible={showSearch} chat={chat} />}
+            {chat && (
+                <SearchChat
+                    isVisible={showSearch}
+                    chatId={chat.id}
+                    isGroupChat={false}
+                />
+            )}
         </>
     )
 }
