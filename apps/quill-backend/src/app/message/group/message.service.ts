@@ -8,6 +8,7 @@ import {
     CreateGroupMessageParams,
     EditGroupMessageParams,
     DeleteGroupMessageParams,
+    SearchChatParams,
 } from '../../../utils/types'
 import {
     CreateGroupMessageResponse,
@@ -138,5 +139,16 @@ export class GroupMessageService {
                 })
             }
         }
+    }
+    async searchGroupMessages({ id, query }: SearchChatParams) {
+        return this.groupMessageRepository
+            .createQueryBuilder('groupMessage')
+            .leftJoinAndSelect('groupMessage.author', 'author')
+            .where('LOWER(groupMessage.messageContent) LIKE :query', {
+                query: `%${query.toLowerCase()}%`,
+            })
+            .andWhere('groupMessage.groupChat = :id', { id })
+            .orderBy('groupMessage.createdAt', 'DESC')
+            .getMany()
     }
 }

@@ -3,6 +3,7 @@ import {
     DeleteResult,
     EditGroupMessageResponse,
     GroupChat,
+    GroupMessage,
 } from '@quill/data'
 import { NestJSError } from '../../types'
 
@@ -151,6 +152,16 @@ export const addUsersToGroup = async ({
         },
     ).then((res) => res.json())
 
+export const searchGroupMessages = async ({
+    groupId,
+    query,
+}: SearchGroupMessagesParams) => <Promise<GroupMessage[] | []>>await fetch(
+        `${BASE_URL}/${groupId}/message/search?query=${query}`,
+        {
+            credentials: 'include',
+        },
+    ).then((res) => res.json())
+
 type CreateGroupChatParams = {
     members: string[]
     name?: string
@@ -177,4 +188,8 @@ type LeaveGroupChatParams = {
 type AddGroupChatMemberParams = {
     groupId: number
     users: number[]
+}
+type SearchGroupMessagesParams = {
+    groupId: number
+    query: string
 }

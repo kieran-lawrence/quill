@@ -94,3 +94,7 @@ export type ValidateUserParams = {
     email: string
     password: string
 }
+export type SearchChatParams = {
+    id: number
+    query: string
+}

@@ -13,6 +13,7 @@ import {
     CreatePrivateMessageParams,
     DeletePrivateMessageParams,
     EditPrivateMessageParams,
+    SearchChatParams,
 } from '../../../utils/types'
 import {
     CreatePrivateMessageResponse,
@@ -111,5 +112,16 @@ export class PrivateMessageService {
                 return this.messageRepository.delete({ id })
             }
         }
+    }
+    async searchMessages({ id, query }: SearchChatParams) {
+        return this.messageRepository
+            .createQueryBuilder('privateMessage')
+            .leftJoinAndSelect('privateMessage.author', 'author')
+            .where('LOWER(privateMessage.messageContent) LIKE :query', {
+                query: `%${query.toLowerCase()}%`,
+            })
+            .andWhere('privateMessage.chat = :id', { id })
+            .orderBy('privateMessage.createdAt', 'DESC')
+            .getMany()
     }
 }

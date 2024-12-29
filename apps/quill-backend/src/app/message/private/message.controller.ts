@@ -7,6 +7,7 @@ import {
     Param,
     ParseIntPipe,
     Post,
+    Query,
     UploadedFile,
     UseGuards,
     UseInterceptors,
@@ -60,6 +61,14 @@ export class PrivateMessageController {
             user,
             image,
         })
+    }
+
+    @Get('/search')
+    searchGroupMessages(
+        @Param('id', ParseIntPipe) id: number,
+        @Query('query') query: string,
+    ) {
+        return this.messageService.searchMessages({ id, query })
     }
 
     @Get(':id')

@@ -3,6 +3,7 @@ import {
     CreatePrivateMessageResponse,
     DeleteResult,
     EditPrivateMessageResponse,
+    PrivateMessage,
 } from '@quill/data'
 import { NestJSError } from '../../types'
 
@@ -66,18 +67,30 @@ export const deletePrivateMessage = async ({
         },
     ).then((res) => res.json())
 
+export const searchPrivateMessages = async ({
+    chatId,
+    query,
+}: SearchMessagesParams) => <Promise<PrivateMessage[] | []>>await fetch(
+        `${BASE_URL}/${chatId}/message/search?query=${query}`,
+        {
+            credentials: 'include',
+        },
+    ).then((res) => res.json())
+
 type CreateChatParams = {
     email: string
     message?: string
 }
-
 type CreatePrivateMessageParams = {
     chatId: number
     formData: FormData
 }
-
 type UpdatePrivateMessageParams = {
     chatId: number
     messageId: number
     messageContent?: string
+}
+type SearchMessagesParams = {
+    chatId: number
+    query: string
 }
