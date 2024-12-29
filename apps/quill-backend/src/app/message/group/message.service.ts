@@ -40,7 +40,7 @@ export class GroupMessageService {
                 'You are not a part of this group chat',
             )
         const groupMessage = this.groupMessageRepository.create({
-            messageContent: image.filename ?? messageContent,
+            messageContent: image ? image.filename : messageContent,
             groupChat,
             author,
         })

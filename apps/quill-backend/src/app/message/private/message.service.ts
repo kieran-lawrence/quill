@@ -43,7 +43,7 @@ export class PrivateMessageService {
         if (creator.id !== author.id && recipient.id !== author.id)
             throw new UnauthorizedException('You are not a part of this chat!')
         const privateMessage = this.messageRepository.create({
-            messageContent: image.filename ?? messageContent,
+            messageContent: image ? image.filename : messageContent,
             chat,
             author,
         })
