@@ -1,15 +1,22 @@
 # 🪶 Quill 🪶
 
-Quill is a full stack real-time chat application I am building.\
-The backend is running NestJS with TypeORM for the database. It has all the basic stuff working like real time messages, personalisation, group and private messaging\
-I've still got to finish off the front end, add all the cool functionality you would expect from a chat app like Slack or Discord before this is done.
+Quill is a full stack real-time chat application I have built for fun and to further my TypeScript abilities.\
+The backend is running NestJS with TypeORM for the database. It has all the essential stuff working like real time messages, personalisation, group and private messaging.\
+
+The base application is done, and you can clone this repo and get it running locally by following the below instructions. I have some stretch goals I hope to be able to implement in the future as I get time outside of work which are:
+
+-   Audio/Video calling using WebRTC (no libraries)
+-   Refactor the friend system so you can actually send a 'request' to become friends, and not just automatically add a friend 😆
+-   Support advanced text features like hyperlinks and previews when sending this type of content
+-   Add support for GIFs in messaging as well as reacting to messages
+-   Notifications (unread messages, friend requests etc)
 
 <figure>
   <img src="https://preview.redd.it/pleasestop-v0-txr7gptyv1ad1.jpeg?width=1080&crop=smart&auto=webp&s=abbfa10a91eb5c9d099c3128320fa150e7c4078c" alt="Big Plans." style="width:50%">
   <figcaption>> me thinking about all the things I want to do in this project </figcaption>
 </figure>
 
-## If you want to have a play in its current state, read on for instructions
+## Project Configuration
 
 There are a few pre-requisites you will need before starting in order for the project to build successfully:
 
@@ -29,14 +36,17 @@ DB_PASSWORD=password # Your postgres user creds
 DB_NAME=quill # Change if desired
 FILE_UPLOAD_DESTINATION= # The path where you want uploaded files to go, eg ~/User/{path_to_repo}/quill/assets/images
 ```
+
 4. Create a `.env.local` file in `/apps/quill-frontend` and populate it with the following:
+
 ```sh
 NEXT_PUBLIC_SOCKET_URI= Url the backend is running on, probably http://localhost:3001
 ```
+
 5. Create a database with the name you specified in `DB_NAME`
 6. Run `yarn` to install all dependencies
 
-## Run tasks
+## Running Quill
 
 Once you've finished setting up, you can run it with the following commands:
 
