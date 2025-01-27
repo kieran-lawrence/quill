@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { isImage } from '../../utils/helpers'
 import { Avatar } from '../Avatar'
 import { GroupUserInitials } from '../GroupUserInitials'
+import { format } from 'date-fns'
 
 type Props = {
     message: GroupMessage | PrivateMessage
@@ -74,7 +75,12 @@ export const ChatMessage = ({
                         onClick={() => onImageClick && onImageClick(true)}
                     />
                 ) : (
-                    <div>{message.messageContent}</div>
+                    <SChatMessageContainer>
+                        <p>{message.messageContent}</p>
+                        <SChatMessageInfo>
+                            {format(message.createdAt, 'hh:m')}
+                        </SChatMessageInfo>
+                    </SChatMessageContainer>
                 )}
             </SChat>
         </>
@@ -123,4 +129,16 @@ const SChatImage = styled.img`
     width: auto;
     object-fit: cover;
     cursor: pointer;
+`
+
+const SChatMessageContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+`
+const SChatMessageInfo = styled.div`
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
 `
