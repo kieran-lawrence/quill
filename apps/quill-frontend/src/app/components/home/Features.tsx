@@ -1,23 +1,60 @@
+import { Delius } from 'next/font/google'
+import Image from 'next/image'
 import styled from 'styled-components'
+
+const deliusFont = Delius({
+    subsets: ['latin'],
+    weight: '400',
+})
 
 export const Features = () => {
     return (
         <SFeatureGrid>
             <SFeatureItem>
-                <div className="featuredImage" />
-                <h3>Feature 1</h3>
+                <Image
+                    src="/showcase/adding-friend.png"
+                    className="featuredImage"
+                    alt="Adding a friend"
+                    width="1300"
+                    height="900"
+                />
+                <h3 className={deliusFont.className}>
+                    Connect with your friends or make new ones
+                </h3>
             </SFeatureItem>
             <SFeatureItem>
-                <div className="featuredImage" />
-                <h3>Feature 2</h3>
+                <Image
+                    src="/showcase/editing-message.png"
+                    className="featuredImage"
+                    alt="Adding a friend"
+                    width="1300"
+                    height="900"
+                />
+                <h3 className={deliusFont.className}>Typos? Not a problem!</h3>
             </SFeatureItem>
             <SFeatureItem>
-                <div className="featuredImage" />
-                <h3>Feature 3</h3>
+                <Image
+                    src="/showcase/updating-group.png"
+                    className="featuredImage"
+                    alt="Adding a friend"
+                    width="1300"
+                    height="900"
+                />
+                <h3 className={deliusFont.className}>
+                    Customise your spaces to suit your needs
+                </h3>
             </SFeatureItem>
             <SFeatureItem>
-                <div className="featuredImage" />
-                <h3>Feature 4</h3>
+                <Image
+                    src="/showcase/updating-profile.png"
+                    className="featuredImage"
+                    alt="Adding a friend"
+                    width="1300"
+                    height="900"
+                />
+                <h3 className={deliusFont.className}>
+                    Be yourself with full profile customisation
+                </h3>
             </SFeatureItem>
         </SFeatureGrid>
     )
@@ -38,11 +75,13 @@ const SFeatureItem = styled.div`
 
     h3 {
         padding: 1rem;
+        font-size: 1.3rem;
     }
     .featuredImage {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
         flex: 1;
-        background: url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80');
-        background-size: cover;
         border-top-left-radius: 0.5rem;
         border-top-right-radius: 0.5rem;
         border-bottom: 1px solid #9e9e9e;

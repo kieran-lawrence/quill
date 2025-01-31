@@ -1,12 +1,21 @@
 import styled from 'styled-components'
 import { QuillButton } from '../shared/QuillButton'
+import Image from 'next/image'
+import { Delius } from 'next/font/google'
+
+const deliusFont = Delius({
+    subsets: ['latin'],
+    weight: '400',
+})
 
 export const Community = () => {
     return (
         <SCommunity>
             <div className="innerLeft">
-                <h3>🌟 Join the Conversation with Quill! ✍️</h3>
-                <p>
+                <h3 className={deliusFont.className}>
+                    🌟 Join the Conversation with Quill! ✍️
+                </h3>
+                <p className={deliusFont.className}>
                     Unlock a world of connection and creativity. Sign up now to
                     start chatting, sharing, and collaborating with friends and
                     colleagues. Don’t miss out—your next great conversation is
@@ -14,13 +23,20 @@ export const Community = () => {
                 </p>
                 <QuillButton text="Sign Up" style="filled" />
             </div>
-            <div className="innerRight">Chats Go Here</div>
+            <Image
+                className="innerRight"
+                src="/showcase/chat-overview.png"
+                width="1280"
+                height="800"
+                alt="Chats Overview"
+            />
         </SCommunity>
     )
 }
 const SCommunity = styled.div`
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 2rem 4rem;
     .innerLeft {
         h3 {
@@ -39,6 +55,9 @@ const SCommunity = styled.div`
         gap: 2rem;
     }
     .innerRight {
-        width: 50%;
+        width: 60%;
+        height: auto;
+        object-fit: contain;
+        border-radius: 0.5rem;
     }
 `
