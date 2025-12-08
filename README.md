@@ -1,7 +1,7 @@
 # 🪶 Quill 🪶
 
 Quill is a full stack real-time chat application I have built for fun and to further my TypeScript abilities.
-The backend is running NestJS with TypeORM for the database. It has all the essential stuff working like real time messages, personalisation, group and private messaging.\
+The backend is running NestJS with TypeORM for the database. It has all the essential stuff working like real time messages, personalisation, group and private messaging.
 
 The base application is done, and you can clone this repo and get it running locally by following the below instructions. I have some stretch goals I hope to be able to implement in the future as I get time outside of work which are:
 
