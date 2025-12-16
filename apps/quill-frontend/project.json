@@ -1,9 +1,0 @@
-{
-  "name": "quill-frontend",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/quill-frontend",
-  "projectType": "application",
-  "tags": [],
-  "// targets": "to see all targets run: nx show project quill-frontend --web",
-  "targets": {}
-}

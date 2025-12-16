@@ -1,0 +1,44 @@
+{
+    "name": "@repo/api",
+    "version": "0.0.0",
+    "private": true,
+    "license": "MIT",
+    "scripts": {
+        "dev": "yarn build --watch",
+        "build": "tsc -b -v",
+        "lint": "eslint \"{src,apps,libs,test}/**/*.ts\""
+    },
+    "main": "./dist/entry.js",
+    "types": "./dist/entry.d.ts",
+    "files": [
+        "./dist/**"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "exports": {
+        ".": {
+            "import": "./dist/entry.js",
+            "require": "./dist/entry.js"
+        },
+        "./*": {
+            "import": "./dist/*.js",
+            "require": "./dist/*.js"
+        }
+    },
+    "dependencies": {
+        "@nestjs/mapped-types": "*",
+        "class-transformer": "^0.5.1",
+        "class-validator": "^0.14.3",
+        "connect-typeorm": "^2.0.0",
+        "typeorm": "^0.3.28",
+        "typescript": "5.5.4"
+    },
+    "devDependencies": {
+        "@repo/eslint-config": "*",
+        "@repo/typescript-config": "*",
+        "@types/node": "^22.10.7",
+        "ts-loader": "^9.4.3",
+        "ts-node": "^10.9.2"
+    }
+}
