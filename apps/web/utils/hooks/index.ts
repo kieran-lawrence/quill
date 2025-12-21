@@ -7,11 +7,12 @@ import { filterFriends } from '../store/friends'
 /** A hook that returns all of a users friends, and allows for searching of friends */
 export const useFriends = () => {
     const [searchTerm, setSearchTerm] = useState('')
-    const friends = useAppSelector((state) =>
+    const { friends, pending } = useAppSelector((state) =>
         filterFriends(state.friends, searchTerm),
     )
     return {
         friends,
+        pending,
         searchTerm,
         setSearchTerm,
     }

@@ -16,6 +16,7 @@ import {
     GroupChatEntity,
     GroupMessageEntity,
     SessionEntity,
+    FriendRequestEntity,
 } from '@repo/api'
 
 @Module({
@@ -31,6 +32,7 @@ import {
             entities: [
                 UserEntity,
                 FriendEntity,
+                FriendRequestEntity,
                 ChatEntity,
                 PrivateMessageEntity,
                 GroupChatEntity,

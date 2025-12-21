@@ -12,6 +12,7 @@ export { EditPrivateMessageDto } from './message/dto/edit-private-message.dto'
 export { UpdateUserDto } from './user/dto/update-user.dto'
 // Entities
 export { FriendEntity } from './friend/entities/friend.entity'
+export { FriendRequestEntity } from './friend/entities/friend-request.entity'
 export { ChatEntity } from './chat/entities/chat.entity'
 export { GroupChatEntity } from './group/entities/group-chat.entity'
 export { GroupMessageEntity } from './group/entities/group-message.entity'

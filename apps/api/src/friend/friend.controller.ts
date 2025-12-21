@@ -23,13 +23,34 @@ export class FriendsController {
         @Inject(Services.FRIEND) private readonly friendService: FriendService,
     ) {}
 
-    @Post()
+    @Post('/request')
     @UsePipes(ValidationPipe)
     add(
         @AuthenticatedUser() user: UserEntity,
         @Body() { email }: AddFriendDto,
     ) {
         return this.friendService.addFriend({ user, email })
+    }
+
+    @Post('/:id/accept')
+    accept(
+        @AuthenticatedUser() user: UserEntity,
+        @Param('id', ParseIntPipe) id: number,
+    ) {
+        return this.friendService.acceptFriendRequest({ user, id })
+    }
+
+    @Post('/:id/reject')
+    reject(
+        @AuthenticatedUser() user: UserEntity,
+        @Param('id', ParseIntPipe) id: number,
+    ) {
+        return this.friendService.rejectFriendRequest({ user, id })
+    }
+
+    @Get('/requests')
+    getFriendRequests(@AuthenticatedUser() user: UserEntity) {
+        return this.friendService.getFriendRequests(user)
     }
 
     @Get(':id')

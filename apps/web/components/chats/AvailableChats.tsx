@@ -7,7 +7,12 @@ import { CreateChatModal } from './CreateChatModal'
 import { IoAdd, IoSearch } from 'react-icons/io5'
 import { ChatPreview } from './ChatPreview'
 import { Chat, GroupChat } from '@repo/api'
-import { getChats, getFriends, getGroups } from '../../utils/api'
+import {
+    getChats,
+    getFriendRequests,
+    getFriends,
+    getGroups,
+} from '../../utils/api'
 import { AppDispatch, useAppSelector } from '../../utils/store'
 import { setChatState, updateChatUserState } from '../../utils/store/chats'
 import { useDispatch } from 'react-redux'
@@ -16,7 +21,11 @@ import { setGroupsState } from '../../utils/store/groups'
 import { useRouter } from 'next/navigation'
 import { PiHandWavingBold } from 'react-icons/pi'
 import { useWebSocketConnection, useWebSocketEvents } from '../../utils/hooks'
-import { setFriendState, updateFriendState } from '../../utils/store/friends'
+import {
+    setFriendRequestsState,
+    setFriendState,
+    updateFriendState,
+} from '../../utils/store/friends'
 import { UserUpdatedEventParams } from '@repo/api'
 
 export const AvailableChats = () => {
@@ -24,6 +33,8 @@ export const AvailableChats = () => {
     useWebSocketConnection()
 
     const [showCreateChatModal, setShowCreateChatModal] = useState(false)
+    const [pendingFriendRequests, setPendingFriendRequests] =
+        useState<number>(0)
     const { user } = useAuth()
     const dispatch = useDispatch<AppDispatch>()
     const chats = useAppSelector((state) => state.chats.chats)
@@ -44,6 +55,26 @@ export const AvailableChats = () => {
         )
         return userStatusListener
     }, [listenForMessage, dispatch])
+
+    useEffect(() => {
+        const fetchFriendRequests = async () => {
+            const requests = await getFriendRequests()
+            if ('status' in requests) {
+                const errorMessage = requests?.message
+                toast.error(
+                    errorMessage ||
+                        'An error occurred fetching your friend requests.',
+                )
+            } else {
+                const count = requests.filter(
+                    (request) => request.status === 'pending',
+                ).length
+                setPendingFriendRequests(count)
+                dispatch(setFriendRequestsState(requests))
+            }
+        }
+        fetchFriendRequests()
+    }, [dispatch])
 
     useEffect(() => {
         const fetchChats = async () => {
@@ -121,6 +152,11 @@ export const AvailableChats = () => {
                     >
                         <PiHandWavingBold size={26} />
                         Friends
+                        {pendingFriendRequests > 0 && (
+                            <SPendingRequestBadge>
+                                {pendingFriendRequests}
+                            </SPendingRequestBadge>
+                        )}
                     </SFriendsButton>
                     {data &&
                         data.map((chat: Chat | GroupChat, index) => (
@@ -215,4 +251,16 @@ const SFriendsButton = styled.button`
         outline: ${({ theme }) => `1px solid ${theme.colors.blueStrong}`};
         cursor: pointer;
     }
+`
+const SPendingRequestBadge = styled.div`
+    display: grid;
+    place-items: center;
+    background: ${({ theme }) => theme.colors.blueAccent};
+    color: ${({ theme }) => theme.colors.text};
+    border-radius: 50%;
+    padding: 0.2rem;
+    width: 1rem;
+    height: 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
 `

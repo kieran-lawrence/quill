@@ -10,11 +10,17 @@ import { useAppSelector } from '../../../utils/store'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import AddFriendModal from '../../../components/AddFriendModal'
+import RequestOptionsModal from '../../../components/RequestOptionsModal'
+import { FriendRequest } from '@repo/api'
 
 export default function FriendsPage() {
-    const { friends, setSearchTerm } = useFriends()
+    const { friends, pending, searchTerm, setSearchTerm } = useFriends()
     const chats = useAppSelector((state) => state.chats.chats)
     const [showAddFriendModal, setShowAddFriendModal] = useState(false)
+    const [selectedRequest, setSelectedRequest] =
+        useState<FriendRequest | null>(null)
+    const [showRequestOptionsModal, setShowRequestOptionsModal] =
+        useState(false)
     const router = useRouter()
 
     const handleFriendMessage = (friendId: number) => {
@@ -30,6 +36,12 @@ export default function FriendsPage() {
             {showAddFriendModal && (
                 <AddFriendModal onClose={() => setShowAddFriendModal(false)} />
             )}
+            {showRequestOptionsModal && selectedRequest && (
+                <RequestOptionsModal
+                    request={selectedRequest}
+                    onClose={() => setShowRequestOptionsModal(false)}
+                />
+            )}
             <SHeading>
                 <PiHandWavingBold size={26} />
                 Friends
@@ -39,15 +51,48 @@ export default function FriendsPage() {
                 <SFilterButton onClick={() => setSearchTerm('')}>
                     All
                 </SFilterButton>
-                {/* <SFilterButton onClick={() => setSearchTerm('')}>
+                <SFilterButton onClick={() => setSearchTerm('pending')}>
                     Pending
-                </SFilterButton> */}
+                </SFilterButton>
                 <SAddFriendButton onClick={() => setShowAddFriendModal(true)}>
                     Add Friend
                 </SAddFriendButton>
             </SHeading>
             <SFriendsWrapper>
-                {friends &&
+                {searchTerm === 'pending' ? (
+                    pending.length > 0 ? (
+                        <>
+                            {pending.map((request) => (
+                                <SFriendWrapper
+                                    key={request.addressee.id}
+                                    onClick={() => {
+                                        setSelectedRequest(request)
+                                        setShowRequestOptionsModal(true)
+                                    }}
+                                >
+                                    {request.addressee.avatar ? (
+                                        <Avatar
+                                            imgSrc={`/images/${request.addressee.avatar}`}
+                                            size="3.5rem"
+                                        />
+                                    ) : (
+                                        <GroupUserInitials
+                                            text={`${request.addressee.firstName} ${request.addressee.lastName}`}
+                                            size="3.5rem"
+                                        />
+                                    )}
+                                    {`${request.addressee.firstName} ${request.addressee.lastName}`}
+                                    <SPendingRequestBadge>
+                                        Pending
+                                    </SPendingRequestBadge>
+                                </SFriendWrapper>
+                            ))}
+                        </>
+                    ) : (
+                        <>No friend requests</>
+                    )
+                ) : (
+                    friends &&
                     friends.map((friend) => (
                         <SFriendWrapper
                             key={friend.id}
@@ -68,7 +113,8 @@ export default function FriendsPage() {
                             {`${friend.firstName} ${friend.lastName}`}
                             <OnlineStatus userId={friend.id} />
                         </SFriendWrapper>
-                    ))}
+                    ))
+                )}
             </SFriendsWrapper>
         </SFriendsContainer>
     )
@@ -153,4 +199,13 @@ const SFriendWrapper = styled.address`
         background: ${({ theme }) => theme.colors.blueWeak};
         cursor: pointer;
     }
+`
+const SPendingRequestBadge = styled.div`
+    display: grid;
+    place-items: center;
+    background: ${({ theme }) => theme.colors.blueAccent};
+    color: ${({ theme }) => theme.colors.text};
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.9rem;
 `

@@ -49,6 +49,14 @@ export type Friend = {
     userTwo: User
     createdAt: string
 }
+export type FriendRequest = {
+    id: number
+    requester: User
+    addressee: User
+    status: FriendRequestStatus
+    createdAt: string
+    updatedAt: string
+}
 export type CreateGroupMessageResponse = {
     message: GroupMessage
     chat: GroupChat
@@ -194,3 +202,5 @@ export type Gif = {
     alt_text: string
     is_low_contrast?: boolean
 }
+
+export type FriendRequestStatus = 'pending' | 'accepted' | 'rejected'
