@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import { isGif } from '../../utils/helpers'
 
 type FullscreenImageProps = {
     imagePath: string
@@ -13,7 +14,7 @@ export const FullscreenImage: React.FC<FullscreenImageProps> = ({
     return (
         <SOverlay onClick={onClose}>
             <SImage
-                src={`/images/${imagePath}`}
+                src={isGif(imagePath) ? imagePath : `/images/${imagePath}`}
                 alt="Fullscreen"
                 onClick={(e) => e.stopPropagation()}
             />

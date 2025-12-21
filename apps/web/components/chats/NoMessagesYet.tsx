@@ -1,12 +1,11 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import styled from 'styled-components'
 
 export const NoMessagesYet: React.FC = () => {
-    return (
-        <SContainer>
-            {messages[Math.floor(Math.random() * messages.length)]}
-        </SContainer>
+    const message = useRef(
+        messages[Math.floor(Math.random() * messages.length)],
     )
+    return <SContainer>{message.current}</SContainer>
 }
 
 const SContainer = styled.div`

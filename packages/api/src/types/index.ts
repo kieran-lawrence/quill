@@ -155,3 +155,42 @@ export enum Services {
     FRIEND = 'FRIEND_SERVICE',
     SESSION_STORE = 'SESSION_STORE_SERVICE',
 }
+export type GifResponse = {
+    data: Gif[]
+    pagination: GifPagination
+    meta: GifMeta
+}
+
+export type GifMeta = {
+    msg: string
+    status: number
+    response_id: string
+}
+export type GifPagination = {
+    offset: number
+    total_count: number
+    count: number
+}
+export type Gif = {
+    type: string
+    id: string
+    slug: string
+    url: string
+    bitly_url: string
+    embed_url: string
+    username: string
+    source: string
+    rating: string
+    content_url: string
+    user?: any // Replace 'any' with a User type if you have the structure
+    source_tld: string
+    source_post_url: string
+    update_datetime: string
+    create_datetime: string
+    import_datetime: string
+    trending_datetime: string
+    images: any // Replace 'any' with an Images type if you have the structure
+    title: string
+    alt_text: string
+    is_low_contrast?: boolean
+}

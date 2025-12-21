@@ -8,7 +8,21 @@
         },
         "build": {
             "dependsOn": ["^build"],
-            "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+            "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+            "env": [
+                "NEXT_PUBLIC_GIPHY_API_KEY",
+                "NEXT_PUBLIC_SOCKET_URI",
+                "PORT",
+                "COOKIE_SECRET",
+                "COOKIE_MAX_AGE",
+                "SESSION_NAME",
+                "DB_HOST",
+                "DB_PORT",
+                "DB_USERNAME",
+                "DB_PASSWORD",
+                "DB_NAME",
+                "FILE_UPLOAD_DESTINATION"
+            ]
         },
         "typecheck": {
             "outputs": []

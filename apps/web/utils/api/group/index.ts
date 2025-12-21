@@ -69,15 +69,21 @@ export const deleteGroup = async (groupId: number) =>
 export const createGroupMessage = async ({
     groupId,
     formData,
-}: CreateGroupMessageParams) =>
-    <Promise<CreateGroupMessageResponse | NestJSError>>await fetch(
+}: CreateGroupMessageParams) => {
+    const isFormData =
+        typeof FormData !== 'undefined' && formData instanceof FormData
+    return <Promise<CreateGroupMessageResponse | NestJSError>>await fetch(
         `${BASE_URL}/${groupId}/message`,
         {
             method: 'POST',
             credentials: 'include',
-            body: formData,
+            body: isFormData ? formData : JSON.stringify(formData),
+            ...(isFormData
+                ? {}
+                : { headers: { 'Content-Type': 'application/json' } }),
         },
     ).then((res) => res.json())
+}
 
 export const updateGroupMessage = async ({
     groupId,
@@ -162,6 +168,9 @@ export const searchGroupMessages = async ({
         },
     ).then((res) => res.json())
 
+type Message = {
+    messageContent: string
+}
 type CreateGroupChatParams = {
     members: string[]
     name?: string
@@ -169,7 +178,7 @@ type CreateGroupChatParams = {
 }
 type CreateGroupMessageParams = {
     groupId: number
-    formData: FormData
+    formData: FormData | Message
 }
 type UpdateGroupChatParams = {
     groupId: number

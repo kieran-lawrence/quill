@@ -32,5 +32,9 @@ export const getChatRecipient = (chat: Chat, user?: User) => {
 }
 
 export const isImage = (fileName: string) => {
-    return /\.(jpe?g|png|gif)$/i.test(fileName)
+    return /\.(jpe?g|png)$/i.test(fileName)
+}
+
+export const isGif = (fileName: string) => {
+    return /\.gif$/i.test(fileName)
 }

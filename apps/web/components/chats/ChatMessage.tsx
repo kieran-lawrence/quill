@@ -1,7 +1,7 @@
 import { PrivateMessage, GroupMessage } from '@repo/api'
 import { PropsWithChildren } from 'react'
 import styled from 'styled-components'
-import { isImage } from '../../utils/helpers'
+import { isGif, isImage } from '../../utils/helpers'
 import { Avatar } from '../Avatar'
 import { GroupUserInitials } from '../GroupUserInitials'
 import { format } from 'date-fns'
@@ -72,6 +72,12 @@ export const ChatMessage = ({
                     <SChatImage
                         src={`/images/${message.messageContent}`}
                         alt={`Image from: ${message.author.firstName}`}
+                        onClick={() => onImageClick && onImageClick(true)}
+                    />
+                ) : isGif(message.messageContent) ? (
+                    <SChatImage
+                        src={message.messageContent}
+                        alt={`GIF from: ${message.author.firstName}`}
                         onClick={() => onImageClick && onImageClick(true)}
                     />
                 ) : (

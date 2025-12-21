@@ -9,10 +9,12 @@ import { GroupUserInitials } from '../GroupUserInitials'
 import { OnlineStatus } from '@repo/api'
 import { useState } from 'react'
 import { ProfileMenu } from '../menu/ProfileMenu'
+import { useRouter } from 'next/navigation'
 
 export const Sidebar = () => {
     const { user } = useAuth()
     const [showProfileOptions, setShowProfileOptions] = useState(false)
+    const router = useRouter()
 
     return (
         <IconContext.Provider value={{ className: 'sidebarIcons' }}>
@@ -22,10 +24,7 @@ export const Sidebar = () => {
                     <IconWithText
                         icon={<IoChatbox />}
                         text={'Chats'}
-                        onClick={() => {
-                            console.log('Clicked')
-                            //TODO: Handle click of chats
-                        }}
+                        onClick={() => router.push('/chats')}
                     />
                 </SChatGroups>
                 {user && showProfileOptions && (

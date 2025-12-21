@@ -7,6 +7,8 @@ import {
     getChatDisplayName,
     getChatRecipient,
     getGroupChatMembers,
+    isGif,
+    isImage,
 } from '../../utils/helpers'
 import { OnlineStatus } from '../OnlineStatus'
 
@@ -37,9 +39,12 @@ export const ChatPreview = ({ user, chat }: ChatPreviewProps) => {
                 </SNameContainer>
                 <SMessage>
                     {chat.lastMessageSent
-                        ? chat.lastMessageSent.messageContent.length > 30
-                            ? `${chat.lastMessageSent.messageContent.slice(0, 30)}...`
-                            : chat.lastMessageSent.messageContent
+                        ? isGif(chat.lastMessageSent.messageContent) ||
+                          isImage(chat.lastMessageSent.messageContent)
+                            ? 'Image'
+                            : chat.lastMessageSent.messageContent.length > 30
+                              ? `${chat.lastMessageSent.messageContent.slice(0, 30)}...`
+                              : chat.lastMessageSent.messageContent
                         : `No messages yet`}
                 </SMessage>
             </SContent>

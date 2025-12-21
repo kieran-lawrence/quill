@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { GroupChat, Chat } from '@repo/api'
+import { GroupChat, Chat, Gif } from '@repo/api'
 import {
     GroupMessageReceivedEventParams,
     MessageReceivedEventParams,
@@ -8,13 +8,14 @@ import { IoSearch, IoCall, IoPaperPlaneOutline, IoClose } from 'react-icons/io5'
 import { LuChevronLeft, LuChevronRight } from 'react-icons/lu'
 import toast, { Toaster } from 'react-hot-toast'
 import { FiPaperclip } from 'react-icons/fi'
+import { MdGif } from 'react-icons/md'
 import { IconContext } from 'react-icons'
 import { ChatBox } from './ChatBox'
 import { getChatRecipient, getGroupChatMembers } from '../../utils/helpers'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { NoMessagesYet } from './NoMessagesYet'
-import { useWebSocketEvents } from '../../utils/hooks'
-import { useEffect } from 'react'
+import { useDebounce, useWebSocketEvents } from '../../utils/hooks'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from '../../contexts/auth'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../../utils/store'
@@ -22,6 +23,8 @@ import { addMessageState } from '../../utils/store/chats'
 import { createGroupMessage, createPrivateMessage } from '../../utils/api'
 import { addGroupMessageState } from '../../utils/store/groups'
 import { MenuActions } from '../../utils/types'
+import { getTrendingGifs, searchGifs } from '../../utils/api/gif'
+import { FaSearch } from 'react-icons/fa'
 
 type ChatWindowProps = {
     chat: Chat | GroupChat
@@ -47,6 +50,9 @@ export const ChatWindow = ({
         reset: clearForm,
         watch,
     } = useForm<CreateMessageParams>()
+    const [showGifWindow, setShowGifWindow] = useState(false)
+    const [gifs, setGifs] = useState<Gif[]>([])
+    const gifWindowRef = useRef<HTMLDivElement>(null)
     const isGroupChat = 'members' in chat
     const chatName = isGroupChat
         ? chat.name || getGroupChatMembers(chat)
@@ -88,9 +94,87 @@ export const ChatWindow = ({
     }, [dispatch, listenForMessage])
 
     /** Provides a single method in which to dispatch websocket events related to Chats */
-    const sendMessageToSocket = <T extends object>(event: string, data: T) => {
-        sendMessage(event, data)
-    }
+    const sendMessageToSocket = useCallback(
+        <T extends object>(event: string, data: T) => {
+            sendMessage(event, data)
+        },
+        [sendMessage],
+    )
+
+    const handleGifClick = useCallback(
+        (gif: Gif) => {
+            if (isGroupChat) {
+                createGroupMessage({
+                    groupId: chat.id,
+                    formData: { messageContent: gif.images['downsized'].url },
+                }).then((resp) => {
+                    if ('status' in resp) {
+                        const errorMessage = resp?.message
+                        toast.error(
+                            errorMessage ||
+                                'Unable to send message. An error occurred.',
+                        )
+                    } else {
+                        dispatch(
+                            addGroupMessageState({
+                                groupId: chat.id,
+                                message: resp.message,
+                            }),
+                        )
+                        setShowGifWindow(false)
+                        sendMessageToSocket('onGroupMessageCreation', {
+                            message: resp.message,
+                            chat,
+                        })
+                    }
+                })
+            } else {
+                createPrivateMessage({
+                    chatId: chat.id,
+                    formData: { messageContent: gif.images['downsized'].url },
+                }).then((resp) => {
+                    if ('status' in resp) {
+                        const errorMessage = resp?.message
+                        toast.error(
+                            errorMessage ||
+                                'Unable to send message. An error occurred.',
+                        )
+                    } else {
+                        dispatch(
+                            addMessageState({
+                                chatId: chat.id,
+                                message: resp.message,
+                            }),
+                        )
+                        setShowGifWindow(false)
+                        sendMessageToSocket('onPrivateMessageCreation', {
+                            message: resp.message,
+                            chat,
+                            recipientId: getChatRecipient(chat, user).id,
+                        })
+                    }
+                })
+            }
+        },
+        [chat, dispatch, isGroupChat, sendMessageToSocket, user],
+    )
+
+    const handleSearchGifs = useDebounce((query: string) => {
+        if (!query || query.length < 2) return
+        const fetchGifs = async () => {
+            const gifs = await searchGifs(query)
+            setGifs(gifs.data)
+        }
+        fetchGifs()
+    }, 500)
+
+    useEffect(() => {
+        const fetchGifs = async () => {
+            const gifs = await getTrendingGifs()
+            setGifs(gifs.data)
+        }
+        fetchGifs()
+    }, [])
 
     const onSubmit: SubmitHandler<CreateMessageParams> = ({
         image,
@@ -105,61 +189,83 @@ export const ChatWindow = ({
 
         if (image && image.length) {
             const uploadedFile = image.item(0)
-            uploadedFile && formData.append('image', uploadedFile)
+            if (uploadedFile) {
+                formData.append('image', uploadedFile)
+            }
         }
         if (message) formData.append('messageContent', message)
 
-        isGroupChat
-            ? createGroupMessage({
-                  groupId: chat.id,
-                  formData,
-              }).then((resp) => {
-                  if ('status' in resp) {
-                      const errorMessage = resp?.message
-                      toast.error(
-                          errorMessage ||
-                              'Unable to send message. An error occurred.',
-                      )
-                  } else {
-                      dispatch(
-                          addGroupMessageState({
-                              groupId: chat.id,
-                              message: resp.message,
-                          }),
-                      )
-                      clearForm()
-                      sendMessageToSocket('onGroupMessageCreation', {
-                          message: resp.message,
-                          chat,
-                      })
-                  }
-              })
-            : createPrivateMessage({
-                  chatId: chat.id,
-                  formData,
-              }).then((resp) => {
-                  if ('status' in resp) {
-                      const errorMessage = resp?.message
-                      toast.error(
-                          errorMessage ||
-                              'Unable to send message. An error occurred.',
-                      )
-                  } else {
-                      dispatch(
-                          addMessageState({
-                              chatId: chat.id,
-                              message: resp.message,
-                          }),
-                      )
-                      clearForm()
-                      sendMessageToSocket('onPrivateMessageCreation', {
-                          message: resp.message,
-                          chat,
-                          recipientId: getChatRecipient(chat, user).id,
-                      })
-                  }
-              })
+        if (isGroupChat) {
+            createGroupMessage({
+                groupId: chat.id,
+                formData,
+            }).then((resp) => {
+                if ('status' in resp) {
+                    const errorMessage = resp?.message
+                    toast.error(
+                        errorMessage ||
+                            'Unable to send message. An error occurred.',
+                    )
+                } else {
+                    dispatch(
+                        addGroupMessageState({
+                            groupId: chat.id,
+                            message: resp.message,
+                        }),
+                    )
+                    clearForm()
+                    sendMessageToSocket('onGroupMessageCreation', {
+                        message: resp.message,
+                        chat,
+                    })
+                }
+            })
+        } else {
+            createPrivateMessage({
+                chatId: chat.id,
+                formData,
+            }).then((resp) => {
+                if ('status' in resp) {
+                    const errorMessage = resp?.message
+                    toast.error(
+                        errorMessage ||
+                            'Unable to send message. An error occurred.',
+                    )
+                } else {
+                    dispatch(
+                        addMessageState({
+                            chatId: chat.id,
+                            message: resp.message,
+                        }),
+                    )
+                    clearForm()
+                    sendMessageToSocket('onPrivateMessageCreation', {
+                        message: resp.message,
+                        chat,
+                        recipientId: getChatRecipient(chat, user).id,
+                    })
+                }
+            })
+        }
     }
+
+    // Close GIF window on outside click
+    useEffect(() => {
+        if (!showGifWindow) return
+        const handleClick = (e: MouseEvent) => {
+            if (
+                gifWindowRef.current &&
+                !gifWindowRef.current.contains(e.target as Node)
+            ) {
+                setShowGifWindow(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClick)
+        return () => {
+            document.removeEventListener('mousedown', handleClick)
+        }
+    }, [showGifWindow])
+
     return (
         <SChatWindow>
             <Toaster />
@@ -217,6 +323,37 @@ export const ChatWindow = ({
                 ) : (
                     <NoMessagesYet />
                 )}
+                {showGifWindow && (
+                    <SGifWindow ref={gifWindowRef}>
+                        <SGifSearchWrapper>
+                            <IconContext.Provider
+                                value={{
+                                    className: 'messageIcons',
+                                    size: '1.6rem',
+                                }}
+                            >
+                                <SGifSearchInput
+                                    onChange={(e) =>
+                                        handleSearchGifs(e.target.value)
+                                    }
+                                    placeholder="Search GIPHY"
+                                />
+                            </IconContext.Provider>
+                            <FaSearch />
+                        </SGifSearchWrapper>
+                        {gifs.map((gif) => (
+                            <SGifSendButton
+                                key={gif.id}
+                                onClick={() => handleGifClick(gif)}
+                            >
+                                <SGif
+                                    alt={gif.title}
+                                    src={gif.images['downsized'].url}
+                                />
+                            </SGifSendButton>
+                        ))}
+                    </SGifWindow>
+                )}
             </SChatBody>
             <SMessageInputWrapper
                 onSubmit={handleSubmit(onSubmit)}
@@ -229,6 +366,11 @@ export const ChatWindow = ({
                         onClick={() =>
                             document.getElementById('fileInput')?.click()
                         }
+                    />
+                    <MdGif
+                        onClick={() => {
+                            setShowGifWindow((prev) => !prev)
+                        }}
                     />
                     <input
                         id="fileInput"
@@ -309,6 +451,7 @@ const SChatBody = styled.div`
     overflow-y: scroll;
     transition: all 0.2s;
     padding: 1rem 2rem;
+    position: relative;
 `
 const SMessageInputWrapper = styled.form`
     display: flex;
@@ -384,4 +527,62 @@ const SImagePreview = styled.img`
     &:hover {
         cursor: pointer;
     }
+`
+
+const SGifWindow = styled.div`
+    position: absolute;
+    bottom: 0;
+    left: 2rem;
+    width: fit-content;
+    height: fit-content;
+    border: 1px solid ${({ theme }) => theme.colors.blueStrong};
+    background: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: ${({ theme }) => `0 4px 8px ${theme.colors.shadow}`};
+    z-index: 1000;
+    padding: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(3, 10rem);
+    grid-template-rows: 2rem auto;
+    height: 30rem;
+    overflow-y: auto;
+    gap: 0.3rem;
+
+    .messageIcons {
+        size: 2rem;
+        color: ${({ theme }) => theme.colors.blueStrong};
+        cursor: pointer;
+
+        transition: all 0.2s;
+        &:hover {
+            color: ${({ theme }) => theme.colors.orangeStrong};
+        }
+    }
+`
+const SGifSearchWrapper = styled.div`
+    display: flex;
+    grid-column: 1 / span 3;
+    align-items: center;
+    gap: 0.5rem;
+    background: ${({ theme }) => theme.colors.blueAccent};
+    outline: ${({ theme }) => `1px solid ${theme.colors.blueAccent}`};
+    color: ${({ theme }) => theme.colors.text.primary};
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+`
+const SGifSearchInput = styled.input`
+    flex: 1;
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 1rem;
+`
+const SGifSendButton = styled.button`
+    background: none;
+    border: none;
+`
+const SGif = styled.img`
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    width: 100%;
 `
