@@ -7,9 +7,6 @@ The base application is done, and you can clone this repo and get it running loc
 
 - Audio/Video calling using WebRTC (no libraries)
 - Refactor the friend system so you can actually send a 'request' to become friends, and not just automatically add a friend 😆
-- Support advanced text features like hyperlinks and previews when sending this type of content
-- Add support for GIFs in messaging as well as reacting to messages
-- Notifications (unread messages, friend requests etc)
 
 <figure>
   <img src="https://preview.redd.it/pleasestop-v0-txr7gptyv1ad1.jpeg?width=1080&crop=smart&auto=webp&s=abbfa10a91eb5c9d099c3128320fa150e7c4078c" alt="Big Plans." style="width:50%">
