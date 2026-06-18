@@ -52,6 +52,7 @@ FRONTEND_BASE_URL= # The url for the frontend (web) server, probably http://loca
 
 ```sh
 NEXT_PUBLIC_API_URI= Url the backend is running on, probably http://localhost:3001
+NEXT_PUBLIC_GIPHY_API_KEY= Url An API key to connect with Giphy, for all those mad gifs, yo
 ```
 
 5. Create a database with the name you specified in `DB_NAME`
