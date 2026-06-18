@@ -11,7 +11,7 @@
             "outputs": [".next/**", "!.next/cache/**", "dist/**"],
             "env": [
                 "NEXT_PUBLIC_GIPHY_API_KEY",
-                "NEXT_PUBLIC_SOCKET_URI",
+                "NEXT_PUBLIC_API_URI",
                 "PORT",
                 "COOKIE_SECRET",
                 "COOKIE_MAX_AGE",
@@ -21,7 +21,8 @@
                 "DB_USERNAME",
                 "DB_PASSWORD",
                 "DB_NAME",
-                "FILE_UPLOAD_DESTINATION"
+                "FILE_UPLOAD_DESTINATION",
+                "FRONTEND_BASE_URL"
             ]
         },
         "typecheck": {

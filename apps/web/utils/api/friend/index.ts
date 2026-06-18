@@ -1,7 +1,7 @@
 import { Friend, FriendRequest, FriendRequestStatus } from '@repo/api'
 import { NestJSError } from '../../types'
 
-const BASE_URL = 'http://localhost:3001/api/friend'
+const BASE_URL = `${process.env.NEXT_PUBLIC_API_URI}/api/friend`
 
 export const getFriends = async () =>
     <Promise<GetFriendResponse | NestJSError>>await fetch(`${BASE_URL}/`, {

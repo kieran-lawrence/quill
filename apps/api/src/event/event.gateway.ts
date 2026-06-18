@@ -7,9 +7,13 @@ import {
     ConnectedSocket,
     MessageBody,
 } from '@nestjs/websockets'
-import { Inject } from '@nestjs/common'
+import { Inject, Logger } from '@nestjs/common'
 import { Server } from 'socket.io'
-import { Services } from '@repo/api'
+import {
+    OnCallSignalEventResponse,
+    PrivateCallSocketEvent,
+    Services,
+} from '@repo/api'
 import {
     CreateGroupMessageResponse,
     GroupChatEntity,
@@ -26,7 +30,15 @@ import { ChatService } from '../chat/chat.service'
 import { AuthenticatedSocket, ISessionStore } from 'src/util/interfaces'
 
 @WebSocketGateway({
-    cors: { origin: ['http://localhost:3000'], credentials: true },
+    cors: {
+        origin: [
+            process.env.FRONTEND_BASE_URL,
+            // 'http://localhost:3000',
+            // 'http://192.168.1.113:3000',
+            // 'http://192.168.1.108:3000',
+        ],
+        credentials: true,
+    },
 })
 export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private statusChangeTimeouts: Map<number, NodeJS.Timeout> = new Map()
@@ -41,13 +53,12 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() server: Server = new Server()
 
     private emitStatusChange(user: UserEntity, status: OnlineStatus) {
-        // Clear any existing timeout for this user
+        // Clear any existing timeouts for this user
         const existingTimeout = this.statusChangeTimeouts.get(user.id)
         if (existingTimeout) {
             clearTimeout(existingTimeout)
         }
 
-        // Set new timeout
         const timeout = setTimeout(() => {
             // Emit to all active sessions
             this.sessions.findAllSessions().map((s) => {
@@ -63,7 +74,7 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 }
             })
             this.statusChangeTimeouts.delete(user.id)
-        }, 2000) // 30 seconds
+        }, 2000) // 2 seconds
 
         this.statusChangeTimeouts.set(user.id, timeout)
     }
@@ -79,7 +90,7 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
         })
 
         if (client.user) {
-            client.join(`private-chat-${client.user.id}`)
+            await client.join(`private-chat-${client.user.id}`)
             this.sessions.saveSession(client.user.id, client)
             await this.userService.updateUser({
                 user: client.user,
@@ -118,7 +129,7 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @MessageBody() { groupId }: { groupId: number },
     ) {
         if (!client.user) return
-        client.join(`group-chat-${groupId}`)
+        await client.join(`group-chat-${groupId}`)
     }
 
     @SubscribeMessage('onGroupChatLeave')
@@ -127,7 +138,7 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @MessageBody() { groupId }: { groupId: number },
     ) {
         if (!client.user) return
-        client.leave(`group-chat-${groupId}`)
+        await client.leave(`group-chat-${groupId}`)
     }
 
     @SubscribeMessage('onPrivateMessageCreation')
@@ -203,6 +214,35 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server
             .to(`private-chat-${recipientId}`)
             .emit('messageDeleted', { chatId, messageId })
+    }
+
+    // Relay any WebRTC signal (offer, answer, ICE) between peers
+    @SubscribeMessage('onCallSignal')
+    async callSignal(
+        @ConnectedSocket() client: AuthenticatedSocket,
+        @MessageBody() { toUserId, signal }: PrivateCallSocketEvent,
+    ) {
+        if (!client.user) return
+        const eventArgs: OnCallSignalEventResponse = {
+            signal,
+            userId: client.user.id,
+        }
+        this.server
+            .to(`private-chat-${toUserId}`)
+            .emit('callSignalled', eventArgs)
+    }
+
+    // Use onCallStart only for call initiation notification (e.g., show incoming call modal)
+    @SubscribeMessage('onCallStart')
+    async callStarted(
+        @ConnectedSocket() client: AuthenticatedSocket,
+        @MessageBody() { toUserId }: { toUserId: number },
+    ) {
+        if (!client.user) return
+        this.server
+            .to(`private-chat-${toUserId}`)
+            .emit('callInitiated', { userId: client.user.id })
+        Logger.log(`User ${client.user.id} started a call to User ${toUserId}`)
     }
 
     @SubscribeMessage('onUserUpdated')

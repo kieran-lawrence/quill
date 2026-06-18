@@ -7,7 +7,7 @@ import {
 } from '@repo/api'
 import { NestJSError } from '../../types'
 
-const BASE_URL = 'http://localhost:3001/api/group'
+const BASE_URL = `${process.env.NEXT_PUBLIC_API_URI}/api/group`
 
 export const getGroups = async () =>
     <Promise<GroupChat[] | NestJSError>>(

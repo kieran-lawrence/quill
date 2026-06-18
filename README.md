@@ -45,12 +45,13 @@ DB_USERNAME=username # Your postgres user creds
 DB_PASSWORD=password # Your postgres user creds
 DB_NAME=quill # Change if desired
 FILE_UPLOAD_DESTINATION= # The path where you want uploaded files to go, eg ~/User/{path_to_repo}/quill/assets/images
+FRONTEND_BASE_URL= # The url for the frontend (web) server, probably http://localhost:3000
 ```
 
 4. Create a `.env.local` file in `/apps/web` and populate it with the following:
 
 ```sh
-NEXT_PUBLIC_SOCKET_URI= Url the backend is running on, probably http://localhost:3001
+NEXT_PUBLIC_API_URI= Url the backend is running on, probably http://localhost:3001
 ```
 
 5. Create a database with the name you specified in `DB_NAME`

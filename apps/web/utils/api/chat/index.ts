@@ -7,7 +7,7 @@ import {
 } from '@repo/api'
 import { NestJSError } from '../../types'
 
-const BASE_URL = 'http://localhost:3001/api/chat'
+const BASE_URL = `${process.env.NEXT_PUBLIC_API_URI}/api/chat`
 
 export const getChats = async () =>
     <Promise<Chat[] | NestJSError>>(

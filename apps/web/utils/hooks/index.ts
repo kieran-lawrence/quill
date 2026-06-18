@@ -45,9 +45,11 @@ export const useWebSocketConnection = () => {
 
     useEffect(() => {
         const socket = socketService.connect(user)
+        if (!socket) return
         socket.on('connect', () => {
             setConnected(true)
             setError(null)
+            console.log('WebSocket connected')
         })
 
         socket.on('disconnect', () => {
@@ -102,6 +104,11 @@ export const useWebSocketEvents = () => {
                 return () => {
                     socket.off(event, callback)
                 }
+            } else {
+                console.warn(
+                    'listenForMessage: socket not available or connected for event',
+                    event,
+                )
             }
         },
         [],

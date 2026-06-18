@@ -38,6 +38,7 @@
         "@repo/eslint-config": "*",
         "@repo/typescript-config": "*",
         "@types/node": "^22.10.7",
+        "@types/simple-peer": "^9.11.9",
         "ts-loader": "^9.4.3",
         "ts-node": "^10.9.2"
     }

@@ -1,3 +1,5 @@
+import { SignalData } from 'simple-peer'
+
 export type User = {
     id: number
     email: string
@@ -92,6 +94,22 @@ export type SocketEvent<TParams> = {
     event: string
     stateAction: (params: TParams) => void
     paramMap: (params: TParams) => void
+}
+interface CallSocketEventBase {
+    signal: SignalData
+    type: 'privateCall' | 'groupCall'
+}
+export interface PrivateCallSocketEvent extends CallSocketEventBase {
+    type: 'privateCall'
+    toUserId: number
+}
+export interface GroupCallSocketEvent extends CallSocketEventBase {
+    type: 'groupCall'
+    groupChatId: number
+}
+export type OnCallSignalEventResponse = {
+    signal: SignalData
+    userId: number
 }
 export type NewPrivateMessageEventParams = {
     recipientId: number

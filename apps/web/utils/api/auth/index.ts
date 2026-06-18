@@ -1,7 +1,7 @@
 import { User } from '@repo/api'
 import { NestJSError } from '../../types'
 
-const BASE_URL = 'http://localhost:3001/api/auth'
+const BASE_URL = `${process.env.NEXT_PUBLIC_API_URI}/api/auth`
 
 export const login = async (params: LoginParams) => <boolean>await fetch(
         `${BASE_URL}/login`,

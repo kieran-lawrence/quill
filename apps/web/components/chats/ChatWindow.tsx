@@ -25,6 +25,8 @@ import { addGroupMessageState } from '../../utils/store/groups'
 import { MenuActions } from '../../utils/types'
 import { getTrendingGifs, searchGifs } from '../../utils/api/gif'
 import { FaSearch } from 'react-icons/fa'
+import { CallWindow } from '../calls/CallWindow'
+import { useCall } from '../../contexts/call'
 
 type ChatWindowProps = {
     chat: Chat | GroupChat
@@ -51,6 +53,7 @@ export const ChatWindow = ({
         watch,
     } = useForm<CreateMessageParams>()
     const [showGifWindow, setShowGifWindow] = useState(false)
+    const [showCallScreen, setShowCallScreen] = useState(false)
     const [gifs, setGifs] = useState<Gif[]>([])
     const gifWindowRef = useRef<HTMLDivElement>(null)
     const isGroupChat = 'members' in chat
@@ -61,6 +64,13 @@ export const ChatWindow = ({
           }`
     const { sendMessage, listenForMessage } = useWebSocketEvents()
     const imageMessage = watch('image') ? watch('image')?.item(0) : null
+    const { callActive, startCall } = useCall()
+
+    useEffect(() => {
+        if (callActive) {
+            setShowCallScreen(true)
+        }
+    }, [callActive])
 
     useEffect(() => {
         const privateMessageEvent =
@@ -269,6 +279,12 @@ export const ChatWindow = ({
     return (
         <SChatWindow>
             <Toaster />
+            {showCallScreen && !isGroupChat && (
+                <CallWindow
+                    chat={chat}
+                    onClose={() => setShowCallScreen(false)}
+                />
+            )}
             <SChatHeader>
                 <div className="chatInfo">
                     <h1>{chatName}</h1>
@@ -294,7 +310,17 @@ export const ChatWindow = ({
                             }}
                         >
                             <IoSearch onClick={() => onChatAction('search')} />
-                            <IoCall />
+                            {isGroupChat ? null : (
+                                <IoCall
+                                    onClick={() => {
+                                        setShowCallScreen((prev) => !prev)
+                                        startCall(
+                                            chat.id,
+                                            getChatRecipient(chat, user).id,
+                                        )
+                                    }}
+                                />
+                            )}
                             {isGroupChat ? (
                                 optionsVisible ? (
                                     <LuChevronRight

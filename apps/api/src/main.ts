@@ -9,13 +9,22 @@ import { TypeormStore } from 'connect-typeorm'
 import passport from 'passport'
 
 async function bootstrap() {
-    const { PORT, COOKIE_SECRET, COOKIE_MAX_AGE, SESSION_NAME } = process.env
+    const {
+        PORT,
+        COOKIE_SECRET,
+        COOKIE_MAX_AGE,
+        SESSION_NAME,
+        FRONTEND_BASE_URL,
+    } = process.env
 
     const app = await NestFactory.create(AppModule)
     const globalPrefix = 'api'
     const sessionRepo = app.get(DataSource).getRepository(SessionEntity)
     app.setGlobalPrefix(globalPrefix)
-    app.enableCors({ origin: [`http://localhost:3000`], credentials: true })
+    app.enableCors({
+        origin: [FRONTEND_BASE_URL],
+        credentials: true,
+    })
     app.use(
         session({
             secret: COOKIE_SECRET,

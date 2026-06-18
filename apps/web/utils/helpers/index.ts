@@ -38,3 +38,45 @@ export const isImage = (fileName: string) => {
 export const isGif = (fileName: string) => {
     return /\.gif$/i.test(fileName)
 }
+
+/**
+ * Check if the audio level is exceeding the threshold
+ */
+export const isAudioLevelExceedingThreshold = ({
+    threshold,
+    analyser,
+}: {
+    threshold: number
+    analyser: AnalyserNode
+}) => {
+    const dataArray = new Uint8Array(analyser.frequencyBinCount)
+    analyser.getByteFrequencyData(dataArray)
+
+    const average =
+        dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length
+    const normalizedValue = average / 255
+
+    return normalizedValue > threshold
+}
+
+/**
+ * Check if the audio level is exceeding the threshold,
+ * and call the appropriate callback
+ */
+export const checkAudioLevel = ({
+    threshold,
+    analyser,
+    onExceedThreshold,
+    onBelowThreshold,
+}: {
+    threshold: number
+    analyser: AnalyserNode
+    onExceedThreshold: () => void
+    onBelowThreshold: () => void
+}) => {
+    if (isAudioLevelExceedingThreshold({ threshold, analyser })) {
+        onExceedThreshold()
+    } else {
+        onBelowThreshold()
+    }
+}

@@ -2,7 +2,7 @@
 
 import styled from 'styled-components'
 import { useAuth } from '../../contexts/auth'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { CreateChatModal } from './CreateChatModal'
 import { IoAdd, IoSearch } from 'react-icons/io5'
 import { ChatPreview } from './ChatPreview'
@@ -27,6 +27,8 @@ import {
     updateFriendState,
 } from '../../utils/store/friends'
 import { UserUpdatedEventParams } from '@repo/api'
+import { useCall } from '../../contexts/call'
+import IncomingCallModal from '../calls/IncomingCallModal'
 
 export const AvailableChats = () => {
     // Establish WebSocket connection
@@ -41,8 +43,9 @@ export const AvailableChats = () => {
     const groups = useAppSelector((state) => state.groups.groups)
     const data = [...chats, ...groups]
     const router = useRouter()
+    const { incomingCall } = useCall()
 
-    const { listenForMessage } = useWebSocketEvents()
+    const { listenForMessage, sendMessage } = useWebSocketEvents()
 
     useEffect(() => {
         const userStatusListener = listenForMessage<UserUpdatedEventParams>(
@@ -75,6 +78,11 @@ export const AvailableChats = () => {
         }
         fetchFriendRequests()
     }, [dispatch])
+
+    const handleCallAccept = useCallback(() => {
+        console.log('Call accepted')
+        sendMessage('onCallAccept', {})
+    }, [sendMessage])
 
     useEffect(() => {
         const fetchChats = async () => {
@@ -132,6 +140,7 @@ export const AvailableChats = () => {
                         onClose={() => setShowCreateChatModal(false)}
                     />
                 )}
+                {incomingCall && <IncomingCallModal />}
                 <SChatOverview>
                     <SActionsContainer>
                         <SSearchInput>
